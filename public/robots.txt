@@ -1,0 +1,23 @@
+# Specify the User-Agent (all web crawlers in this case)
+User-agent: *
+
+# Allow all pages except the restricted sections
+Allow: /
+
+# Disallow specific sections you don't want indexed
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /auth/*
+Disallow: /security/*
+
+# Allow access to important assets like CSS, JS, and images
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+
+# Specify the Sitemap URL to help crawlers find all indexed pages
+Sitemap: https://pentasent.com/sitemap.xml
