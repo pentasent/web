@@ -4,7 +4,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/auth/AuthGuard';
 import QueryProvider from '@/components/providers/QueryProvider';
 import { Toaster } from '@/components/ui/toaster';
-import AnalyticsTracker from '@/components/analytics/analyticsTracker';
+import AnalyticsTracker from '@/components/analytics/AnalyticsTracker';
 
 export const metadata: Metadata = {
   title: "Pentasent",
