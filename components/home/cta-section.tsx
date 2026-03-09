@@ -28,7 +28,7 @@ export default function CTASection() {
             <p className="mt-6 text-[#5e4a50] text-lg">
               Get the Pentasent app and start tracking what matters.
             </p>
-{/* 
+            {/* 
             <div className="mt-8 flex gap-4 flex-wrap">
               <a href='/beta-release'>
               <button className="px-6 py-3 bg-[#3d253b] text-white rounded-full shadow-md hover:shadow-lg transition">
@@ -43,20 +43,20 @@ export default function CTASection() {
               </a>
             </div> */}
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mt-8">
-  
-  <a href="/beta-release" className="w-full sm:w-auto">
-    <button className="w-full sm:w-auto bg-[#3d2f4d] text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-[#2d1f3d] transition-all">
-      Get the app
-    </button>
-  </a>
 
-  <a href="#pricing" className="w-full sm:w-auto">
-    <button className="w-full sm:w-auto bg-white text-gray-700 px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-gray-50 transition-all border border-gray-200">
-      Pricing Plans
-    </button>
-  </a>
+              <a href="/beta-release" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-[#3d2f4d] text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-[#2d1f3d] transition-all">
+                  Get the app
+                </button>
+              </a>
 
-</div>
+              <a href="#pricing" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-white text-gray-700 px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-gray-50 transition-all border border-gray-200">
+                  Pricing Plans
+                </button>
+              </a>
+
+            </div>
           </motion.div>
 
           {/* ===== RIGHT PHONE MOCKUPS ===== */}
@@ -71,7 +71,7 @@ export default function CTASection() {
               className='absolute -right-[150px] top-10 inset-[8px] w-[430px] h-[660px] mx-auto rotate-[6deg]'>
               <Image
                 alt="Pentasent Community"
-                src="/images/Community.svg"
+                src="/images/community.svg"
                 width={1000}
                 height={1000}
                 className="w-full h-full object-contain"
@@ -85,7 +85,7 @@ export default function CTASection() {
               className='absolute right-[140px] top-0 inset-[8px] w-[430px] h-[660px] mx-auto -rotate-[6deg]'>
               <Image
                 alt="Pentasent Welcome"
-                src="/images/Splashscreen.svg"
+                src="/images/splashscreen.svg"
                 width={1000}
                 height={1000}
                 className="w-full h-full object-contain"

@@ -21,7 +21,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <p className="mt-6 text-sm text-gray-500">
-            Effective Date: January 1, 2026
+            Effective Date: March 1, 2026
           </p>
         </div>
       </section>

@@ -214,7 +214,7 @@ export default function SignInPage() {
               className='absolute -right-[150px] top-10 inset-[8px] w-[430px] h-[660px] mx-auto rotate-[6deg]'>
               <Image
                 alt="Pentasent Community"
-                src="/images/Community.svg"
+                src="/images/community.svg"
                 width={1000}
                 height={1000}
                 className="w-full h-full object-contain"
@@ -228,7 +228,7 @@ export default function SignInPage() {
               className='absolute right-[140px] top-0 inset-[8px] w-[430px] h-[660px] mx-auto -rotate-[6deg]'>
               <Image
                 alt="Pentasent Welcome"
-                src="/images/Splashscreen.svg"
+                src="/images/splashscreen.svg"
                 width={1000}
                 height={1000}
                 className="w-full h-full object-contain"

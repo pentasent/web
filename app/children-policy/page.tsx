@@ -20,7 +20,7 @@ export default function ChildrenPolicyPage() {
           </p>
 
           <p className="mt-6 text-sm text-gray-500">
-            Effective Date: January 1, 2026
+            Effective Date: March 1, 2026
           </p>
         </div>
       </section>
@@ -106,7 +106,7 @@ Material updates will be communicated appropriately.`}
 
 Pentasent Privacy Office  
 Email: hello@pentasent.com  
-Address: [Your Registered Business Address]`}
+Address: Tower-A, Sector-15, Village Silokhera Gurugram, Haryana, 122002`}
           />
 
         </div>
