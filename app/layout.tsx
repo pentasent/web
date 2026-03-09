@@ -4,6 +4,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import AuthGuard from '@/components/auth/AuthGuard';
 import QueryProvider from '@/components/providers/QueryProvider';
 import { Toaster } from '@/components/ui/toaster';
+import AnalyticsTracker from '@/components/analytics/analyticsTracker';
 
 export const metadata: Metadata = {
   title: "Pentasent",
@@ -59,6 +60,7 @@ export default function RootLayout({
         <AuthProvider>
           <QueryProvider>
             <AuthGuard />
+            <AnalyticsTracker />
             {children}
             <Toaster />
           </QueryProvider>

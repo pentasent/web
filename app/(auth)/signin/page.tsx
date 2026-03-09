@@ -26,7 +26,7 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<SignInFormValues>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
   });
 
@@ -35,15 +35,17 @@ export default function SignInPage() {
     try {
       await login(data.email.toLowerCase().trim(), data.password);
       toast({
-        title: "Logged in successfully",
+        title: "Login successful",
+        description: "Login successful, redirecting...",
       });
-      // AuthGuard will handle redirection if fully onboarded
+      reset();
+      // AuthGuard will handle redirection/popups
     } catch (error: any) {
       if (error.message.includes('Email not confirmed')) {
         setUnverifiedEmail(data.email);
         toast({
           title: "Verification required",
-          description: "Please verify your email first",
+          description: "Please verify your email using the OTP sent to you.",
         });
       } else {
         toast({

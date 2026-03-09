@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { User } from '../types/database';
+import { trackEvent } from "@/lib/analytics/track";
+import { identifyUser } from "@/lib/analytics/identify";
 
 interface AuthContextType {
     user: User | null;
@@ -94,12 +96,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUser(userData);
                 setIsAdmin(userData.role === 'admin' || email === userData.email);
             } else {
-                // User exist in auth but not in public DB => Logging them out completely
-                await supabase.auth.signOut();
-                if (typeof window !== 'undefined') {
-                    localStorage.clear(); // Ensure all local storage traces are cleared
-                }
-                setUser(null);
+                // User exists in auth but not in public DB => This is a new user who needs to complete profile
+                // Do NOT sign out. Instead, provide a default User object.
+                const defaultUserData: User = {
+                    id: userId,
+                    email: email,
+                    name: email.split('@')[0], // Default name
+                    role: 'user',
+                    followers_count: 0,
+                    following_count: 0,
+                    profile_views_count: 0,
+                    posts_count: 0,
+                    is_verified: false,
+                    is_active: true,
+                    is_onboarded: false,
+                    created_at: new Date().toISOString(),
+                };
+                setUser(defaultUserData);
                 setIsAdmin(false);
             }
         } catch (e) {
@@ -121,6 +134,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (data?.user && data.user.identities && data.user.identities.length === 0) {
                 throw new Error("Account already exists. Please sign in.");
             }
+
+            // If signup is successful but user is not automatically signed in (common if email confirmation is required)
+            // Or if we just want to trigger the popup anyway
+            if (data?.user && !data.session) {
+                setUnverifiedEmail(email);
+            }
+
+            if (data?.user) {
+                identifyUser(data.user.id, {
+                    email: data.user.email
+                });
+                trackEvent("user_signup");
+            }
         } catch (error: any) {
             throw new Error(error.message || 'Registration failed');
         }
@@ -134,6 +160,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
             if (error) throw error;
         } catch (error: any) {
+            if (error.message.includes('Email not confirmed')) {
+                setUnverifiedEmail(email);
+                // Automatically trigger a resend of the OTP
+                await supabase.auth.resend({
+                    type: 'signup',
+                    email: email,
+                    options: {
+                        emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
+                    }
+                });
+            }
             throw new Error(error.message || 'Login failed');
         }
     };

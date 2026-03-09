@@ -9,6 +9,7 @@ import { Check, Users, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { Community } from '@/types/database';
 import { useRouter } from 'next/navigation';
+import { trackEvent } from "@/lib/analytics/track";
 
 export default function CommunityOnboardingPopup() {
     const { user, refreshUser } = useAuth();
@@ -119,7 +120,16 @@ export default function CommunityOnboardingPopup() {
 
             // Successfully onboarded, refresh user context
             await refreshUser();
-            router.push('/app/feed');
+
+            // Track onboarding completion
+            trackEvent("onboarding_completed");
+
+            // Redirect based on role
+            if (user.role === 'admin') {
+                router.push('/app/feed');
+            } else {
+                router.push('/beta-release');
+            }
         } catch (e: any) {
             console.error('Join error:', e);
             toast({

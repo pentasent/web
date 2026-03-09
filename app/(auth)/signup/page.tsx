@@ -32,7 +32,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<SignUpFormValues>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
   });
 
@@ -53,6 +53,7 @@ export default function SignUpPage() {
         description: "Please check your email for the confirmation code.",
       });
       setUnverifiedEmail(data.email);
+      reset();
     } catch (error: any) {
       toast({
         title: "Registration failed",

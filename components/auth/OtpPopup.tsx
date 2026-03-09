@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { trackEvent } from "@/lib/analytics/track";
+import { identifyUser } from "@/lib/analytics/identify";
 
 export default function OtpPopup() {
     const { unverifiedEmail, setUnverifiedEmail, refreshUser } = useAuth();
@@ -65,7 +67,7 @@ export default function OtpPopup() {
 
         setLoading(true);
         try {
-            const { error } = await supabase.auth.verifyOtp({
+            const { data, error } = await supabase.auth.verifyOtp({
                 email: decodeURIComponent(unverifiedEmail),
                 token: otpString,
                 type: 'signup',
@@ -77,6 +79,14 @@ export default function OtpPopup() {
                 title: "Email verified!",
                 description: "Email verified successfully!",
             });
+
+            if (data?.user) {
+                identifyUser(data.user.id, {
+                    email: data.user.email
+                });
+                trackEvent("user_verified");
+            }
+
             setUnverifiedEmail(null);
             // Wait for auth context to react to the new session
             await refreshUser();
