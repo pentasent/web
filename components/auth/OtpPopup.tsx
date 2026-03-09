@@ -106,13 +106,14 @@ export default function OtpPopup() {
 
         setResendLoading(true);
         try {
-            await supabase.auth.resend({
+            const { error } = await supabase.auth.resend({
                 type: 'signup',
                 email: decodeURIComponent(unverifiedEmail),
                 options: {
                     emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
                 }
             });
+            if (error) throw error;
             setTimer(120); // 2 minutes
             toast({
                 title: "Code sent",
@@ -151,7 +152,7 @@ export default function OtpPopup() {
                     </h3>
 
                     <p className="text-gray-500 mb-8 text-sm">
-                        We sent a 6-digit code to <br />
+                        Please enter the 6-digit code sent to <br />
                         <span className="font-medium text-gray-800">{decodeURIComponent(unverifiedEmail)}</span>
                     </p>
 

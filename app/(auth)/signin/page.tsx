@@ -43,9 +43,15 @@ export default function SignInPage() {
     } catch (error: any) {
       if (error.message.includes('Email not confirmed')) {
         setUnverifiedEmail(data.email);
+        const resendFailed = (error as any).resendFailed;
+        const resendMessage = (error as any).resendMessage;
+
         toast({
           title: "Verification required",
-          description: "Please verify your email using the OTP sent to you.",
+          description: resendFailed
+            ? `Please check your email for the code sent earlier. (New code failed: ${resendMessage})`
+            : "Please verify your email using the OTP sent to you.",
+          variant: resendFailed ? "destructive" : "default",
         });
       } else {
         toast({

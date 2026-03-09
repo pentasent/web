@@ -163,15 +163,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (error.message.includes('Email not confirmed')) {
                 setUnverifiedEmail(email);
                 // Automatically trigger a resend of the OTP
-                await supabase.auth.resend({
+                const { error: resendError } = await supabase.auth.resend({
                     type: 'signup',
                     email: email,
                     options: {
                         emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
                     }
                 });
+                if (resendError) {
+                    const combinedError = new Error(error.message);
+                    (combinedError as any).resendFailed = true;
+                    (combinedError as any).resendMessage = resendError.message;
+                    throw combinedError;
+                }
             }
-            throw new Error(error.message || 'Login failed');
+            throw error;
         }
     };
 
