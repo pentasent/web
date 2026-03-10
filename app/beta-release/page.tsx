@@ -43,12 +43,12 @@ export default function BetaReleasePage() {
                 .from('newsletter')
                 .select('id')
                 .eq('email', email.trim())
-                .single();
+                .maybeSingle();
 
             if (existing) {
                 toast({
                     title: "Waitlist entry exists",
-                    description: "You are already on our waitlist!",
+                    description: "You already subscribed!!",
                     variant: "destructive",
                 });
                 setLoading(false);
@@ -63,7 +63,19 @@ export default function BetaReleasePage() {
                 user_id: user?.id || null
             });
 
-            if (error) throw error;
+            if (error) {
+                // Handle unique constraint violation (duplicate email)
+                if (error.code === '23505') {
+                    toast({
+                        title: "Waitlist entry exists",
+                        description: "You already subscribed!!",
+                        variant: "destructive",
+                    });
+                    setLoading(false);
+                    return;
+                }
+                throw error;
+            }
 
             toast({
                 title: "Joined waitlist!",

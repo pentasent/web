@@ -179,7 +179,8 @@ export default function FeatureSection() {
 
           {/* TABS */}
           <div className="flex justify-center">
-            <div className="flex gap-3 bg-gray-100 rounded-full overflow-x-auto scrollbar-hide p-3 md:p-4 whitespace-nowrap scroll-smooth mx-auto">
+            <div className="flex gap-3 bg-gray-100 rounded-full overflow-x-auto custom-scrollbar p-3 md:p-4 whitespace-nowrap scroll-smooth mx-auto">
+              <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;

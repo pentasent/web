@@ -6,12 +6,12 @@ import Image from 'next/image';
 
 function MobileMockup({ image }: { image: string }) {
   return (
-    <div className="relative w-[230px] h-[460px] mx-auto">
+    <div className="relative w-[260px] h-[560px] mx-auto">
       <Image
         alt="Pentasent preview"
         src={image}
-        width={1000}
-        height={1000}
+        width={700}
+        height={700}
         className="w-full h-full object-contain"
       />
     </div>

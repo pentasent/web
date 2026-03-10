@@ -217,29 +217,29 @@ export default function SignUpPage() {
           <div className="relative h-[220px] hidden lg:block">
 
             {/* Back Phone */}
-            <motion.div
-              initial={{ opacity: 0, x: 60, rotate: 6 }}
-              whileInView={{ opacity: 1, x: 0, rotate: 6 }}
+                        <motion.div
+              initial={{ opacity: 0, x: 60, rotate: -6 }}
+              whileInView={{ opacity: 1, x: 0, rotate: -6 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className='absolute -right-[150px] top-10 inset-[8px] w-[430px] h-[660px] mx-auto rotate-[6deg]'>
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className='absolute right-[140px] top-0 inset-[8px] w-[330px] h-[560px] mx-auto -rotate-[6deg]'>
               <Image
-                alt="Pentasent Community"
-                src="/images/community.svg"
+                alt="Pentasent Welcome"
+                src="/images/splashscreen.svg"
                 width={1000}
                 height={1000}
                 className="w-full h-full object-contain"
               />
             </motion.div>
             <motion.div
-              initial={{ opacity: 0, x: 60, rotate: -6 }}
-              whileInView={{ opacity: 1, x: 0, rotate: -6 }}
+              initial={{ opacity: 0, x: 60, rotate: 6 }}
+              whileInView={{ opacity: 1, x: 0, rotate: 6 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className='absolute right-[140px] top-0 inset-[8px] w-[430px] h-[660px] mx-auto -rotate-[6deg]'>
+              transition={{ duration: 0.8 }}
+              className='absolute -right-[150px] top-10 inset-[8px] w-[330px] h-[560px] mx-auto rotate-[6deg]'>
               <Image
-                alt="Pentasent Welcome"
-                src="/images/splashscreen.svg"
+                alt="Pentasent Community"
+                src="/images/community.svg"
                 width={1000}
                 height={1000}
                 className="w-full h-full object-contain"
