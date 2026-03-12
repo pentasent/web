@@ -30,18 +30,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 1. Initial Load
         const initializeAuth = async () => {
             try {
+                // If we are on the reset-password page or have recovery tokens, 
+                // don't sign out automatically.
+                const isRecovery = typeof window !== 'undefined' && 
+                    (window.location.pathname === '/reset-password' || 
+                     window.location.hash.includes('type=recovery') ||
+                     window.location.hash.includes('access_token='));
+
                 const { data: { user: authUser }, error } = await supabase.auth.getUser();
 
-                if (error || !authUser) {
+                if ((error || !authUser) && !isRecovery) {
                     await supabase.auth.signOut();
                     setLoading(false);
                     return;
                 }
 
-                await fetchAndSetUserData(authUser.id, authUser.email || '');
+                if (authUser) {
+                    await fetchAndSetUserData(authUser.id, authUser.email || '');
+                } else {
+                    setLoading(false);
+                }
             } catch (e) {
                 console.error("Initial session fetch error:", e);
-                await supabase.auth.signOut();
                 setLoading(false);
             }
         };

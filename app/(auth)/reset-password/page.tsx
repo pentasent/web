@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Loader2, CheckCircle, AlertTriangle, ShieldX } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
@@ -21,101 +21,90 @@ export default function ResetPasswordPage() {
   const router = useRouter();
 
   const passwordsMatch = newPassword.length >= 6 && newPassword === confirmPassword;
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
-    const processRecoveryToken = async () => {
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setPageState("ready");
+      }
+    });
+
+    const verify = async () => {
       try {
-        // Parse hash fragment from Supabase recovery redirect
+        // 1. Immediate check for existing session
+        const { data: { session: existingSession } } = await supabase.auth.getSession();
+        if (existingSession) {
+          setPageState("ready");
+          subscription.unsubscribe();
+          return;
+        }
+
+        // 2. Extract tokens and perform manual setSession
         const hash = window.location.hash.substring(1);
-        const params = new URLSearchParams(hash);
+        const search = window.location.search.substring(1);
+        const params = new URLSearchParams(hash || search);
         const accessToken = params.get("access_token");
         const refreshToken = params.get("refresh_token");
-        const type = params.get("type");
 
-        // If we don't have a recovery token, check if we're already in a recovery session
-        if (type !== "recovery" || !accessToken) {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session) {
-            // We already have a session, maybe from a previous redirect
+        if (accessToken) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || "",
+          });
+
+          if (!error && data?.session) {
             setPageState("ready");
-          } else {
-            console.warn("No recovery token or active session found");
-            setPageState("invalid");
+            subscription.unsubscribe();
+            return;
           }
-          return;
         }
 
-        // Establish session with recovery tokens
-        const { error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken || "",
-        });
+        // 3. Final safety check
+        setTimeout(async () => {
+          if (pageState === "loading") {
+            const { data: { session: lastCheck } } = await supabase.auth.getSession();
+            if (lastCheck) {
+              setPageState("ready");
+            } else if (!accessToken) {
+              setPageState("invalid");
+            }
+            subscription.unsubscribe();
+          }
+        }, 2000);
 
-        if (error) {
-          console.error("setSession error:", error.message);
-          setPageState("expired");
-          return;
-        }
-
-        // verify session exists
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (!session) {
-          console.error("No session after setSession");
-          setPageState("expired");
-          return;
-        }
-
-        // Clear the hash from URL but stay on the page
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Short delay to ensure state updates smoothly
-        setTimeout(() => {
-          setPageState("ready");
-        }, 300);
-      } catch (e) {
-        console.error("Recovery token processing error:", e);
-        setPageState("expired");
+      } catch (err) {
+        console.error("Verification failed:", err);
       }
     };
 
-    processRecoveryToken();
-  }, []);
+    verify();
+    return () => subscription.unsubscribe();
+  }, [pageState]);
 
   const handleResetPassword = async () => {
     if (!passwordsMatch) return;
 
     setSaving(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
+      const result = await Promise.race([
+        supabase.auth.updateUser({ password: newPassword }),
+        new Promise<any>((_, reject) => 
+          setTimeout(() => reject(new Error("Request timed out. Please try again.")), 30000)
+        )
+      ]);
 
-      if (error) {
-        if (
-          error.message.toLowerCase().includes("expired") ||
-          error.message.toLowerCase().includes("session")
-        ) {
-          setPageState("expired");
-          return;
-        }
-        throw error;
-      }
+      if (result.error) throw result.error;
 
       setPageState("success");
-
-      // Sign out so they log in fresh with new password
-      // setTimeout(async () => {
-      //   await supabase.auth.signOut();
-      // }, 3000);
-      setTimeout(async () => {
-  await supabase.auth.signOut();
-  router.push("/signin");
-}, 2500);
+      setTimeout(() => router.push("/beta-release"), 3000);
     } catch (e: any) {
       toast({
-        title: "Error",
-        description: e.message || "Failed to reset password. Please try again.",
+        title: "Update Failed",
+        description: e.message || "Something went wrong.",
         variant: "destructive",
       });
     } finally {
@@ -140,7 +129,7 @@ export default function ResetPasswordPage() {
 
         {/* ===== LOADING STATE ===== */}
         {pageState === "loading" && (
-          <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
+          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
             <Loader2 className="w-10 h-10 animate-spin text-[#3d2f4d] mx-auto mb-4" />
             <p className="text-gray-500">Verifying your reset link...</p>
           </div>
@@ -152,11 +141,9 @@ export default function ResetPasswordPage() {
             <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-5">
               <ShieldX className="w-8 h-8 text-red-500" />
             </div>
-            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-3">
-              Invalid Link
-            </h2>
+            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-3">Invalid Link</h2>
             <p className="text-gray-500 mb-6 leading-relaxed">
-              This password reset link is invalid or missing. Please request a new one from the sign in page.
+              This password reset link is invalid or has expired. Please request a new one.
             </p>
             <Link
               href="/signin"
@@ -173,11 +160,9 @@ export default function ResetPasswordPage() {
             <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-5">
               <AlertTriangle className="w-8 h-8 text-amber-500" />
             </div>
-            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-3">
-              Link Expired
-            </h2>
+            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-3">Link Expired</h2>
             <p className="text-gray-500 mb-6 leading-relaxed">
-              This password reset link has expired or has already been used. Please request a new reset link.
+              This password reset link has expired. Please request a new one.
             </p>
             <Link
               href="/signin"
@@ -191,92 +176,85 @@ export default function ResetPasswordPage() {
         {/* ===== READY — PASSWORD FORM ===== */}
         {pageState === "ready" && (
           <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-2">
-              Set New Password
-            </h2>
-            <p className="text-gray-500 mb-6 text-sm leading-relaxed">
+            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-2">Set New Password</h2>
+            <p className="text-gray-500 mb-8 text-sm leading-relaxed">
               Enter your new password below. It must be at least 6 characters long.
             </p>
 
-            {/* New Password */}
-            <div className="relative mb-4">
-              <Lock className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
-              <input
-                type={showNewPassword ? "text" : "password"}
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition"
-                autoFocus
-              />
-              {showNewPassword ? (
-                <EyeOff onClick={() => setShowNewPassword(false)} className="absolute right-4 top-4 w-5 h-5 text-gray-400 cursor-pointer" />
-              ) : (
-                <Eye onClick={() => setShowNewPassword(true)} className="absolute right-4 top-4 w-5 h-5 text-gray-400 cursor-pointer" />
-              )}
-            </div>
-            {newPassword.length > 0 && newPassword.length < 6 && (
-              <p className="text-red-500 text-xs mb-3 -mt-2 pl-1">Password must be at least 6 characters</p>
-            )}
+            <div className="space-y-4">
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  placeholder="New Password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-100 focus:border-[#3d2f4d] focus:ring-1 focus:ring-[#3d2f4d] outline-none transition bg-gray-50/50"
+                  autoFocus
+                />
+                <button
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                  type="button"
+                >
+                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
 
-            {/* Confirm Password */}
-            <div className="relative mb-2">
-              <Lock className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && passwordsMatch && handleResetPassword()}
-                className={`w-full pl-12 pr-12 py-4 rounded-xl border ${confirmPassword && !passwordsMatch ? "border-red-400" : "border-gray-200"} focus:ring-2 focus:ring-[#e8d4df] outline-none transition`}
-              />
-              {showConfirmPassword ? (
-                <EyeOff onClick={() => setShowConfirmPassword(false)} className="absolute right-4 top-4 w-5 h-5 text-gray-400 cursor-pointer" />
-              ) : (
-                <Eye onClick={() => setShowConfirmPassword(true)} className="absolute right-4 top-4 w-5 h-5 text-gray-400 cursor-pointer" />
-              )}
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-100 focus:border-[#3d2f4d] focus:ring-1 focus:ring-[#3d2f4d] outline-none transition bg-gray-50/50"
+                />
+                <button
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                  type="button"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
-            {confirmPassword && !passwordsMatch && (
-              <p className="text-red-500 text-xs mb-4 pl-1">Passwords do not match</p>
-            )}
-            {passwordsMatch && (
-              <p className="text-green-600 text-xs mb-4 pl-1 flex items-center gap-1">
-                <CheckCircle className="w-3.5 h-3.5" /> Passwords match
-              </p>
-            )}
 
             <button
               onClick={handleResetPassword}
-              disabled={saving || !passwordsMatch}
-              className="w-full py-3.5 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-60 mt-2"
+              disabled={!passwordsMatch || saving}
+              className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-semibold hover:bg-[#2d1f3d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-8 shadow-lg shadow-[#3d2f4d]/20 active:scale-[0.98]"
             >
-              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save New Password"}
+              {saving ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Save Password"
+              )}
             </button>
           </div>
         )}
 
         {/* ===== SUCCESS STATE ===== */}
         {pageState === "success" && (
-          <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
-            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-5">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
+            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
-            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-3">
-              Password Updated!
-            </h2>
-            <p className="text-gray-500 mb-3 leading-relaxed">
-              Your password has been reset successfully.
+            <h2 className="text-2xl font-bold text-[#3c2a34] mb-3">Password Changed!</h2>
+            <p className="text-gray-500 mb-6 leading-relaxed">
+              Your password has been updated successfully. Taking you to your dashboard...
             </p>
-
-            <p className="text-sm text-gray-400 mb-6">
-              Redirecting you to sign in...
-            </p>
-            <Link
-              href="/signin"
-              className="inline-flex w-full py-3.5 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition justify-center"
-            >
-              Sign In
-            </Link>
+            <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+              <motion.div 
+                className="h-full bg-green-500"
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 2.5 }}
+              />
+            </div>
           </div>
         )}
       </motion.div>
