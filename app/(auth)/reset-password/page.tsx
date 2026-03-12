@@ -6,6 +6,7 @@ import { Eye, EyeOff, Lock, Loader2, CheckCircle, AlertTriangle, ShieldX } from 
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 type PageState = "loading" | "ready" | "expired" | "invalid" | "success";
 
@@ -17,6 +18,7 @@ export default function ResetPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const passwordsMatch = newPassword.length >= 6 && newPassword === confirmPassword;
 
@@ -30,7 +32,7 @@ export default function ResetPasswordPage() {
         const refreshToken = params.get("refresh_token");
         const type = params.get("type");
 
-        if (type !== "recovery" || !accessToken || !refreshToken) {
+        if (type !== "recovery" || !accessToken) {
           setPageState("invalid");
           return;
         }
@@ -38,26 +40,41 @@ export default function ResetPasswordPage() {
         // Establish session with recovery tokens
         const { error } = await supabase.auth.setSession({
           access_token: accessToken,
-          refresh_token: refreshToken,
+          refresh_token: refreshToken || "",
         });
 
-        if (error) {
-          console.error("Recovery session error:", error.message);
-          if (
-            error.message.toLowerCase().includes("expired") ||
-            error.message.toLowerCase().includes("invalid") ||
-            error.message.toLowerCase().includes("already used")
-          ) {
-            setPageState("expired");
-          } else {
-            setPageState("expired");
-          }
+
+        if (error) throw error;
+
+        // verify session exists
+        const { data } = await supabase.auth.getSession();
+
+        if (!data.session) {
+          setPageState("expired");
           return;
         }
 
+        // if (error) {
+        //   console.error("Recovery session error:", error.message);
+        //   if (
+        //     error.message.toLowerCase().includes("expired") ||
+        //     error.message.toLowerCase().includes("invalid") ||
+        //     error.message.toLowerCase().includes("already used")
+        //   ) {
+        //     setPageState("expired");
+        //   } else {
+        //     setPageState("expired");
+        //   }
+        //   return;
+        // }
+
         // Clear the hash from URL so a page refresh doesn't reprocess
-        window.history.replaceState(null, "", window.location.pathname);
-        setPageState("ready");
+        // window.history.replaceState(null, "", window.location.pathname);
+        // setPageState("ready");
+        window.history.replaceState({}, document.title, "/reset-password");
+        setTimeout(() => {
+          setPageState("ready");
+        }, 100);
       } catch (e) {
         console.error("Recovery token processing error:", e);
         setPageState("expired");
@@ -90,9 +107,13 @@ export default function ResetPasswordPage() {
       setPageState("success");
 
       // Sign out so they log in fresh with new password
+      // setTimeout(async () => {
+      //   await supabase.auth.signOut();
+      // }, 3000);
       setTimeout(async () => {
-        await supabase.auth.signOut();
-      }, 3000);
+  await supabase.auth.signOut();
+  router.push("/signin");
+}, 2500);
     } catch (e: any) {
       toast({
         title: "Error",
@@ -245,8 +266,12 @@ export default function ResetPasswordPage() {
             <h2 className="text-2xl font-semibold text-[#3c2a34] mb-3">
               Password Updated!
             </h2>
-            <p className="text-gray-500 mb-6 leading-relaxed">
-              Your password has been reset successfully. Please sign in with your new password.
+            <p className="text-gray-500 mb-3 leading-relaxed">
+              Your password has been reset successfully.
+            </p>
+
+            <p className="text-sm text-gray-400 mb-6">
+              Redirecting you to sign in...
             </p>
             <Link
               href="/signin"
