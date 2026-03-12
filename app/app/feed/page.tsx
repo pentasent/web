@@ -554,8 +554,8 @@ export default function FeedPage() {
 
     if (authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#FFFBF7]">
-                <Loader2 className="w-8 h-8 animate-spin text-[#3d2f4d] mb-4" />
+            <div className="min-h-screen flex items-center justify-center bg-warm-50">
+                <Loader2 className="w-8 h-8 animate-spin text-warm-700 mb-4" />
             </div>
         );
     }
@@ -656,7 +656,7 @@ export default function FeedPage() {
                                 <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
                                 <button
                                     onClick={() => setSelectedCommunityFilter(null)}
-                                    className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold transition-transform hover:scale-105 active:scale-95 shadow-md ${selectedCommunityFilter === null ? 'bg-[#3c2a34] text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                                    className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold transition-transform hover:scale-105 active:scale-95 shadow-md ${selectedCommunityFilter === null ? 'bg-[#3c2a34] text-white' : 'bg-warm-100 border border-warm-300 text-warm-700 hover:bg-warm-200'
                                         }`}
                                 >
                                     All Communities
@@ -665,7 +665,7 @@ export default function FeedPage() {
                                     <button
                                         key={comm.id}
                                         onClick={() => setSelectedCommunityFilter(comm.id)}
-                                        className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-medium transition-transform hover:scale-105 active:scale-95 shadow-sm ${selectedCommunityFilter === comm.id ? 'bg-[#3c2a34] text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                                        className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-medium transition-transform hover:scale-105 active:scale-95 shadow-sm ${selectedCommunityFilter === comm.id ? 'bg-[#3c2a34] text-white' : 'bg-warm-100 border border-warm-300 text-warm-700 hover:bg-warm-200'
                                             }`}
                                     >
                                         {comm.name}
@@ -686,14 +686,14 @@ export default function FeedPage() {
 
                     {loading && posts.length === 0 && !postIdFromUrl ? (
                         <div className="flex flex-col items-center justify-center py-20 px-4">
-                            <Loader2 className="w-8 h-8 animate-spin text-gray-400 mb-4" />
-                            <p className="text-gray-500 font-medium">Loading feed...</p>
+                            <Loader2 className="w-8 h-8 animate-spin text-warm-400 mb-4" />
+                            <p className="text-warm-500 font-medium">Loading feed...</p>
                         </div>
                     ) : (
                         <div className="space-y-0 px-4 md:px-0">
                             {posts.length === 0 ? (
-                                <div className="text-center py-20 bg-white/50 rounded-2xl border border-gray-100 border-dashed">
-                                    <p className="text-gray-500 font-medium">No posts in your feed yet.</p>
+                                <div className="text-center py-20 bg-white/50 rounded-2xl border border-warm-300 border-dashed">
+                                    <p className="text-warm-500 font-medium">No posts in your feed yet.</p>
                                 </div>
                             ) : (
                                 posts.map((post) => (
@@ -711,8 +711,8 @@ export default function FeedPage() {
 
                             {!loading && posts.length > 0 && (
                                 <div className="text-center py-10 pt-4">
-                                    <p className="text-gray-400 font-medium text-sm">You&apos;ve reached the end of the feed.</p>
-                                    <p className="text-gray-400 text-xs mt-1 italic">Try refreshing to see new content.</p>
+                                    <p className="text-warm-400 font-medium text-sm">You&apos;ve reached the end of the feed.</p>
+                                    <p className="text-warm-400 text-xs mt-1 italic">Try refreshing to see new content.</p>
                                 </div>
                             )}
                         </div>
@@ -730,7 +730,7 @@ export default function FeedPage() {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
                                     transition={{ duration: 0.2 }}
-                                    className="h-[calc(100vh-4rem)] w-full shadow-2xl rounded-2xl bg-white border border-gray-200 overflow-hidden"
+                                    className="h-[calc(100vh-4rem)] w-full shadow-2xl rounded-2xl bg-warm-100 border border-warm-300 overflow-hidden"
                                 >
                                     <PostDetailPanel
                                         post={selectedPost}
@@ -756,11 +756,11 @@ export default function FeedPage() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="h-full border-2 border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center text-center p-8 bg-gray-50/50"
+                                    className="h-full border-2 border-dashed border-warm-300 rounded-3xl flex flex-col items-center justify-center text-center p-8 bg-gray-50/50"
                                 >
-                                    <MessageCircle className="w-12 h-12 text-gray-300 mb-4" />
-                                    <h3 className="text-gray-900 font-semibold mb-2">Select a Post</h3>
-                                    <p className="text-gray-500 text-sm">Click any post from your feed to view details, read comments, and join the discussion.</p>
+                                    <MessageCircle className="w-12 h-12 text-warm-400 mb-4" />
+                                    <h3 className="text-warm-700 font-semibold mb-2">Select a Post</h3>
+                                    <p className="text-warm-500 text-sm">Click any post from your feed to view details, read comments, and join the discussion.</p>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -776,7 +776,7 @@ export default function FeedPage() {
                         animate={{ y: 0 }}
                         exit={{ y: "100%" }}
                         transition={{ type: "spring", bounce: 0, duration: 0.5 }}
-                        className="fixed inset-0 z-50 xl:hidden bg-white"
+                        className="fixed inset-0 z-50 xl:hidden bg-warm-100"
                     >
                         <PostDetailPanel
                             post={selectedPost}
@@ -811,7 +811,7 @@ export default function FeedPage() {
                             className="w-full max-w-[1400px] mx-auto lg:px-16 px-0 pointer-events-none"
                         >
                             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-12 gap-8 md:px-0">
-                                <div className="max-w-[700px] mx-auto xl:mx-0 w-full px-2 lg:px-0 z-40 bg-white border-t border-gray-200 lg:border shadow-[0_-4px_20px_-15px_rgba(0,0,0,0.1)] lg:rounded-t-3xl md:rounded-t-3xl pointer-events-auto">
+                                <div className="max-w-[700px] mx-auto xl:mx-0 w-full px-2 lg:px-0 z-40 bg-warm-100 border-t border-warm-300 lg:border shadow-[0_-4px_20px_-15px_rgba(0,0,0,0.1)] lg:rounded-t-3xl md:rounded-t-3xl pointer-events-auto">
                                     <CreatePostCard
                                         communities={communities}
                                         channels={channels}

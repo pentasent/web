@@ -16,21 +16,26 @@ import {
     X,
     Crown,
     Bell,
+    Brain,
+    Book,
+    PenBox,
+    User,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
 
 const sidebarItems = [
-    { name: "Feed", href: "/app/feed", icon: LayoutDashboard },
+    { name: "Feed", href: "/app/feed", icon: LayoutDashboard  },
     { name: "Beats", href: "/app/beats", icon: Headphones },
     { name: "Community", href: "/app/community", icon: Users },
-    { name: "Meditation", href: "/app/meditation", icon: Flower2 },
+    { name: "Meditation", href: "/app/meditation", icon: Brain },
     { name: "Yoga", href: "/app/yoga", icon: Activity },
     { name: "Tasks", href: "/app/tasks", icon: CheckSquare },
-    { name: "Journal", href: "/app/journal", icon: BookOpen },
+    { name: "Journal", href: "/app/journal", icon: PenBox },
     { name: "Products", href: "/app/products", icon: ShoppingBag },
 ];
 
@@ -44,6 +49,7 @@ export function Sidebar({
     const pathname = usePathname();
     const [isHovered, setIsHovered] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
+    const { user } = useAuth();
 
     // The sidebar is logically open if it's open on mobile OR hovered on desktop
     const isOpen = mobileOpen || isHovered;
@@ -89,7 +95,7 @@ export function Sidebar({
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 className={cn(
-                    "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#FFFBF7] transition-all duration-300 ease-in-out h-screen",
+                    "fixed inset-y-0 left-0 z-50 flex flex-col bg-warm-50 transition-all duration-300 ease-in-out h-screen",
                     // On mobile, completely translate it off-screen when hidden
                     !mobileOpen ? "-translate-x-full lg:translate-x-0" : "translate-x-0"
                 )}
@@ -118,7 +124,7 @@ export function Sidebar({
 
                 {/* Navigation Items */}
                 <div className="flex-1 overflow-y-auto no-scrollbar py-4 space-y-2">
-                    {sidebarItems.map((item) => {
+                    {(user ? [...sidebarItems, { name: "Profile", href: "/app/profile", icon: User }] : sidebarItems).map((item) => {
                         const isActive = pathname === item.href || (pathname === "/" && item.href === "/app");
                         return (
                             <Link
@@ -129,7 +135,7 @@ export function Sidebar({
                                     "flex items-center gap-3 px-7 py-3 text-sm font-medium transition-colors relative overflow-hidden group",
                                     isActive
                                         ? "text-[#3D253B]"
-                                        : "text-gray-600 hover:bg-[#F8F2EE] hover:text-[#3D253B]"
+                                        : "text-warm-500 hover:bg-[#F8F2EE] hover:text-[#3D253B]"
                                 )}
                                 title={!isOpen ? item.name : undefined}
                             >
@@ -144,7 +150,7 @@ export function Sidebar({
                                 <item.icon
                                     className={cn(
                                         "h-5 w-5 shrink-0 transition-transform group-hover:scale-110",
-                                        isActive ? "text-[#3D253B]" : "text-gray-600 group-hover:text-[#3D253B]"
+                                        isActive ? "text-[#3D253B]" : "text-warm-500 group-hover:text-[#3D253B]"
                                     )}
                                 />
                                 <motion.span
@@ -176,14 +182,14 @@ export function Sidebar({
 
                                 {item.name === "Profile" && (
                                     <div className="flex items-center gap-4 min-w-fit pl-4">
-                                        <Button variant="ghost" size="icon" className="rounded-full bg-[#F8F2EE] border border-border/40 relative h-10 w-10 shrink-0">
+                                        {/* <Button variant="ghost" size="icon" className="rounded-full bg-[#F8F2EE] border border-border/40 relative h-10 w-10 shrink-0">
                                             <Bell className="h-4 w-4 text-foreground" />
                                             <span className="absolute top-[8px] right-[8px] w-2 h-2 bg-red-900 rounded-full border-2 border-[#F8F2EE]" />
-                                        </Button>
+                                        </Button> */}
                                         <div className="flex items-center gap-2 cursor-pointer rounded-full shrink-0">
-                                            <Avatar className="h-10 w-10 border border-border/40 shrink-0">
-                                                <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026024e" alt="User" />
-                                                <AvatarFallback>U</AvatarFallback>
+                                            <Avatar className="h-8 w-8 border border-border/40 shrink-0">
+                                                <AvatarImage src={user?.avatar_url || "https://i.pravatar.cc/150?u=a042581f4e29026024e"} alt="User" />
+                                                <AvatarFallback>{user?.name?.charAt(0)?.toUpperCase() || "U"}</AvatarFallback>
                                             </Avatar>
                                         </div>
                                     </div>

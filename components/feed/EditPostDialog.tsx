@@ -128,25 +128,25 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="w-full h-full sm:max-h-[90vh] sm:max-w-[600px] overflow-hidden sm:overflow-visible rounded-none sm:rounded-3xl p-0 gap-0 border-0 flex flex-col pt-3 sm:pt-0">
-                <DialogHeader className="px-6 py-4 border-b border-gray-100">
-                    <DialogTitle className="text-xl font-bold text-gray-900">Edit Post</DialogTitle>
+                <DialogHeader className="px-6 py-4 border-b border-warm-300">
+                    <DialogTitle className="text-xl font-bold text-warm-700">Edit Post</DialogTitle>
                 </DialogHeader>
 
                 <div className="flex flex-col p-6 overflow-y-auto max-h-[80vh] custom-scrollbar">
                     <div className="flex flex-col gap-4 mb-4 relative z-50">
                         <div className="relative cursor-not-allowed">
-                            <button className="flex items-center justify-between w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-left pointer-events-none opacity-70">
+                            <button className="flex items-center justify-between w-full p-3 rounded-xl border border-warm-300 bg-warm-200 text-left pointer-events-none opacity-70">
                                 <div className="flex items-center gap-3">
                                     {selectedCommunity?.logo_url ? (
                                         <Image src={selectedCommunity.logo_url} alt="Logo" width={24} height={24} className="rounded-full w-6 h-6 object-cover" />
                                     ) : (
                                         <div className="w-6 h-6 rounded-full bg-[#3c2a34]" />
                                     )}
-                                    <span className="font-medium text-gray-800">
+                                    <span className="font-medium text-warm-700">
                                         {selectedCommunity ? selectedCommunity.name : 'Select Community'}
                                     </span>
                                 </div>
-                                <ChevronDown size={20} className="text-gray-400" />
+                                <ChevronDown size={20} className="text-warm-400" />
                             </button>
                         </div>
 
@@ -154,15 +154,15 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
                         {(selectedChannel || true) && (
                             <div className="flex items-center gap-3 relative">
                                 <div className="flex-1 relative opacity-70 cursor-not-allowed">
-                                    <button className="flex items-center justify-between w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-left pointer-events-none">
-                                        <span className="font-medium text-gray-800">
+                                    <button className="flex items-center justify-between w-full p-3 rounded-xl border border-warm-300 bg-warm-200 text-left pointer-events-none">
+                                        <span className="font-medium text-warm-700">
                                             #{selectedChannel?.name || 'Channel'}
                                         </span>
-                                        <ChevronDown size={20} className="text-gray-400" />
+                                        <ChevronDown size={20} className="text-warm-400" />
                                     </button>
                                 </div>
 
-                                <label className="shrink-0 flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-[#3c2a34] font-semibold cursor-pointer hover:bg-gray-100 transition-colors z-50 relative">
+                                <label className="shrink-0 flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl border border-warm-300 bg-warm-200 text-[#3c2a34] font-semibold cursor-pointer hover:bg-warm-200 transition-colors z-50 relative">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></svg>
                                     <span className="hidden sm:inline">Add Image</span>
                                     <input type="file" className="hidden" accept="image/jpeg, image/png, image/svg+xml" multiple onChange={handleImageChange} />
@@ -175,7 +175,7 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
                     {(existingImages.length > 0 || imageUrls.length > 0) && (
                         <div className="flex gap-4 mb-4 overflow-x-auto pb-4 pt-3 pl-1 pr-3 custom-scrollbar relative z-10 w-full">
                             {existingImages.map((img: any) => (
-                                <div key={img.id} className="relative w-20 h-20 shrink-0 border border-gray-200 rounded-lg">
+                                <div key={img.id} className="relative w-20 h-20 shrink-0 border border-warm-300 rounded-lg">
                                     <Image src={img.image_url} alt="existing preview" fill className="object-cover rounded-lg" />
                                     <button
                                         onClick={() => removeExistingImage(img.id)}
@@ -186,7 +186,7 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
                                 </div>
                             ))}
                             {imageUrls.map((url, index) => (
-                                <div key={index} className="relative w-20 h-20 shrink-0 border border-gray-200 rounded-lg">
+                                <div key={index} className="relative w-20 h-20 shrink-0 border border-warm-300 rounded-lg">
                                     <Image src={url} alt={`preview ${index}`} fill className="object-cover rounded-lg" />
                                     <button
                                         onClick={() => removeNewImage(index)}
@@ -202,15 +202,15 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
                     <div className="flex flex-col gap-2 relative z-10 w-full mb-4">
                         <div className="flex items-center justify-between border-b border-transparent focus-within:border-gray-200 pb-2">
                             <input
-                                className="text-lg font-bold text-gray-900 placeholder:text-gray-400 w-full bg-transparent outline-none"
+                                className="text-lg font-bold text-warm-700 placeholder:text-gray-400 w-full bg-transparent outline-none"
                                 placeholder="Title (Optional)"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value.substring(0, MAX_TITLE_LENGTH))}
                             />
-                            <span className="text-xs text-gray-400 whitespace-nowrap">{title.length}/{MAX_TITLE_LENGTH}</span>
+                            <span className="text-xs text-warm-400 whitespace-nowrap">{title.length}/{MAX_TITLE_LENGTH}</span>
                         </div>
                         <textarea
-                            className="w-full text-[15px] sm:text-base text-gray-800 placeholder:text-gray-400 bg-transparent min-h-[160px] resize-none outline-none leading-relaxed mt-2 pb-[100px]"
+                            className="w-full text-[15px] sm:text-base text-warm-700 placeholder:text-gray-400 bg-transparent min-h-[160px] resize-none outline-none leading-relaxed mt-2 pb-[100px]"
                             placeholder="What do you want to share?"
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
@@ -219,8 +219,8 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
                 </div>
 
                 {/* Sticky Bottom Actions */}
-                <div className="mt-auto absolute bottom-0 left-0 w-full bg-white flex justify-end gap-3 pt-3 pb-4 sm:pb-5 px-6 border-t border-gray-100 z-[100] sm:rounded-b-3xl">
-                    <Button variant="ghost" onClick={onClose} disabled={loading} className="text-gray-500 rounded-full px-4 sm:px-6">
+                <div className="mt-auto absolute bottom-0 left-0 w-full bg-warm-100 flex justify-end gap-3 pt-3 pb-4 sm:pb-5 px-6 border-t border-warm-300 z-[100] sm:rounded-b-3xl">
+                    <Button variant="ghost" onClick={onClose} disabled={loading} className="text-warm-500 rounded-full px-4 sm:px-6">
                         Cancel
                     </Button>
                     <Button

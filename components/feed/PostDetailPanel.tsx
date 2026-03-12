@@ -96,28 +96,28 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
             <div key={comment.id} className="relative mb-4">
 
                 <div className="flex gap-3 relative z-10">
-                    <div className={`rounded-full bg-gray-100 shrink-0 relative overflow-hidden mt-1 ${isReply ? 'w-6 h-6' : 'w-8 h-8'}`}>
+                    <div className={`rounded-full bg-warm-200 shrink-0 relative overflow-hidden mt-1 ${isReply ? 'w-6 h-6' : 'w-8 h-8'}`}>
                         <SmartImage src={comment.user?.avatar_url || 'https://via.placeholder.com/40'} alt="avatar" className="object-cover" fallbackIconSize={16} />
                     </div>
                     <div className="flex-1">
-                        <div className="bg-gray-50 rounded-2xl px-4 py-3 relative group">
+                        <div className="bg-warm-200 rounded-2xl px-4 py-3 relative group">
                             <div className="flex justify-between items-start mb-1">
-                                <h5 className="text-sm font-semibold text-gray-900">{comment.user?.name}</h5>
+                                <h5 className="text-sm font-semibold text-warm-700">{comment.user?.name}</h5>
 
                                 {commentOwner && (
                                     <div className="relative">
                                         <button
                                             onClick={() => setShowOptionsTarget(showOptionsTarget === comment.id ? null : comment.id)}
-                                            className="text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                            className="text-warm-400 hover:text-warm-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
                                         >
                                             <MoreVertical size={16} />
                                         </button>
 
                                         {showOptionsTarget === comment.id && (
-                                            <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-100 shadow-lg rounded-xl overflow-hidden z-[100]">
+                                            <div className="absolute right-0 mt-1 w-32 bg-warm-100 border border-warm-300 shadow-lg rounded-xl overflow-hidden z-[100]">
                                                 <button
                                                     onClick={() => { onDeleteComment(comment.id); setShowOptionsTarget(null); }}
-                                                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-50 flex items-center gap-2"
+                                                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-warm-200 flex items-center gap-2"
                                                 >
                                                     <Trash2 size={14} /> Delete
                                                 </button>
@@ -126,20 +126,20 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                                     </div>
                                 )}
                             </div>
-                            <p className="text-sm text-gray-700 whitespace-pre-line">{parseContent(comment.content)}</p>
+                            <p className="text-sm text-warm-700 whitespace-pre-line">{parseContent(comment.content)}</p>
                         </div>
 
                         <div className="flex items-center gap-4 mt-2 px-3">
-                            <span className="text-xs text-gray-400 font-medium">
+                            <span className="text-xs text-warm-400 font-medium">
                                 {new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             </span>
 
-                            <button onClick={() => onLikeComment(comment.id)} className={`text-xs font-semibold hover:opacity-80 transition-colors ${comment.user_has_liked ? 'text-red-400' : 'text-gray-500'}`}>
+                            <button onClick={() => onLikeComment(comment.id)} className={`text-xs font-semibold hover:opacity-80 transition-colors ${comment.user_has_liked ? 'text-red-400' : 'text-warm-500'}`}>
                                 {comment.likes_count > 0 ? `${comment.likes_count} Likes` : 'Like'}
                             </button>
 
                             {!isReply && (
-                                <button onClick={() => setReplyingTo(comment)} className="text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors">
+                                <button onClick={() => setReplyingTo(comment)} className="text-xs font-semibold text-warm-500 hover:text-gray-700 transition-colors">
                                     Reply
                                 </button>
                             )}
@@ -147,7 +147,7 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
 
                         {/* render replies */}
                         {comment.replies && comment.replies.length > 0 && (
-                            <div className="mt-2 relative pl-8 sm:pl-11 bg-white">
+                            <div className="mt-2 relative pl-8 sm:pl-11 bg-warm-100">
                                 {comment.replies.slice(0, visibleRepliesCount[comment.id] || 3).map((reply) => {
                                     return (
                                         <div key={reply.id} className="relative pt-2">
@@ -186,31 +186,31 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
     };
 
     return (
-        <div className="flex flex-col h-full bg-white lg:rounded-2xl overflow-hidden relative border-none lg:border-solid lg:border lg:border-gray-200">
+        <div className="flex flex-col h-full bg-warm-100 lg:rounded-2xl overflow-hidden relative border-none lg:border-solid lg:border lg:border-gray-200">
             {/* Header Navbar */}
-            <div className="h-[60px] flex items-center justify-between px-4 border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20 shrink-0">
+            <div className="h-[60px] flex items-center justify-between px-4 border-b border-warm-300 bg-white/80 backdrop-blur-md sticky top-0 z-20 shrink-0">
                 <button
                     onClick={onClose}
-                    className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                    className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-warm-200 transition-colors"
                 >
-                    <ChevronLeft size={24} className="text-gray-700" />
+                    <ChevronLeft size={24} className="text-warm-700" />
                 </button>
-                <h2 className="text-lg font-bold text-gray-900">Post</h2>
+                <h2 className="text-lg font-bold text-warm-700">Post</h2>
 
                 <div className="relative">
                     {isOwner ? (
                         <>
                             <button
                                 onClick={() => setShowOptionsTarget(showOptionsTarget === 'post' ? null : 'post')}
-                                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-warm-200 transition-colors"
                             >
-                                <MoreVertical size={20} className="text-gray-700" />
+                                <MoreVertical size={20} className="text-warm-700" />
                             </button>
                             {showOptionsTarget === 'post' && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 shadow-xl rounded-xl py-1 z-30">
+                                <div className="absolute right-0 mt-2 w-48 bg-warm-100 border border-warm-300 shadow-xl rounded-xl py-1 z-30">
                                     <button
                                         onClick={() => { onEditPost(); setShowOptionsTarget(null); }}
-                                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 font-medium border-b border-gray-50"
+                                        className="w-full text-left px-4 py-2.5 text-sm text-warm-700 hover:bg-warm-200 flex items-center gap-2 font-medium border-b border-gray-50"
                                     >
                                         Edit Post
                                     </button>
@@ -230,18 +230,18 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar bg-white">
+            <div className="flex-1 overflow-y-auto custom-scrollbar bg-warm-100">
                 <div className="p-5">
                     {/* Post Author */}
                     <div className="flex items-center mb-4">
-                        <div className="w-12 h-12 rounded-full bg-gray-100 overflow-hidden mr-3 shrink-0 relative">
+                        <div className="w-12 h-12 rounded-full bg-warm-200 overflow-hidden mr-3 shrink-0 relative">
                             <SmartImage src={post.user?.avatar_url || 'https://via.placeholder.com/40'} alt="avatar" className="object-cover" fallbackIconSize={24} />
                         </div>
                         <div>
-                            <h4 className="text-[16px] font-bold text-gray-900 leading-tight">
+                            <h4 className="text-[16px] font-bold text-warm-700 leading-tight">
                                 {post.user?.name || 'Anonymous'}
                             </h4>
-                            <div className="flex items-center text-xs text-gray-500 mt-0.5">
+                            <div className="flex items-center text-xs text-warm-500 mt-0.5">
                                 {post.community && <span className="font-semibold mr-1">{post.community.name} •</span>}
                                 <span> {new Date(post.created_at).toLocaleDateString(undefined, {
                                     month: 'short',
@@ -252,8 +252,8 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                     </div>
 
                     {/* Text Content */}
-                    {post.title && <h3 className="text-lg font-bold text-gray-900 mb-2">{post.title}</h3>}
-                    <p className="text-[15px] text-gray-800 leading-relaxed whitespace-pre-line mb-4">
+                    {post.title && <h3 className="text-lg font-bold text-warm-700 mb-2">{post.title}</h3>}
+                    <p className="text-[15px] text-warm-700 leading-relaxed whitespace-pre-line mb-4">
                         {postContent}
                     </p>
 
@@ -266,7 +266,7 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                                     <div
                                         key={idx}
                                         onClick={() => setSelectedImageIndex(idx)}
-                                        className={`h-[250px] sm:h-[300px] bg-gray-100 rounded-xl overflow-hidden relative shrink-0 snap-center cursor-pointer hover:opacity-95 transition-opacity ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
+                                        className={`h-[250px] sm:h-[300px] bg-warm-200 rounded-xl overflow-hidden relative shrink-0 snap-center cursor-pointer hover:opacity-95 transition-opacity ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
                                             }`}
                                     >
                                         <SmartImage src={img.image_url} alt="Post media" className="object-cover" fallbackIconSize={48} />
@@ -277,21 +277,21 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                     )}
 
                     {/* Action Bar */}
-                    <div className="flex items-center gap-8 py-3 border-y border-gray-100 mb-6">
+                    <div className="flex items-center gap-8 py-3 border-y border-warm-300 mb-6">
                         <button onClick={onLikePost} className="flex items-center gap-2 group hover:opacity-80 transition-opacity">
-                            <Heart size={22} className={`transition-colors duration-200 ${post.user_has_liked ? 'fill-red-400 text-red-400' : 'text-gray-500 group-hover:text-red-400'}`} />
-                            <span className={`text-sm font-semibold ${post.user_has_liked ? 'text-red-400' : 'text-gray-500'}`}>{formatNumber(post.likes_count)}</span>
+                            <Heart size={22} className={`transition-colors duration-200 ${post.user_has_liked ? 'fill-red-400 text-red-400' : 'text-warm-500 group-hover:text-red-400'}`} />
+                            <span className={`text-sm font-semibold ${post.user_has_liked ? 'text-red-400' : 'text-warm-500'}`}>{formatNumber(post.likes_count)}</span>
                         </button>
-                        <div className="flex items-center gap-2 text-gray-500 cursor-default">
+                        <div className="flex items-center gap-2 text-warm-500 cursor-default">
                             <MessageCircle size={22} />
                             <span className="text-sm font-semibold">{formatNumber(post.comments_count)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-500 cursor-default">
+                        <div className="flex items-center gap-2 text-warm-500 cursor-default">
                             <BarChart2 size={22} />
                             <span className="text-sm font-semibold">{formatNumber(post.views_count)}</span>
                         </div>
                         <button onClick={onSharePost} className="flex items-center gap-2 group hover:opacity-80 transition-opacity ml-auto">
-                            <Share2 size={22} className="text-gray-500 group-hover:text-green-500" />
+                            <Share2 size={22} className="text-warm-500 group-hover:text-green-500" />
                         </button>
                     </div>
 
@@ -299,10 +299,10 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                     <div className="space-y-2 pb-6">
                         {loadingComments ? (
                             <div className="flex justify-center py-8">
-                                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                                <Loader2 className="w-6 h-6 animate-spin text-warm-400" />
                             </div>
                         ) : comments.length === 0 ? (
-                            <div className="text-center py-8 text-gray-400 italic">No comments yet. Be the first to share your thoughts!</div>
+                            <div className="text-center py-8 text-warm-400 italic">No comments yet. Be the first to share your thoughts!</div>
                         ) : (
                             <>
                                 {comments.slice(0, visibleCommentsCount).map(c => renderComment(c))}
@@ -321,18 +321,18 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
             </div>
 
             {/* Sticky Input Area */}
-            <div className="bg-white border-t border-gray-100 p-3 shrink-0 shadow-[0_-4px_20px_-15px_rgba(0,0,0,0.1)] z-10">
+            <div className="bg-warm-100 border-t border-warm-300 p-3 shrink-0 shadow-[0_-4px_20px_-15px_rgba(0,0,0,0.1)] z-10">
                 {replyingTo && (
-                    <div className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-t-xl text-xs">
-                        <span className="font-medium text-gray-600">Replying to {replyingTo.user?.name}</span>
-                        <button onClick={() => setReplyingTo(null)} className="text-gray-400 hover:text-gray-600">
+                    <div className="flex items-center justify-between bg-warm-200 px-3 py-2 rounded-t-xl text-xs">
+                        <span className="font-medium text-warm-500">Replying to {replyingTo.user?.name}</span>
+                        <button onClick={() => setReplyingTo(null)} className="text-warm-400 hover:text-warm-500">
                             <X size={14} />
                         </button>
                     </div>
                 )}
-                <div className={`flex items-center gap-2 bg-gray-100 pl-4 pr-1 py-1 ${replyingTo ? 'rounded-b-2xl' : 'rounded-full'}`}>
+                <div className={`flex items-center gap-2 bg-warm-200 pl-4 pr-1 py-1 ${replyingTo ? 'rounded-b-2xl' : 'rounded-full'}`}>
                     <input
-                        className="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-500 outline-none h-10"
+                        className="flex-1 bg-transparent text-sm text-warm-700 placeholder:text-gray-500 outline-none h-10"
                         placeholder={replyingTo ? "Write a reply..." : "Add a comment..."}
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
@@ -347,7 +347,7 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                     <button
                         onClick={handleCommentSubmit}
                         disabled={!newComment.trim() || submitting}
-                        className={`w-10 h-10 flex items-center justify-center rounded-full shrink-0 transition-colors ${newComment.trim() ? 'bg-[#3c2a34] text-white shadow-md hover:bg-[#2a1c24]' : 'bg-transparent text-gray-400'
+                        className={`w-10 h-10 flex items-center justify-center rounded-full shrink-0 transition-colors ${newComment.trim() ? 'bg-[#3c2a34] text-white shadow-md hover:bg-[#2a1c24]' : 'bg-transparent text-warm-400'
                             }`}
                     >
                         {submitting ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send size={18} className="translate-x-[1px]" />}

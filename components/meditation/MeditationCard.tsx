@@ -1,24 +1,17 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Play, BarChart2 } from 'lucide-react';
+import { Play, Headphones } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Beat } from '@/types/database';
+import { Meditation } from '@/types/database';
 
-interface BeatCardProps {
-    beat: Beat;
-    onPlay: (beat: Beat) => void;
+interface MeditationCardProps {
+    meditation: Meditation;
+    onPlay: (meditation: Meditation) => void;
     isPlaying?: boolean;
 }
 
-export const BeatCard: React.FC<BeatCardProps> = ({ beat, onPlay, isPlaying }) => {
+export const MeditationCard: React.FC<MeditationCardProps> = ({ meditation, onPlay, isPlaying }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
-
-    const formatDuration = (seconds?: number) => {
-        if (!seconds) return '0:00';
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    };
 
     const formatNumber = (num: number) => {
         if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -29,22 +22,24 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onPlay, isPlaying }) =
     return (
         <button
             onClick={() => {
-                if (!isPlaying) onPlay(beat);
+                if (!isPlaying) onPlay(meditation);
             }}
             disabled={isPlaying}
-            className={`w-full text-left bg-warm-100 border ${isPlaying ? 'border-[#3c2a34] bg-orange-50/10' : 'border-warm-300'} rounded-2xl p-4 flex items-center gap-4 hover:border-[#F0E8E4] hover:shadow-md transition-all group relative`}
+            className={`w-full text-left bg-warm-100 border ${isPlaying ? 'border-[#3c2a34] bg-indigo-50/10' : 'border-warm-300'} rounded-2xl p-4 flex items-center gap-4 hover:border-[#F0E8E4] hover:shadow-sm transition-all group relative`}
         >
             <div className="relative w-20 h-16 rounded-xl overflow-hidden shrink-0 bg-warm-200">
-                {beat.banner_url ? (
+                {meditation.banner_url ? (
                     <Image
-                        src={beat.banner_url}
-                        alt={beat.title || 'Beat'}
+                        src={meditation.banner_url}
+                        alt={meditation.title || 'Meditation'}
                         fill
                         className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                         onLoad={() => setImageLoaded(true)}
                     />
                 ) : (
-                    <div className="w-full h-full bg-gray-200" />
+                    <div className="w-full h-full bg-indigo-100/50 flex items-center justify-center">
+                        <Headphones className="w-6 h-6 text-indigo-300" />
+                    </div>
                 )}
 
                 {/* Overlays */}
@@ -64,39 +59,30 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onPlay, isPlaying }) =
                         </div>
                     </div>
                 )}
-
-                {(beat.duration_seconds ?? 0) > 0 && (
-                    <div className="absolute bottom-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[10px] font-semibold text-white">
-                        {formatDuration(beat.duration_seconds)}
-                    </div>
-                )}
             </div>
 
             <div className="flex-1 min-w-0 flex flex-col justify-center">
-                <div className="flex items-center justify-between mb-0.5">
-                    <h3 className="font-semibold text-warm-700 truncate pr-2">{beat.title}</h3>
+                <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-warm-700 truncate pr-2">{meditation.title}</h3>
+                    <div className="flex items-center gap-1.5 text-warm-400">
+                        <Headphones className="w-3.5 h-3.5" />
+                        <span className="text-xs">{formatNumber(meditation.play_count || 0)} plays</span>
+                    </div>
                 </div>
 
-                {beat.short_description && (
-                    <p className="text-sm text-warm-500 truncate mb-1.5 leading-snug">
-                        {beat.short_description}
+                {meditation.description && (
+                    <p className="text-sm text-warm-500 line-clamp-2 my-1.5 leading-snug">
+                        {meditation.description}
                     </p>
                 )}
 
-                <div className="flex items-center justify-between mt-auto">
-                    {beat.beat_tags?.name ? (
-                        <div className="px-2 py-0.5 bg-warm-200 text-warm-500 text-[11px] font-medium rounded-full">
-                            {beat.beat_tags.name}
-                        </div>
-                    ) : (
-                        <div />
-                    )}
-
+                {/* <div className="flex items-center justify-between mt-auto">
+                    <div />
                     <div className="flex items-center gap-1.5 text-warm-400">
-                        <BarChart2 className="w-3.5 h-3.5" />
-                        <span className="text-xs">{formatNumber(beat.play_count || 0)} plays</span>
+                        <Headphones className="w-3.5 h-3.5" />
+                        <span className="text-xs">{formatNumber(meditation.play_count || 0)} plays</span>
                     </div>
-                </div>
+                </div> */}
             </div>
         </button>
     );

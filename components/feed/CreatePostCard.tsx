@@ -161,26 +161,26 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
     };
 
     return (
-        <div className={`bg-white ${minimal ? 'p-2 rounded-full' : 'rounded-[20px] shadow-sm mb-6 p-4'} border border-transparent`}>
+        <div className={`bg-warm-100 ${minimal ? 'p-2 rounded-full' : 'rounded-[20px] shadow-sm mb-6 p-4'} border border-transparent`}>
             <div className="flex items-center gap-3">
                 <Image
                     src={userAvatar}
                     alt="User"
                     width={minimal ? 40 : 48}
                     height={minimal ? 40 : 48}
-                    className={`rounded-full bg-gray-100 object-cover ${minimal ? 'w-10 h-10' : 'w-12 h-12'} shrink-0 border border-gray-100`}
+                    className={`rounded-full bg-warm-200 object-cover ${minimal ? 'w-10 h-10' : 'w-12 h-12'} shrink-0 border border-warm-300`}
                 />
 
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <button className="flex-1 bg-[#F8F2EE] hover:bg-[#F0EBE7] transition-colors rounded-full px-4 py-3 text-left text-gray-500 font-medium border border-transparent truncate">
+                        <button className="flex-1 bg-[#F8F2EE] hover:bg-[#F0EBE7] transition-colors rounded-full px-4 py-3 text-left text-warm-500 font-medium border border-transparent truncate">
                             What do you want to share?
                         </button>
                     </DialogTrigger>
                     <DialogContent className="w-full h-full sm:max-h-[90vh] sm:max-w-[600px] overflow-hidden sm:overflow-visible rounded-none sm:rounded-3xl p-0 gap-0 border-0 flex flex-col pt-3 sm:pt-0">
-                        <DialogHeader className="px-6 py-4 border-b border-gray-100">
+                        <DialogHeader className="px-6 py-4 border-b border-warm-300">
                             <div className="flex items-center justify-between">
-                                <DialogTitle className="text-xl font-bold text-gray-900">Create Post</DialogTitle>
+                                <DialogTitle className="text-xl font-bold text-warm-700">Create Post</DialogTitle>
                             </div>
                         </DialogHeader>
 
@@ -190,7 +190,7 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                                 {/* Community Selector */}
                                 <div className="relative">
                                     <button
-                                        className="flex items-center justify-between w-full p-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-left"
+                                        className="flex items-center justify-between w-full p-3 rounded-xl border border-warm-300 bg-warm-100 hover:bg-warm-200 text-left"
                                         onClick={() => { setShowCommPicker(!showCommPicker); setShowChanPicker(false); }}
                                     >
                                         <div className="flex items-center gap-3">
@@ -199,24 +199,24 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                                             ) : (
                                                 <div className="w-6 h-6 rounded-full bg-[#3c2a34]" />
                                             )}
-                                            <span className="font-medium text-gray-800">
+                                            <span className="font-medium text-warm-700">
                                                 {selectedCommunity ? selectedCommunity.name : 'Select Community'}
                                             </span>
                                         </div>
-                                        <ChevronDown size={20} className="text-gray-400" />
+                                        <ChevronDown size={20} className="text-warm-400" />
                                     </button>
 
                                     {showCommPicker && (
-                                        <div className="absolute top-14 left-0 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-[60] max-h-60 overflow-y-auto py-2">
+                                        <div className="absolute top-14 left-0 w-full bg-warm-100 border border-warm-300 rounded-xl shadow-lg z-[60] max-h-60 overflow-y-auto py-2">
                                             {communities.map(comm => (
                                                 <button
                                                     key={comm.id}
                                                     onClick={() => { setSelectedCommunityId(comm.id); setSelectedChannelId(null); setShowCommPicker(false); }}
-                                                    className="flex w-full items-center justify-between px-4 py-3 hover:bg-gray-50"
+                                                    className="flex w-full items-center justify-between px-4 py-3 hover:bg-warm-200"
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         {comm.logo_url ? <Image src={comm.logo_url} alt="logo" width={24} height={24} className="rounded-full w-6 h-6 object-cover" /> : <div className="min-w-6 min-h-6 rounded-full bg-gray-200" />}
-                                                        <span className={`text-sm ${selectedCommunityId === comm.id ? 'font-semibold text-[#3c2a34]' : 'text-gray-700'}`}>{comm.name}</span>
+                                                        <span className={`text-sm ${selectedCommunityId === comm.id ? 'font-semibold text-[#3c2a34]' : 'text-warm-700'}`}>{comm.name}</span>
                                                     </div>
                                                     {selectedCommunityId === comm.id && <Check size={16} className="text-[#3c2a34]" />}
                                                 </button>
@@ -229,31 +229,31 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                                 {selectedCommunityId && (
                                     <div className="flex items-center gap-3 relative">
                                         <button
-                                            className="flex-1 flex items-center justify-between p-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-left"
+                                            className="flex-1 flex items-center justify-between p-3 rounded-xl border border-warm-300 bg-warm-100 hover:bg-warm-200 text-left"
                                             onClick={() => setShowChanPicker(!showChanPicker)}
                                         >
-                                            <span className="font-medium text-gray-800">
+                                            <span className="font-medium text-warm-700">
                                                 {selectedChannel ? `#${selectedChannel.name}` : '# Select Channel'}
                                             </span>
-                                            <ChevronDown size={20} className="text-gray-400" />
+                                            <ChevronDown size={20} className="text-warm-400" />
                                         </button>
 
                                         {showChanPicker && (
-                                            <div className="absolute top-14 left-0 w-[60%] bg-white border border-gray-200 rounded-xl shadow-lg z-[60] max-h-60 overflow-y-auto py-2">
+                                            <div className="absolute top-14 left-0 w-[60%] bg-warm-100 border border-warm-300 rounded-xl shadow-lg z-[60] max-h-60 overflow-y-auto py-2">
                                                 {filteredChannels.length > 0 ? filteredChannels.map(ch => (
                                                     <button
                                                         key={ch.id}
                                                         onClick={() => { setSelectedChannelId(ch.id); setShowChanPicker(false); }}
-                                                        className="flex w-full items-center justify-between px-4 py-3 hover:bg-gray-50"
+                                                        className="flex w-full items-center justify-between px-4 py-3 hover:bg-warm-200"
                                                     >
-                                                        <span className={`text-sm ${selectedChannelId === ch.id ? 'font-semibold text-[#3c2a34]' : 'text-gray-700'}`}>#{ch.name}</span>
+                                                        <span className={`text-sm ${selectedChannelId === ch.id ? 'font-semibold text-[#3c2a34]' : 'text-warm-700'}`}>#{ch.name}</span>
                                                         {selectedChannelId === ch.id && <Check size={16} className="text-[#3c2a34]" />}
                                                     </button>
-                                                )) : <div className="p-4 text-sm text-gray-500 italic">No channels available</div>}
+                                                )) : <div className="p-4 text-sm text-warm-500 italic">No channels available</div>}
                                             </div>
                                         )}
 
-                                        <label className="shrink-0 flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-[#3c2a34] font-semibold cursor-pointer hover:bg-gray-100 transition-colors">
+                                        <label className="shrink-0 flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl border border-warm-300 bg-warm-200 text-[#3c2a34] font-semibold cursor-pointer hover:bg-warm-200 transition-colors">
                                             <ImageIcon size={20} />
                                             <span className="hidden sm:inline">Add Image</span>
                                             <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
@@ -266,7 +266,7 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                             {imagePreviews.length > 0 && (
                                 <div className="flex gap-4 mb-4 overflow-x-auto pb-4 pt-3 pl-1 pr-3 custom-scrollbar">
                                     {imagePreviews.map((img, idx) => (
-                                        <div key={idx} className="relative w-20 h-20 shrink-0 border border-gray-200 rounded-lg">
+                                        <div key={idx} className="relative w-20 h-20 shrink-0 border border-warm-300 rounded-lg">
                                             <Image src={img} alt="preview" fill className="object-cover rounded-lg" />
                                             <button
                                                 onClick={() => removeImage(idx)}
@@ -283,15 +283,15 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                             <div className="flex flex-col gap-2 relative z-10 w-full mb-4">
                                 <div className="flex items-center justify-between border-b border-transparent focus-within:border-gray-200 pb-2">
                                     <input
-                                        className="text-lg font-bold text-gray-900 placeholder:text-gray-400 w-full bg-transparent outline-none"
+                                        className="text-lg font-bold text-warm-700 placeholder:text-gray-400 w-full bg-transparent outline-none"
                                         placeholder="Title (Optional)"
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value.substring(0, MAX_TITLE_LENGTH))}
                                     />
-                                    <span className="text-xs text-gray-400 whitespace-nowrap">{title.length}/{MAX_TITLE_LENGTH}</span>
+                                    <span className="text-xs text-warm-400 whitespace-nowrap">{title.length}/{MAX_TITLE_LENGTH}</span>
                                 </div>
                                 <textarea
-                                    className="w-full text-[15px] sm:text-base text-gray-800 placeholder:text-gray-400 bg-transparent min-h-[160px] resize-none outline-none leading-relaxed mt-2 pb-[100px]"
+                                    className="w-full text-[15px] sm:text-base text-warm-700 placeholder:text-gray-400 bg-transparent min-h-[160px] resize-none outline-none leading-relaxed mt-2 pb-[100px]"
                                     placeholder="What do you want to share?"
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
@@ -300,8 +300,8 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                         </div>
 
                         {/* Sticky Bottom Actions */}
-                        <div className="mt-auto absolute bottom-0 left-0 w-full bg-white flex justify-end gap-3 pt-3 pb-4 sm:pb-5 px-6 border-t border-gray-100 z-[100] sm:rounded-b-3xl">
-                            <Button variant="ghost" onClick={handleClose} disabled={loading} className="text-gray-500 rounded-full px-4 sm:px-6">
+                        <div className="mt-auto absolute bottom-0 left-0 w-full bg-warm-100 flex justify-end gap-3 pt-3 pb-4 sm:pb-5 px-6 border-t border-warm-300 z-[100] sm:rounded-b-3xl">
+                            <Button variant="ghost" onClick={handleClose} disabled={loading} className="text-warm-500 rounded-full px-4 sm:px-6">
                                 Cancel
                             </Button>
                             <Button
@@ -317,10 +317,10 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
             </div>
 
             {!minimal && (
-                <div className="flex items-center justify-between mt-4 px-2 border-t border-gray-50 pt-2 text-sm text-gray-500 font-medium">
+                <div className="flex items-center justify-between mt-4 px-2 border-t border-gray-50 pt-2 text-sm text-warm-500 font-medium">
                     <div className="flex items-center gap-6">
                         <button onClick={() => setOpen(true)} className="flex items-center gap-2 hover:text-gray-700 transition-colors">
-                            <ImageIcon size={20} className="text-gray-400" />
+                            <ImageIcon size={20} className="text-warm-400" />
                             Media
                         </button>
                         {/* Placeholder for other potential feeds actions */}

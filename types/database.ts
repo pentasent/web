@@ -39,6 +39,7 @@ export interface CommunityModerator {
     community_id: string;
     user_id: string;
     created_at: string;
+    tag: string;
 }
 
 export interface CommunityFollower {
@@ -333,5 +334,15 @@ export interface UserNotificationSetting {
     email_enabled: boolean;
     is_default: boolean;
     is_editable: boolean;
+    created_at: string;
+}
+
+export interface Meditation {
+    id: string;
+    title: string;
+    description?: string | null;
+    audio_url: string;
+    banner_url?: string | null;
+    play_count: number;
     created_at: string;
 }

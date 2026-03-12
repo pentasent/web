@@ -108,11 +108,11 @@ export default function BeatsPage() {
                 {/* LEFT FEED */}
                 <div className="max-w-[640px] mx-auto lg:mx-0 w-full flex flex-col mt-20 xl:mt-6 lg:mt-4">
                     <div className="px-4 md:px-0">
-                        <h1 className="xl:text-4xl text-3xl font-bold text-[#3d2f4d] mb-2 tracking-tight">Explore Beats</h1>
-                        <p className="text-gray-500">Find your perfect rhythm</p>
+                        <h1 className="xl:text-4xl text-3xl font-bold text-warm-700 mb-2 tracking-tight">Explore Beats</h1>
+                        <p className="text-warm-500">Find your perfect rhythm</p>
                     </div>
 
-                    <div className="py-6 px-4 md:px-0 sticky xl:top-0 lg:top-0 top-[70px] z-30 bg-[#FFFBF7]">
+                    <div className="py-6 px-4 md:px-0 sticky xl:top-0 lg:top-0 top-[70px] z-30 bg-warm-50">
                         <BeatTagList
                             tags={tags}
                             selectedTag={selectedTag}
@@ -122,14 +122,14 @@ export default function BeatsPage() {
 
                     {loading && beats.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 px-4 md:px-0">
-                            <Loader2 className="w-8 h-8 animate-spin text-gray-400 mb-4" />
-                            <p className="text-gray-500 font-medium">Loading tracks...</p>
+                            <Loader2 className="w-8 h-8 animate-spin text-warm-400 mb-4" />
+                            <p className="text-warm-500 font-medium">Loading tracks...</p>
                         </div>
                     ) : (
                         <div className="space-y-4 px-4 md:px-0 pb-32 lg:pb-10">
                             {filteredBeats.length === 0 ? (
-                                <div className="text-center py-20 bg-white/50 rounded-2xl border border-gray-100 border-dashed">
-                                    <p className="text-gray-500 font-medium">No beats found matching this filter.</p>
+                                <div className="text-center py-20 bg-white/50 rounded-2xl border border-warm-300 border-dashed">
+                                    <p className="text-warm-500 font-medium">No beats found matching this filter.</p>
                                 </div>
                             ) : (
                                 filteredBeats.map((beat) => (
@@ -156,7 +156,7 @@ export default function BeatsPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: "100%" }}
                                     transition={{ type: "spring", bounce: 0, duration: 0.5 }}
-                                    className="fixed inset-0 z-50 lg:static lg:inset-auto lg:z-auto lg:h-[calc(100vh-8rem)] shadow-2xl lg:rounded-2xl bg-[#FFFBF7] lg:border lg:border-gray-100"
+                                    className="fixed inset-0 z-50 lg:static lg:inset-auto lg:z-auto lg:h-[calc(100vh-8rem)] shadow-2xl lg:rounded-2xl bg-warm-50 lg:border lg:border-gray-100"
                                 >
                                     <BeatDetailPanel
                                         beat={selectedBeat}
@@ -169,17 +169,17 @@ export default function BeatsPage() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="hidden lg:flex h-full border-2 border-dashed border-gray-200 rounded-3xl flex-col items-center justify-center text-center p-8 bg-gray-50/50"
+                                    className="hidden lg:flex h-full border-2 border-dashed border-warm-300 rounded-3xl flex-col items-center justify-center text-center p-8 bg-gray-50/50"
                                 >
-                                    <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+                                    <div className="w-16 h-16 rounded-full bg-warm-200 flex items-center justify-center mb-4">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-warm-400">
                                             <path d="M9 18V5l12-2v13"></path>
                                             <circle cx="6" cy="18" r="3"></circle>
                                             <circle cx="18" cy="16" r="3"></circle>
                                         </svg>
                                     </div>
-                                    <h3 className="text-gray-900 font-semibold mb-2">No Beat Playing</h3>
-                                    <p className="text-gray-500 text-sm">Select a beat from the list to start listening</p>
+                                    <h3 className="text-warm-700 font-semibold mb-2">No Beat Playing</h3>
+                                    <p className="text-warm-500 text-sm">Select a beat from the list to start listening</p>
                                 </motion.div>
                             )}
                         </AnimatePresence>

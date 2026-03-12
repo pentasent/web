@@ -16,14 +16,15 @@ export default function AppLayout({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="flex bg-[#FFFBF7] min-h-screen">
+    <div className="flex bg-warm-50 min-h-screen">
+    {/* <div className="flex bg-warm-50 min-h-screen"> */}
       <Sidebar
         mobileOpen={mobileSidebarOpen}
         setMobileOpen={setMobileSidebarOpen}
       />
       <main className="flex-1 w-full lg:pl-[80px]">
         {/* Header matches styling from UI image */}
-        <header className="h-[70px] xl:hidden lg:hidden flex items-center justify-between px-2 shrink-0 bg-[#FFFBF7] z-40 w-full lg:w-[calc(100%-80px)] lg:mt-0 fixed top-0 left-0 backdrop-blur-md lg:ml-[80px]">
+        <header className="h-[70px] xl:hidden lg:hidden flex items-center justify-between px-2 shrink-0 bg-warm-50 z-40 w-full lg:w-[calc(100%-80px)] lg:mt-0 fixed top-0 left-0 backdrop-blur-md lg:ml-[80px]">
           <div className="flex items-center justify-between px-2 flex-1 max-w-7xl">
             {/* <span className="text-[#3c2a34] font-semibold text-2xl lg:hidden font-serif">Pentasent</span> */}
             <Link href="/app/feed" className="flex items-center gap-3 overflow-hidden">
@@ -45,7 +46,7 @@ export default function AppLayout({
           </div>
         </header>
 
-        <div className="md:px-4 xl:px-8 bg-[#FFFBF7]">
+        <div className="md:px-4 xl:px-8 bg-warm-50">
           {children}
         </div>
       </main>

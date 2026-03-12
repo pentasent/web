@@ -23,13 +23,13 @@ export const PostCard: React.FC<PostCardProps> = ({
 
     return (
         <div
-            className="bg-white border hover:border-gray-200 border-transparent rounded-[20px] shadow-sm mb-4 cursor-pointer overflow-hidden transition-all duration-200"
+            className="bg-warm-100 border hover:border-warm-300 border-transparent rounded-[20px] shadow-sm mb-4 cursor-pointer overflow-hidden transition-all duration-200"
             onClick={onPress}
         >
             {/* Header */}
             <div className="flex items-center justify-between px-5 pt-5 pb-3">
                 <div className="flex items-center">
-                    <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden mr-3 shrink-0 relative">
+                    <div className="w-10 h-10 rounded-full bg-warm-200 overflow-hidden mr-3 shrink-0 relative">
                         <SmartImage
                             src={post.user?.avatar_url || 'https://via.placeholder.com/40'}
                             alt="avatar"
@@ -38,10 +38,10 @@ export const PostCard: React.FC<PostCardProps> = ({
                         />
                     </div>
                     <div>
-                        <h4 className="text-[15px] font-semibold text-gray-900 leading-none mb-1">
+                        <h4 className="text-[15px] font-semibold text-warm-700 leading-none mb-1">
                             {post.user?.name || 'Anonymous'}
                         </h4>
-                        <div className="flex items-center text-xs text-gray-500">
+                        <div className="flex items-center text-xs text-warm-500">
                             {post.community && (
                                 <span className="font-medium mr-1">{post.community.name} •</span>
                             )}
@@ -59,9 +59,9 @@ export const PostCard: React.FC<PostCardProps> = ({
             {/* Content */}
             <div className="px-5 mb-3">
                 {post.title && (
-                    <h3 className="text-base font-bold text-gray-900 mb-1">{post.title}</h3>
+                    <h3 className="text-base font-bold text-warm-700 mb-1">{post.title}</h3>
                 )}
-                <p className="text-sm text-gray-700 leading-relaxed line-clamp-3 whitespace-pre-line">
+                <p className="text-sm text-warm-700 leading-relaxed line-clamp-3 whitespace-pre-line">
                     {postContent}
                 </p>
             </div>
@@ -73,7 +73,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                     {post.images.map((img, idx) => (
                         <div
                             key={idx}
-                            className={`relative h-[300px] sm:h-[400px] bg-gray-100 rounded-xl overflow-hidden shrink-0 snap-center ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
+                            className={`relative h-[300px] sm:h-[400px] bg-warm-200 rounded-xl overflow-hidden shrink-0 snap-center ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
                                 }`}
                         >
                             <SmartImage
@@ -97,11 +97,11 @@ export const PostCard: React.FC<PostCardProps> = ({
                         size={20}
                         className={`transition-colors duration-200 ${post.user_has_liked
                             ? 'fill-red-400 text-red-400'
-                            : 'text-gray-500 group-hover:text-red-400'
+                            : 'text-warm-500 group-hover:text-red-400'
                             }`}
                     />
                     <span
-                        className={`text-sm font-medium ${post.user_has_liked ? 'text-red-400' : 'text-gray-500'
+                        className={`text-sm font-medium ${post.user_has_liked ? 'text-red-400' : 'text-warm-500'
                             }`}
                     >
                         {post.likes_count > 0 ? formatNumber(post.likes_count) : 'Like'}
@@ -114,14 +114,14 @@ export const PostCard: React.FC<PostCardProps> = ({
                 >
                     <MessageCircle
                         size={20}
-                        className="text-gray-500 group-hover:text-blue-500"
+                        className="text-warm-500 group-hover:text-blue-500"
                     />
-                    <span className="text-sm font-medium text-gray-500 group-hover:text-blue-500 transition-colors">
+                    <span className="text-sm font-medium text-warm-500 group-hover:text-blue-500 transition-colors">
                         {post.comments_count > 0 ? formatNumber(post.comments_count) : 'Comment'}
                     </span>
                 </button>
 
-                <div className="flex items-center gap-2 text-gray-500 cursor-default">
+                <div className="flex items-center gap-2 text-warm-500 cursor-default">
                     <BarChart2 size={20} />
                     <span className="text-sm font-medium">
                         {post.views_count > 0 ? formatNumber(post.views_count) : 'View'}
@@ -132,7 +132,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                     onClick={onShare}
                     className="flex items-center gap-2 group hover:opacity-80 transition-opacity ml-auto"
                 >
-                    <Share2 size={20} className="text-gray-500 group-hover:text-green-500" />
+                    <Share2 size={20} className="text-warm-500 group-hover:text-green-500" />
                 </button>
             </div>
         </div>

@@ -14,7 +14,7 @@ export const BeatTagList: React.FC<BeatTagListProps> = ({ tags, selectedTag, onS
                 onClick={() => onSelect(null)}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${selectedTag === null
                         ? 'bg-[#3d2f4d] text-white border-[#3d2f4d]'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        : 'bg-warm-100 text-warm-500 border-warm-300 hover:border-gray-300 hover:bg-warm-200'
                     }`}
             >
                 All Beats
@@ -25,7 +25,7 @@ export const BeatTagList: React.FC<BeatTagListProps> = ({ tags, selectedTag, onS
                     onClick={() => onSelect(tag.id)}
                     className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${selectedTag === tag.id
                             ? 'bg-[#3d2f4d] text-white border-[#3d2f4d]'
-                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                            : 'bg-warm-100 text-warm-500 border-warm-300 hover:border-gray-300 hover:bg-warm-200'
                         }`}
                 >
                     {tag.name}

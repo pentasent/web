@@ -20,6 +20,16 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       colors: {
+        warm: {
+          50: '#FFFBF7',   // App Background (~98% L)
+          100: '#FFFFFF',  // Cards & pristine surfaces (100% L)
+          200: '#F5EFE9',  // Subtle hovers, disabled, secondary panels (~94% L) [4-6% diff]
+          300: '#EAE1D9',  // Clean elegant borders (~88% L) [12% diff from surface]
+          400: '#A39C97',  // Muted icons & placeholders
+          500: '#756D68',  // Soft readable secondary text
+          600: '#524A45',  // Stronger secondary text
+          700: '#1C1917',  // High contrast Charcoal black (Primary Text headings)
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

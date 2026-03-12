@@ -92,7 +92,7 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#FFFBF7] rounded-2xl overflow-hidden relative">
+        <div className="flex flex-col h-full bg-warm-50 rounded-2xl overflow-hidden relative">
             <audio
                 ref={audioRef}
                 autoPlay
@@ -126,17 +126,17 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
                         onClick={onClose}
                         className="p-2 hover:bg-black/5 rounded-full transition-colors md:hidden"
                     >
-                        <ChevronDown className="w-6 h-6 text-gray-800" />
+                        <ChevronDown className="w-6 h-6 text-warm-700" />
                     </button>
                     <div className="hidden md:block w-10" /> {/* Spacer */}
 
-                    <span className="font-semibold text-gray-800 tracking-wide">Now Playing</span>
+                    <span className="font-semibold text-warm-700 tracking-wide">Now Playing</span>
 
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-black/5 rounded-full transition-colors hidden md:block" // Desktop close
                     >
-                        <X className="w-5 h-5 text-gray-500" />
+                        <X className="w-5 h-5 text-warm-500" />
                     </button>
                     <div className="md:hidden w-10" /> {/* Mobile Spacer */}
                 </div>
@@ -158,13 +158,13 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
                 {/* Track Info */}
                 <div className="flex items-start justify-between mb-8 max-w-sm mx-auto w-full">
                     <div className="flex-1 pr-4 min-w-0">
-                        <h2 className="text-2xl font-bold text-gray-900 truncate mb-1">{beat.title}</h2>
+                        <h2 className="text-2xl font-bold text-warm-700 truncate mb-1">{beat.title}</h2>
                         <p className="text-[#3d2f4d]/80 font-medium truncate">
                             {beat.beat_tags?.name || 'Unknown Genre'}
                         </p>
                     </div>
                     <button className="p-2 hover:bg-black/5 rounded-full transition-colors shrink-0">
-                        <Heart className="w-6 h-6 text-gray-400 hover:text-red-500 transition-colors" />
+                        <Heart className="w-6 h-6 text-warm-400 hover:text-red-500 transition-colors" />
                     </button>
                 </div>
 
@@ -178,7 +178,7 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
                         onChange={handleSeek}
                         className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#3d2f4d]"
                     />
-                    <div className="flex justify-between mt-2 text-xs font-medium text-gray-500">
+                    <div className="flex justify-between mt-2 text-xs font-medium text-warm-500">
                         <span className="tabular-nums">{formatTime(progress)}</span>
                         <span className="tabular-nums">{formatTime(duration)}</span>
                     </div>
@@ -187,11 +187,11 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
                 {/* Controls */}
                 <div className="flex items-center justify-between max-w-xs mx-auto w-full mt-auto">
                     <button onClick={toggleLoop} className="p-2 hover:bg-black/5 rounded-full transition-colors">
-                        <Repeat className={`w-5 h-5 ${isLooping ? 'text-[#3d2f4d]' : 'text-gray-400'}`} />
+                        <Repeat className={`w-5 h-5 ${isLooping ? 'text-warm-700' : 'text-warm-400'}`} />
                     </button>
 
                     <button onClick={skipBackward} className="p-3 hover:bg-black/5 rounded-full transition-colors">
-                        <RotateCcw className="w-6 h-6 text-gray-800" />
+                        <RotateCcw className="w-6 h-6 text-warm-700" />
                     </button>
 
                     <button
@@ -209,11 +209,11 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
                     </button>
 
                     <button onClick={skipForward} className="p-3 hover:bg-black/5 rounded-full transition-colors">
-                        <RotateCw className="w-6 h-6 text-gray-800" />
+                        <RotateCw className="w-6 h-6 text-warm-700" />
                     </button>
 
                     <button className="p-2 hover:bg-black/5 rounded-full transition-colors">
-                        <Info className="w-5 h-5 text-gray-400" />
+                        <Info className="w-5 h-5 text-warm-400" />
                     </button>
                 </div>
             </div>
