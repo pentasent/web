@@ -32,8 +32,16 @@ export default function ResetPasswordPage() {
         const refreshToken = params.get("refresh_token");
         const type = params.get("type");
 
+        // If we don't have a recovery token, check if we're already in a recovery session
         if (type !== "recovery" || !accessToken) {
-          setPageState("invalid");
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            // We already have a session, maybe from a previous redirect
+            setPageState("ready");
+          } else {
+            console.warn("No recovery token or active session found");
+            setPageState("invalid");
+          }
           return;
         }
 
@@ -43,38 +51,28 @@ export default function ResetPasswordPage() {
           refresh_token: refreshToken || "",
         });
 
-
-        if (error) throw error;
-
-        // verify session exists
-        const { data } = await supabase.auth.getSession();
-
-        if (!data.session) {
+        if (error) {
+          console.error("setSession error:", error.message);
           setPageState("expired");
           return;
         }
 
-        // if (error) {
-        //   console.error("Recovery session error:", error.message);
-        //   if (
-        //     error.message.toLowerCase().includes("expired") ||
-        //     error.message.toLowerCase().includes("invalid") ||
-        //     error.message.toLowerCase().includes("already used")
-        //   ) {
-        //     setPageState("expired");
-        //   } else {
-        //     setPageState("expired");
-        //   }
-        //   return;
-        // }
+        // verify session exists
+        const { data: { session } } = await supabase.auth.getSession();
 
-        // Clear the hash from URL so a page refresh doesn't reprocess
-        // window.history.replaceState(null, "", window.location.pathname);
-        // setPageState("ready");
-        window.history.replaceState({}, document.title, "/reset-password");
+        if (!session) {
+          console.error("No session after setSession");
+          setPageState("expired");
+          return;
+        }
+
+        // Clear the hash from URL but stay on the page
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Short delay to ensure state updates smoothly
         setTimeout(() => {
           setPageState("ready");
-        }, 100);
+        }, 300);
       } catch (e) {
         console.error("Recovery token processing error:", e);
         setPageState("expired");
