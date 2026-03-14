@@ -34,14 +34,15 @@ export default function AuthGuard() {
                 router.push('/signin');
             } else if (!user.is_onboarded) {
                 // Stay here, popups will show
-            } else if (user.role !== 'admin') {
-                toast({
-                    title: "Access restricted",
-                    description: "Feed is currently only for admins.",
-                    variant: "destructive",
-                });
-                router.replace('/beta-release');
-            }
+            } 
+            // else if (user.role !== 'admin') {
+            //     toast({
+            //         title: "Access restricted",
+            //         description: "Feed is currently only for admins.",
+            //         variant: "destructive",
+            //     });
+            //     router.replace('/beta-release');
+            // }
         }
     }, [user, loading, pathname, router, toast]);
 
