@@ -12,6 +12,8 @@ import { format, startOfDay, endOfDay, parseISO } from 'date-fns';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { TaskDetailPanel } from '@/components/tasks/TaskDetailPanel';
 import { TaskEditPanel } from '@/components/tasks/TaskEditPanel';
+import { GlobalLayout } from '@/components/layout/global-layout';
+import { TaskListShimmer } from '@/components/shimmer/TaskCardShimmer';
 
 type SortOption = 'latest' | 'oldest' | 'priority';
 type FilterPriority = 'all' | 'high' | 'medium' | 'low';
@@ -160,9 +162,7 @@ export default function TasksPage() {
 
     if (authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-warm-50">
-                <Loader2 className="w-8 h-8 animate-spin text-warm-700 mb-4" />
-            </div>
+          <GlobalLayout />
         );
     }
 
@@ -265,10 +265,7 @@ export default function TasksPage() {
                     </div>
 
                     {loadingTasks && tasks.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 px-4">
-                            <Loader2 className="w-8 h-8 animate-spin text-warm-400 mb-4" />
-                            <p className="text-warm-500 font-medium">Loading tasks...</p>
-                        </div>
+                        <TaskListShimmer />
                     ) : (
                         <div className="space-y-3 px-4 md:px-0">
                             {tasks.length > 0 ? (
@@ -310,8 +307,8 @@ export default function TasksPage() {
                 </div>
 
                 {/* RIGHT SIDEBAR (Desktop Overlay) */}
-                <div className="hidden xl:block relative h-full mt-8">
-                    <div className="sticky top-8 h-[calc(100vh-4rem)] w-full">
+                <div className="lg:relative lg:h-full hidden lg:block mt-8">
+                    <div className="lg:sticky lg:top-16 lg:h-[calc(100vh-8rem)] w-fulll">
                         <AnimatePresence mode="wait">
                             {(selectedTask && !isEditing) && (
                                 <motion.div
@@ -320,7 +317,7 @@ export default function TasksPage() {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
                                     transition={{ duration: 0.2 }}
-                                    className="h-[calc(100vh-4rem)] w-full shadow-2xl rounded-2xl overflow-hidden border border-warm-300 bg-warm-100"
+                                    className="h-[calc(100vh-8rem)] w-full shadow-2xl rounded-2xl bg-warm-100 border border-warm-300 overflow-hidden"
                                 >
                                     <TaskDetailPanel
                                         task={selectedTask}
@@ -337,7 +334,7 @@ export default function TasksPage() {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
                                     transition={{ duration: 0.2 }}
-                                    className="h-[calc(100vh-4rem)] w-full shadow-2xl rounded-2xl overflow-hidden border border-warm-300 bg-warm-100"
+                                    className="h-[calc(100vh-8rem)] w-full shadow-2xl rounded-2xl bg-warm-100 border border-warm-300 overflow-hidden"
                                 >
                                     <TaskEditPanel
                                         task={isEditing ? selectedTask : null}

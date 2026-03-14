@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Play, Pause, RotateCcw, RotateCw, ChevronDown, Repeat, Heart, Info, X } from 'lucide-react';
 import { Beat } from '@/types/database';
+import { SmartImage } from '../ui/SmartImage';
 
 interface BeatDetailPanelProps {
     beat: Beat;
@@ -144,11 +145,11 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
                 {/* Cover Art */}
                 <div className="w-full aspect-square relative rounded-3xl overflow-hidden shadow-xl mb-10 mx-auto max-w-sm">
                     {beat.banner_url ? (
-                        <Image
+                        <SmartImage
                             src={beat.banner_url}
-                            alt={beat.title || 'Cover'}
-                            fill
+                            alt={`${beat.title} || 'Cover'`}
                             className="object-cover"
+                            fallbackIconSize={48}
                         />
                     ) : (
                         <div className="w-full h-full bg-gray-200" />
@@ -163,9 +164,9 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
                             {beat.beat_tags?.name || 'Unknown Genre'}
                         </p>
                     </div>
-                    <button className="p-2 hover:bg-black/5 rounded-full transition-colors shrink-0">
+                    {/* <button className="p-2 hover:bg-black/5 rounded-full transition-colors shrink-0">
                         <Heart className="w-6 h-6 text-warm-400 hover:text-red-500 transition-colors" />
-                    </button>
+                    </button> */}
                 </div>
 
                 {/* Progress Bar */}

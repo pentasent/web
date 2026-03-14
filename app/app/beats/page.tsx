@@ -9,10 +9,14 @@ import { BeatDetailPanel } from '@/components/beats/BeatDetailPanel';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
+import { GlobalLayout } from '@/components/layout/global-layout';
+import { BeatListShimmer, BeatTagsShimmer } from '@/components/shimmer/BeatCardShimmer';
 
 type SortOption = 'views' | 'duration';
 
 export default function BeatsPage() {
+    const { user, loading: authLoading } = useAuth();
     const queryClient = useQueryClient();
 
     // Filters
@@ -102,6 +106,14 @@ export default function BeatsPage() {
         setSelectedBeat({ ...beat, play_count: currentCount + 1 });
     };
 
+    if (authLoading) {
+        return (
+          <GlobalLayout />
+        );
+    }
+
+    if (!user) return null;
+
     return (
         <div className="">
             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-20 gap-8 items-start max-w-7xl mx-auto lg:px-16">
@@ -113,18 +125,19 @@ export default function BeatsPage() {
                     </div>
 
                     <div className="py-6 px-4 md:px-0 sticky xl:top-0 lg:top-0 top-[70px] z-30 bg-warm-50">
-                        <BeatTagList
-                            tags={tags}
-                            selectedTag={selectedTag}
-                            onSelect={setSelectedTag}
-                        />
+                        {loading && beats.length === 0 ? (
+                            <BeatTagsShimmer />
+                        ) : (
+                            <BeatTagList
+                                tags={tags}
+                                selectedTag={selectedTag}
+                                onSelect={setSelectedTag}
+                            />
+                        )}
                     </div>
 
                     {loading && beats.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 px-4 md:px-0">
-                            <Loader2 className="w-8 h-8 animate-spin text-warm-400 mb-4" />
-                            <p className="text-warm-500 font-medium">Loading tracks...</p>
-                        </div>
+                        <BeatListShimmer />
                     ) : (
                         <div className="space-y-4 px-4 md:px-0 pb-32 lg:pb-10">
                             {filteredBeats.length === 0 ? (

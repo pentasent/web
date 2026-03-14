@@ -6,15 +6,15 @@ import { Community } from '@/types/database';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, LayoutGrid, Users, Compass, Book } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CommunityCard, ExtendedCommunity } from '@/components/community/CommunityCard';
 import { CommunityDetailPanel } from '@/components/community/CommunityDetailPanel';
+import { GlobalLayout } from '@/components/layout/global-layout';
+import { CommunityListShimmer } from '@/components/shimmer/CommunityCardShimmer';
 
 export default function CommunityPage() {
     const { user, loading: authLoading } = useAuth();
-    const { toast } = useToast();
     const queryClient = useQueryClient();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -133,9 +133,7 @@ export default function CommunityPage() {
 
     if (authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-warm-50">
-                <Loader2 className="w-8 h-8 animate-spin text-warm-700 mb-4" />
-            </div>
+          <GlobalLayout />
         );
     }
 
@@ -157,9 +155,8 @@ export default function CommunityPage() {
                     </div>
 
                     {loading && communities.length === 0 && !communityIdFromUrl ? (
-                         <div className="flex flex-col items-center justify-center py-20 px-4">
-                            <Loader2 className="w-8 h-8 animate-spin text-warm-400 mb-4" />
-                            <p className="text-warm-500 font-medium">Loading communities...</p>
+                         <div className="px-4 md:px-0">
+                            <CommunityListShimmer />
                         </div>
                     ) : (
                         <div className="space-y-10 px-4 md:px-0">
@@ -214,8 +211,8 @@ export default function CommunityPage() {
                  </div>
 
                  {/* RIGHT SIDEBAR (Desktop Post Detail Overlay) */}
-                 <div className="hidden xl:block relative h-full mt-8">
-                    <div className="sticky top-8 h-[calc(100vh-4rem)] w-full">
+                 <div className="lg:relative lg:h-full hidden lg:block mt-8">
+                    <div className="lg:sticky lg:top-16 lg:h-[calc(100vh-8rem)] w-full">
                         <AnimatePresence mode="wait">
                             {selectedCommunity ? (
                                 <motion.div
@@ -224,7 +221,7 @@ export default function CommunityPage() {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
                                     transition={{ duration: 0.2 }}
-                                    className="h-[calc(100vh-4rem)] w-full shadow-2xl rounded-2xl bg-warm-100 border border-warm-300 overflow-hidden"
+                                    className="h-[calc(100vh-8rem)] w-full shadow-2xl rounded-2xl bg-warm-100 border border-warm-300 overflow-hidden"
                                 >
                                     <CommunityDetailPanel
                                         communityId={selectedCommunity.id}

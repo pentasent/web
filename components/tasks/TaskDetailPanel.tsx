@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import { TaskSubtaskShimmer } from '../shimmer/TaskCardShimmer';
 
 interface TaskDetailPanelProps {
     task: UserTask;
@@ -163,7 +164,7 @@ export function TaskDetailPanel({ task, onClose, onEdit, onToggleParentCompletio
         }
     };
 
-    const priorityColor = task.priority === 'high' ? 'text-red-500 bg-red-50 border-red-200' : task.priority === 'medium' ? 'text-yellow-600 bg-yellow-50 border-yellow-200' : 'text-green-600 bg-green-50 border-green-200';
+    // const priorityColor = task.priority === 'high' ? 'text-red-500 bg-red-50 border-red-200' : task.priority === 'medium' ? 'text-yellow-600 bg-yellow-50 border-yellow-200' : 'text-green-600 bg-green-50 border-green-200';
 
     return (
         <div className="h-full flex flex-col bg-warm-100">
@@ -203,7 +204,8 @@ export function TaskDetailPanel({ task, onClose, onEdit, onToggleParentCompletio
             </div>
 
             {/* Content */}
-            <div className={`flex-1 overflow-y-auto p-8 ${isReadOnly ? 'opacity-80' : ''}`}>
+            <div className={`flex-1 overflow-y-auto p-8 custom-scrollbar ${isReadOnly ? 'opacity-80' : ''}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                 <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
                 <div className="max-w-2xl mx-auto space-y-8">
                     
                     {/* Title & Description */}
@@ -265,7 +267,7 @@ export function TaskDetailPanel({ task, onClose, onEdit, onToggleParentCompletio
                         </div>
 
                         {loadingSubtasks ? (
-                            <div className="py-4 flex justify-center"><Loader2 className="w-6 h-6 text-warm-400 animate-spin" /></div>
+                            <TaskSubtaskShimmer />
                         ) : (
                             <div className="space-y-3">
                                 {subtasks.map(st => (

@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { GlobalLayout } from '@/components/layout/global-layout';
 
 export default function FeedPage() {
     const { user, loading: authLoading } = useAuth();
@@ -552,11 +553,17 @@ export default function FeedPage() {
         });
     };
 
+    // if (authLoading) {
+    //     return (
+    //         <div className="min-h-screen flex items-center justify-center bg-warm-50">
+    //             <Loader2 className="w-8 h-8 animate-spin text-warm-700 mb-4" />
+    //         </div>
+    //     );
+    // }
+
     if (authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-warm-50">
-                <Loader2 className="w-8 h-8 animate-spin text-warm-700 mb-4" />
-            </div>
+          <GlobalLayout />
         );
     }
 
@@ -648,32 +655,50 @@ export default function FeedPage() {
             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-12 gap-8 items-start max-w-[1400px] mx-auto lg:px-8">
 
                 {/* LEFT FEED */}
-                <div className="max-w-[700px] mx-auto xl:mx-0 w-full flex flex-col mt-24 xl:mt-8">
+                <div className="max-w-[700px] mx-auto xl:mx-0 w-full flex flex-col mt-16 lg:mt-4">
                     {/* Community Filters (Moved ABOVE Create Post) */}
-                    {communities.length > 0 && (
-                        <div className="px-4 md:px-0 mb-6 w-full">
-                            <div className="flex items-center gap-3 overflow-x-auto pb-4 custom-scrollbar px-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitMaskImage: 'linear-gradient(to right, transparent, black 15px, black calc(100% - 30px), transparent)', maskImage: 'linear-gradient(to right, transparent, black 15px, black calc(100% - 30px), transparent)' }}>
-                                <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
-                                <button
-                                    onClick={() => setSelectedCommunityFilter(null)}
-                                    className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold transition-transform hover:scale-105 active:scale-95 shadow-md ${selectedCommunityFilter === null ? 'bg-[#3c2a34] text-white' : 'bg-warm-100 border border-warm-300 text-warm-700 hover:bg-warm-200'
-                                        }`}
-                                >
-                                    All Communities
-                                </button>
-                                {communities.map(comm => (
+                    <div className="px-4 md:px-0 mb-6 w-full">
+                        <div className="flex items-center gap-3 overflow-x-auto pb-4 px-1 scrollbar-hide snap-x snap-mandatory">
+
+                            {communities.length > 0 ? (
+                                <>
                                     <button
-                                        key={comm.id}
-                                        onClick={() => setSelectedCommunityFilter(comm.id)}
-                                        className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-medium transition-transform hover:scale-105 active:scale-95 shadow-sm ${selectedCommunityFilter === comm.id ? 'bg-[#3c2a34] text-white' : 'bg-warm-100 border border-warm-300 text-warm-700 hover:bg-warm-200'
+                                        onClick={() => setSelectedCommunityFilter(null)}
+                                        className={`shrink-0 px-5 py-2.5 mt-4 rounded-full text-sm font-semibold transition-transform hover:scale-105 active:scale-95 shadow-md ${selectedCommunityFilter === null
+                                            ? "bg-[#3c2a34] text-white"
+                                            : "bg-warm-100 border border-warm-300 text-warm-700 hover:bg-warm-200"
                                             }`}
                                     >
-                                        {comm.name}
+                                        All Communities
                                     </button>
-                                ))}
-                            </div>
+
+                                    {communities.map((comm) => (
+                                        <button
+                                            key={comm.id}
+                                            onClick={() => setSelectedCommunityFilter(comm.id)}
+                                            className={`shrink-0 px-5 py-2.5 mt-4 rounded-full text-sm font-medium transition-transform hover:scale-105 active:scale-95 shadow-sm ${selectedCommunityFilter === comm.id
+                                                ? "bg-[#3c2a34] text-white"
+                                                : "bg-warm-100 border border-warm-300 text-warm-700 hover:bg-warm-200"
+                                                }`}
+                                        >
+                                            {comm.name}
+                                        </button>
+                                    ))}
+                                </>
+                            ) : (
+                                <>
+                                    {[1, 2, 3, 4].map(i => (
+                                        <div
+                                            key={i}
+                                            className="px-20 py-5 rounded-full bg-warm-200 animate-pulse shrink-0 mt-4"
+                                        />
+                                    ))}
+                                </>
+
+                            )}
+
                         </div>
-                    )}
+                    </div>
 
                     <div className="px-4 md:px-0 mb-6">
                         <CreatePostCard
@@ -684,44 +709,86 @@ export default function FeedPage() {
                         />
                     </div>
 
-                    {loading && posts.length === 0 && !postIdFromUrl ? (
-                        <div className="flex flex-col items-center justify-center py-20 px-4">
-                            <Loader2 className="w-8 h-8 animate-spin text-warm-400 mb-4" />
-                            <p className="text-warm-500 font-medium">Loading feed...</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-0 px-4 md:px-0">
-                            {posts.length === 0 ? (
-                                <div className="text-center py-20 bg-white/50 rounded-2xl border border-warm-300 border-dashed">
-                                    <p className="text-warm-500 font-medium">No posts in your feed yet.</p>
-                                </div>
-                            ) : (
-                                posts.map((post) => (
-                                    <div className="mb-6" key={post.id}>
-                                        <PostCard
-                                            post={post}
-                                            onPress={() => openPostDetails(post)}
-                                            onLike={(e) => { e.stopPropagation(); handleLikePost(post); }}
-                                            onComment={(e) => { e.stopPropagation(); openPostDetails(post); }}
-                                            onShare={(e) => { e.stopPropagation(); handleSharePost(post); }}
-                                        />
-                                    </div>
-                                ))
-                            )}
+                    <div className="space-y-0 px-4 md:px-0">
+                        {loadingPosts && posts.length === 0 ? (
+                            <div className="space-y-6 px-4 md:px-0">
 
-                            {!loading && posts.length > 0 && (
-                                <div className="text-center py-10 pt-4">
-                                    <p className="text-warm-400 font-medium text-sm">You&apos;ve reached the end of the feed.</p>
-                                    <p className="text-warm-400 text-xs mt-1 italic">Try refreshing to see new content.</p>
+                                {[1, 2, 3].map((i) => (
+                                    <div
+                                        key={i}
+                                        className="bg-warm-100 border border-warm-200 rounded-[20px] p-5 animate-pulse"
+                                    >
+                                        {/* header */}
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="w-10 h-10 rounded-full bg-warm-200" />
+                                            <div className="flex-1">
+                                                <div className="h-3 w-32 bg-warm-200 rounded mb-2" />
+                                                <div className="h-2 w-24 bg-warm-200 rounded" />
+                                            </div>
+                                        </div>
+
+                                        {/* title */}
+                                        <div className="h-4 w-2/3 bg-warm-200 rounded mb-3" />
+
+                                        {/* text */}
+                                        <div className="space-y-2 mb-4">
+                                            <div className="h-3 bg-warm-200 rounded" />
+                                            <div className="h-3 bg-warm-200 rounded w-5/6" />
+                                        </div>
+
+                                        {/* image */}
+                                        <div className="h-[220px] rounded-xl bg-warm-200 mb-4" />
+
+                                        {/* actions */}
+                                        <div className="flex gap-6">
+                                            <div className="h-4 w-16 bg-warm-200 rounded" />
+                                            <div className="h-4 w-20 bg-warm-200 rounded" />
+                                            <div className="h-4 w-14 bg-warm-200 rounded" />
+                                        </div>
+                                    </div>
+                                ))}
+
+                            </div>
+                        ) : posts.length === 0 ? (
+                            <div className="text-center py-20 bg-white/50 rounded-2xl border border-warm-300 border-dashed">
+                                <p className="text-warm-500 font-medium">
+                                    No posts in your feed yet.
+                                </p>
+                            </div>
+                        ) : (
+                            posts.map((post) => (
+                                <div className="mb-6" key={post.id}>
+                                    <PostCard
+                                        post={post}
+                                        onPress={() => openPostDetails(post)}
+                                        onLike={(e) => {
+                                            e.stopPropagation();
+                                            handleLikePost(post);
+                                        }}
+                                        onComment={(e) => {
+                                            e.stopPropagation();
+                                            openPostDetails(post);
+                                        }}
+                                        onShare={(e) => {
+                                            e.stopPropagation();
+                                            handleSharePost(post);
+                                        }}
+                                    />
                                 </div>
-                            )}
-                        </div>
-                    )}
+                            ))
+                        )}
+                        {!loading && posts.length > 0 && (
+                            <div className="text-center py-10 pt-4">
+                                <p className="text-warm-400 font-medium text-sm">You&apos;ve reached the end of the feed.</p>
+                                <p className="text-warm-400 text-xs mt-1 italic">Try refreshing to see new content.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* RIGHT SIDEBAR (Desktop Post Detail Overlay) */}
-                <div className="hidden xl:block relative h-full mt-8">
-                    <div className="sticky top-8 h-[calc(100vh-4rem)] w-full">
+                <div className="lg:relative lg:h-full hidden lg:block mt-8">
+                    <div className="lg:sticky lg:top-16 lg:h-[calc(100vh-8rem)] w-full">
                         <AnimatePresence mode="wait">
                             {selectedPost ? (
                                 <motion.div
@@ -730,7 +797,7 @@ export default function FeedPage() {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
                                     transition={{ duration: 0.2 }}
-                                    className="h-[calc(100vh-4rem)] w-full shadow-2xl rounded-2xl bg-warm-100 border border-warm-300 overflow-hidden"
+                                    className="h-[calc(100vh-8rem)] w-full shadow-2xl rounded-2xl bg-warm-100 border border-warm-300 overflow-hidden"
                                 >
                                     <PostDetailPanel
                                         post={selectedPost}

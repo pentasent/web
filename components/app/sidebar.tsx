@@ -27,16 +27,18 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
+import { GlobalLayout } from "../layout/global-layout";
 
 const sidebarItems = [
     { name: "Feed", href: "/app/feed", icon: LayoutDashboard  },
     { name: "Beats", href: "/app/beats", icon: Headphones },
     { name: "Community", href: "/app/community", icon: Users },
     { name: "Meditation", href: "/app/meditation", icon: Brain },
-    { name: "Yoga", href: "/app/yoga", icon: Activity },
+    // { name: "Yoga", href: "/app/yoga", icon: Activity },
     { name: "Tasks", href: "/app/tasks", icon: CheckSquare },
     { name: "Journal", href: "/app/journal", icon: PenBox },
-    { name: "Products", href: "/app/products", icon: ShoppingBag },
+    // { name: "Products", href: "/app/products", icon: ShoppingBag },
+    // { name: "Notification", href: "/app/notifications", icon: Bell },
 ];
 
 export function Sidebar({
@@ -49,7 +51,7 @@ export function Sidebar({
     const pathname = usePathname();
     const [isHovered, setIsHovered] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
 
     // The sidebar is logically open if it's open on mobile OR hovered on desktop
     const isOpen = mobileOpen || isHovered;
@@ -71,6 +73,8 @@ export function Sidebar({
         return () => clearTimeout(timer);
     }, [isOpen]);
 
+    
+        if (authLoading || !user) return null;
     return (
         <>
             {/* Mobile Backdrop */}
@@ -187,7 +191,7 @@ export function Sidebar({
                                             <span className="absolute top-[8px] right-[8px] w-2 h-2 bg-red-900 rounded-full border-2 border-[#F8F2EE]" />
                                         </Button> */}
                                         <div className="flex items-center gap-2 cursor-pointer rounded-full shrink-0">
-                                            <Avatar className="h-8 w-8 border border-border/40 shrink-0">
+                                            <Avatar className="h-6 w-6 border border-border/40 shrink-0">
                                                 <AvatarImage src={user?.avatar_url || "https://i.pravatar.cc/150?u=a042581f4e29026024e"} alt="User" />
                                                 <AvatarFallback>{user?.name?.charAt(0)?.toUpperCase() || "U"}</AvatarFallback>
                                             </Avatar>

@@ -128,7 +128,7 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="w-full h-full sm:max-h-[90vh] sm:max-w-[600px] overflow-hidden sm:overflow-visible rounded-none sm:rounded-3xl p-0 gap-0 border-0 flex flex-col pt-3 sm:pt-0">
-                <DialogHeader className="px-6 py-4 border-b border-warm-300">
+                <DialogHeader className="px-6 pb-4 md:pt-4 lg:pt-4 border-b border-warm-300">
                     <DialogTitle className="text-xl font-bold text-warm-700">Edit Post</DialogTitle>
                 </DialogHeader>
 
@@ -210,7 +210,7 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
                             <span className="text-xs text-warm-400 whitespace-nowrap">{title.length}/{MAX_TITLE_LENGTH}</span>
                         </div>
                         <textarea
-                            className="w-full text-[15px] sm:text-base text-warm-700 placeholder:text-gray-400 bg-transparent min-h-[160px] resize-none outline-none leading-relaxed mt-2 pb-[100px]"
+                            className="w-full text-[15px] scrollbar-hide snap-x snap-mandatory sm:text-base text-warm-700 placeholder:text-gray-400 bg-transparent min-h-[160px] resize-none outline-none leading-relaxed mt-2 pb-[100px]"
                             placeholder="What do you want to share?"
                             value={content}
                             onChange={(e) => setContent(e.target.value)}

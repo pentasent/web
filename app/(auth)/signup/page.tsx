@@ -3,14 +3,15 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Eye, Mail, Lock, User, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 const signUpSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -23,6 +24,18 @@ const signUpSchema = z.object({
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-warm-50">
+        <Loader2 className="w-8 h-8 animate-spin text-warm-700" />
+      </div>
+    }>
+      <SignUpForm />
+    </Suspense>
+  );
+}
+
+function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -36,6 +49,22 @@ export default function SignUpPage() {
     resolver: zodResolver(signUpSchema),
   });
 
+  const searchParams = useSearchParams();
+  const [referralCode, setReferralCode] = useState("P-WEB");
+
+  useEffect(() => {
+    const urlRef = searchParams.get("ref");
+    if (urlRef) {
+      localStorage.setItem("referral_code", urlRef);
+      setReferralCode(urlRef);
+    } else {
+      const storedRef = localStorage.getItem("referral_code");
+      if (storedRef) {
+        setReferralCode(storedRef);
+      }
+    }
+  }, [searchParams]);
+
   const onSubmit = async (data: SignUpFormValues) => {
     if (!agreedToTerms) {
       toast({
@@ -47,7 +76,12 @@ export default function SignUpPage() {
     }
     setLoading(true);
     try {
-      await authRegister(data.email.toLowerCase().trim(), data.password);
+      const metadata = {
+        referral_code: referralCode,
+        date: new Date().toISOString(),
+        Campain: "Promotion From Web"
+      };
+      await authRegister(data.email.toLowerCase().trim(), data.password, metadata);
       toast({
         title: "Account created!",
         description: "Please check your email for the confirmation code.",
@@ -217,7 +251,7 @@ export default function SignUpPage() {
           <div className="relative h-[220px] hidden lg:block">
 
             {/* Back Phone */}
-                        <motion.div
+            <motion.div
               initial={{ opacity: 0, x: 60, rotate: -6 }}
               whileInView={{ opacity: 1, x: 0, rotate: -6 }}
               viewport={{ once: true }}

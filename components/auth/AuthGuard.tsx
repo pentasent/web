@@ -19,10 +19,12 @@ export default function AuthGuard() {
         if (user && user.is_onboarded) {
             const isAuthPage = pathname === '/signin' || pathname === '/signup';
             // Also if they try to access /beta-release but they are admin, move them to feed
-            const isAdminOnBeta = user.role === 'admin' && pathname === '/beta-release';
+            // const isAdminOnBeta = user.role === 'admin' && pathname === '/beta-release';
 
-            if (isAuthPage || isAdminOnBeta) {
-                router.push(user.role === 'admin' ? '/app/feed' : '/beta-release');
+            if (isAuthPage) {
+                router.push('/app/feed');
+            // if (isAuthPage || isAdminOnBeta) {
+                // router.push(user.role === 'admin' ? '/app/feed' : '/beta-release');
             }
         }
 

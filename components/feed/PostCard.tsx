@@ -23,7 +23,8 @@ export const PostCard: React.FC<PostCardProps> = ({
 
     return (
         <div
-            className="bg-warm-100 border hover:border-warm-300 border-transparent rounded-[20px] shadow-sm mb-4 cursor-pointer overflow-hidden transition-all duration-200"
+            // className="bg-warm-100 border hover:border-warm-300 border-transparent rounded-[20px] shadow-sm mb-4 cursor-pointer overflow-hidden transition-all duration-200"
+            className="bg-warm-100 border hover:border-warm-300 border-transparent rounded-[20px] shadow-sm hover:shadow-md mb-4 cursor-pointer overflow-hidden transition-all duration-200"
             onClick={onPress}
         >
             {/* Header */}
@@ -68,8 +69,8 @@ export const PostCard: React.FC<PostCardProps> = ({
 
             {/* Media */}
             {post.images && post.images.length > 0 && (
-                <div className="mt-1 flex overflow-x-auto gap-2 pb-2 px-5 custom-scrollbar snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
+                <div className="mt-1 flex overflow-x-auto gap-2 pb-2 px-5 scrollbar-hide snap-x snap-mandatory">
+                   
                     {post.images.map((img, idx) => (
                         <div
                             key={idx}
@@ -114,9 +115,9 @@ export const PostCard: React.FC<PostCardProps> = ({
                 >
                     <MessageCircle
                         size={20}
-                        className="text-warm-500 group-hover:text-blue-500"
+                        className="text-warm-500 group-hover:text-primary"
                     />
-                    <span className="text-sm font-medium text-warm-500 group-hover:text-blue-500 transition-colors">
+                    <span className="text-sm font-medium text-warm-500 group-hover:text-primary transition-colors">
                         {post.comments_count > 0 ? formatNumber(post.comments_count) : 'Comment'}
                     </span>
                 </button>
@@ -132,7 +133,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                     onClick={onShare}
                     className="flex items-center gap-2 group hover:opacity-80 transition-opacity ml-auto"
                 >
-                    <Share2 size={20} className="text-warm-500 group-hover:text-green-500" />
+                    <Share2 size={20} className="text-warm-500 group-hover:text-pink-600" />
                 </button>
             </div>
         </div>

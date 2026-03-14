@@ -7,19 +7,8 @@ import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { Camera, ChevronDown, Check, X, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { COUNTRIES } from '@/lib/country';
 
-const COUNTRIES = [
-    { label: 'United States', flag: '🇺🇸', code: 'us' },
-    { label: 'United Kingdom', flag: '🇬🇧', code: 'gb' },
-    { label: 'India', flag: '🇮🇳', code: 'in' },
-    { label: 'Canada', flag: '🇨🇦', code: 'ca' },
-    { label: 'Australia', flag: '🇦🇺', code: 'au' },
-    { label: 'Germany', flag: '🇩🇪', code: 'de' },
-    { label: 'France', flag: '🇫🇷', code: 'fr' },
-    { label: 'Japan', flag: '🇯🇵', code: 'jp' },
-    { label: 'Brazil', flag: '🇧🇷', code: 'br' },
-    { label: 'South Africa', flag: '🇿🇦', code: 'za' },
-];
 
 export default function ProfilePopup() {
     const { user, refreshUser } = useAuth();
@@ -280,7 +269,8 @@ export default function ProfilePopup() {
                             </div>
 
                             {/* List */}
-                            <div className="overflow-y-auto px-2 py-2 flex-1 ">
+                            <div className="overflow-y-auto px-2 py-2 flex-1 custom-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
                                 {COUNTRIES.map((item) => (
                                     <button
                                         key={item.label}
@@ -291,12 +281,31 @@ export default function ProfilePopup() {
                                         className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors"
                                     >
                                         <div className="flex items-center gap-3">
+                                            {item.code !== "other" ? (
+                                                <Image
+                                                    src={`https://flagcdn.com/w40/${item.code}.png`}
+                                                    alt={item.label}
+                                                    width={24}
+                                                    height={16}
+                                                    className="rounded-sm shadow-sm"
+                                                />
+                                            ) : (
+                                                <span className="text-lg">🌍</span>
+                                            )}
+
+                                            <span className="text-gray-800 font-medium">{item.label}</span>
+                                        </div>
+
+                                        {country?.label === item.label && (
+                                            <Check className="w-5 h-5 text-[#3d2f4d]" />
+                                        )}
+                                        {/* <div className="flex items-center gap-3">
                                             <Image src={`https://flagcdn.com/w40/${item.code}.png`} alt={item.label} width={24} height={16} className="rounded-sm shadow-sm" />
                                             <span className="text-gray-800 font-medium">{item.label}</span>
                                         </div>
                                         {country?.label === item.label && (
                                             <Check className="w-5 h-5 text-[#3d2f4d]" />
-                                        )}
+                                        )} */}
                                     </button>
                                 ))}
                             </div>

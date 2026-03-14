@@ -107,7 +107,8 @@ export function JournalDetailPanel({ journal, onClose, onEdit }: JournalDetailPa
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-8">
+            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
                 <div className="max-w-3xl mx-auto space-y-6">
                     <div className="flex justify-between items-start gap-4">
                         <h1 className="text-3xl font-bold text-warm-700 leading-tight">

@@ -10,20 +10,35 @@ import Navbar from "@/components/layout/navbar";
 import ArticlesSection from "@/components/home/articles-section";
 import PricingSection from "@/components/home/pricing-section";
 import { StickyDownload } from "@/components/layout/sticky-download";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { GlobalLayout } from "@/components/layout/global-layout";
 
 export default function Home() {
+  // useEffect(() => {
+  //   // Only handle hash redirects on the client
+  //   if (typeof window !== "undefined") {
+  //     const hash = window.location.hash;
+  //     if (hash && (hash.includes("type=recovery") || hash.includes("access_token="))) {
+  //       console.log("Recovery hash detected on home page, redirecting to /reset-password...");
+  //       // Use location.replace to avoid browser history pollution for the redirect
+  //       window.location.replace("/reset-password" + hash);
+  //     }
+  //   }
+  // }, []);
+
+  const [showLoader, setShowLoader] = useState(true);
+
   useEffect(() => {
-    // Only handle hash redirects on the client
-    if (typeof window !== "undefined") {
-      const hash = window.location.hash;
-      if (hash && (hash.includes("type=recovery") || hash.includes("access_token="))) {
-        console.log("Recovery hash detected on home page, redirecting to /reset-password...");
-        // Use location.replace to avoid browser history pollution for the redirect
-        window.location.replace("/reset-password" + hash);
-      }
-    }
+    const timer = setTimeout(() => {
+      setShowLoader(false);
+    }, 2000); // 2 seconds
+
+    return () => clearTimeout(timer);
   }, []);
+
+  if (showLoader) {
+    return <GlobalLayout />;
+  }
   return (
     <main className="min-h-screen overflow-x-hidden">
       <Navbar />

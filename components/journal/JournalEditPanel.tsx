@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 
-const MOODS = ['😀', '🥰', '😌', '😐', '😔', '😢', '😠'];
+const MOODS = ['🥰', '😌', '😐', '😔', '😢', '😠'];
 
 interface JournalEditPanelProps {
     journal?: UserJournal | null; // null/undefined for new
@@ -98,8 +98,7 @@ export function JournalEditPanel({ journal, onClose, onSaved }: JournalEditPanel
         <div className="h-full flex flex-col bg-warm-100">
             {/* Header */}
             <div className="px-6 py-4 flex items-center justify-between border-b border-warm-300 bg-warm-100 sticky top-0 z-10">
-                <div className="flex items-center gap-3">
-                    <button
+                <button
                         onClick={onClose}
                         className="p-2 hover:bg-warm-200 rounded-full transition-colors"
                         title="Cancel"
@@ -109,7 +108,6 @@ export function JournalEditPanel({ journal, onClose, onSaved }: JournalEditPanel
                     <h2 className="text-lg font-bold text-warm-700">
                         {journal ? 'Edit Entry' : 'New Entry'}
                     </h2>
-                </div>
                 
                 <button
                     onClick={handleSave}
@@ -126,7 +124,8 @@ export function JournalEditPanel({ journal, onClose, onSaved }: JournalEditPanel
             </div>
 
             {/* Form */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-8">
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
                 <div className="max-w-3xl mx-auto space-y-6">
                     <div>
                         <input

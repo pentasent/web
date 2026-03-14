@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Activity, Apple, Headphones, CheckCircle2, ChevronRight, Users2, Users, UsersRound, Music, NotebookPen, Notebook } from 'lucide-react';
 import Image from 'next/image';
+import { SmartImage } from '../ui/SmartImage';
 
 export default function HeroSection() {
   return (
@@ -40,20 +41,20 @@ export default function HeroSection() {
               </a>
             </div> */}
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-  
-  <a href="/signin" className="w-full sm:w-auto">
-    <button className="w-full sm:w-auto bg-[#3d2f4d] text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-[#2d1f3d] transition-all">
-      Get Started
-    </button>
-  </a>
 
-  <a href="#pricing" className="w-full sm:w-auto">
-    <button className="w-full sm:w-auto bg-white text-gray-700 px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-gray-50 transition-all border border-gray-200">
-      Pricing Plans
-    </button>
-  </a>
+              <a href="/signin" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-[#3d2f4d] text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-[#2d1f3d] transition-all">
+                  Get Started
+                </button>
+              </a>
 
-</div>
+              <a href="#pricing" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-white text-gray-700 px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-gray-50 transition-all border border-gray-200">
+                  Pricing Plans
+                </button>
+              </a>
+
+            </div>
           </motion.div>
 
           <motion.div

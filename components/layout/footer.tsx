@@ -166,7 +166,7 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3 text-gray-600 text-sm">
               <li><a href='/about' className='cursor-pointer'> About Us</a></li>
-              <li><a href='/beta-release' className='cursor-pointer'> Community</a></li>
+              <li><a href='/app/community' className='cursor-pointer'> Community</a></li>
               <li><a href='/contact' className='cursor-pointer'> Contact</a></li>
             </ul>
           </div>

@@ -13,6 +13,8 @@ import { format } from 'date-fns';
 import { JournalCard } from '@/components/journal/JournalCard';
 import { JournalDetailPanel } from '@/components/journal/JournalDetailPanel';
 import { JournalEditPanel } from '@/components/journal/JournalEditPanel';
+import { GlobalLayout } from '@/components/layout/global-layout';
+import { JournalListShimmer } from '@/components/shimmer/JournalCardShimmer';
 
 interface JournalSection {
     title: string;
@@ -91,9 +93,7 @@ export default function JournalPage() {
 
     if (authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-warm-50">
-                <Loader2 className="w-8 h-8 animate-spin text-warm-700 mb-4" />
-            </div>
+          <GlobalLayout />
         );
     }
 
@@ -122,10 +122,7 @@ export default function JournalPage() {
                     </div>
 
                     {loadingJournals && journals.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 px-4">
-                            <Loader2 className="w-8 h-8 animate-spin text-warm-400 mb-4" />
-                            <p className="text-warm-500 font-medium">Loading journals...</p>
-                        </div>
+                        <JournalListShimmer />
                     ) : (
                         <div className="space-y-10 px-4 md:px-0">
                             {sections.length > 0 ? (
@@ -169,8 +166,8 @@ export default function JournalPage() {
                 </div>
 
                 {/* RIGHT SIDEBAR (Desktop Overlay) */}
-                <div className="hidden xl:block relative h-full mt-8">
-                    <div className="sticky top-8 h-[calc(100vh-4rem)] w-full">
+                <div className="lg:relative lg:h-full hidden lg:block mt-8">
+                    <div className="lg:sticky lg:top-16 lg:h-[calc(100vh-8rem)] w-full">
                         <AnimatePresence mode="wait">
                             {(selectedJournal && !isEditing) && (
                                 <motion.div
@@ -179,7 +176,7 @@ export default function JournalPage() {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
                                     transition={{ duration: 0.2 }}
-                                    className="h-[calc(100vh-4rem)] w-full shadow-2xl rounded-2xl overflow-hidden border border-warm-300 bg-warm-100"
+                                    className="h-[calc(100vh-8rem)] w-full shadow-2xl rounded-2xl overflow-hidden border border-warm-300 bg-warm-100"
                                 >
                                     <JournalDetailPanel
                                         journal={selectedJournal}
@@ -195,7 +192,7 @@ export default function JournalPage() {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
                                     transition={{ duration: 0.2 }}
-                                    className="h-[calc(100vh-4rem)] w-full shadow-2xl rounded-2xl overflow-hidden border border-warm-300 bg-warm-100"
+                                    className="h-[calc(100vh-8rem)] w-full shadow-2xl rounded-2xl overflow-hidden border border-warm-300 bg-warm-100"
                                 >
                                     <JournalEditPanel
                                         journal={isEditing ? selectedJournal : null}

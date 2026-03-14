@@ -161,7 +161,7 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
     };
 
     return (
-        <div className={`bg-warm-100 ${minimal ? 'p-2 rounded-full' : 'rounded-[20px] shadow-sm mb-6 p-4'} border border-transparent`}>
+        <div className={`bg-warm-100/50 ${minimal ? 'p-2 rounded-full' : 'rounded-[20px] shadow-sm mb-6 p-4'} border border-transparent`}>
             <div className="flex items-center gap-3">
                 <Image
                     src={userAvatar}
@@ -178,9 +178,10 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                         </button>
                     </DialogTrigger>
                     <DialogContent className="w-full h-full sm:max-h-[90vh] sm:max-w-[600px] overflow-hidden sm:overflow-visible rounded-none sm:rounded-3xl p-0 gap-0 border-0 flex flex-col pt-3 sm:pt-0">
-                        <DialogHeader className="px-6 py-4 border-b border-warm-300">
+                        <DialogHeader className="px-6 pb-4 md:pt-4 lg:pt-4 border-b border-warm-300">
                             <div className="flex items-center justify-between">
                                 <DialogTitle className="text-xl font-bold text-warm-700">Create Post</DialogTitle>
+                                {/* <X className='h-6 w-6 text-warm-600' onClick={handleClose} /> */}
                             </div>
                         </DialogHeader>
 
@@ -291,7 +292,7 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                                     <span className="text-xs text-warm-400 whitespace-nowrap">{title.length}/{MAX_TITLE_LENGTH}</span>
                                 </div>
                                 <textarea
-                                    className="w-full text-[15px] sm:text-base text-warm-700 placeholder:text-gray-400 bg-transparent min-h-[160px] resize-none outline-none leading-relaxed mt-2 pb-[100px]"
+                                    className="w-full text-[15px] scrollbar-hide snap-x snap-mandatory sm:text-base text-warm-700 placeholder:text-gray-400 bg-transparent min-h-[160px] resize-none outline-none leading-relaxed mt-2 pb-[100px]"
                                     placeholder="What do you want to share?"
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}

@@ -13,6 +13,7 @@ import {
   Flower2,
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRef, useState } from 'react';
 
 const tabs = [
@@ -30,6 +31,8 @@ const content = {
     badgeColor: 'bg-[#e78886]',
     title: 'Meaningful connection, designed for growth.',
     icon: Users,
+    link: '/app/community',
+    linktext: "Learn More",
     description:
       'Curated wellness communities where conversations stay intentional. Share progress, ask questions, and evolve alongside others walking a similar path.',
     features: [
@@ -50,6 +53,8 @@ const content = {
     badgeColor: 'bg-[#95936e]',
     title: 'Clarity begins with reflection.',
     icon: BookOpen,
+    link: '/app/journal',
+    linktext: "Learn More",
     description:
       'Structured journaling to track mood, energy, and personal insights. Identify patterns and build intentional awareness over time.',
     features: [
@@ -70,6 +75,8 @@ const content = {
     badgeColor: 'bg-[#78bfa0]',
     title: 'Calm productivity, without burnout.',
     icon: CheckSquare,
+    link: '/app/tasks',
+    linktext: "Learn More",
     description:
       'Plan tasks, manage habits, and align your day with intention. Stay structured while protecting your energy.',
     features: [
@@ -90,6 +97,8 @@ const content = {
     badgeColor: 'bg-[#e28ab2]',
     title: 'Pause. Breathe. Reset your nervous system.',
     icon: Brain,
+    link: '/app/meditation',
+    linktext: "Learn More",
     description:
       'Guided meditation sessions crafted to reduce stress, strengthen emotional balance, and create sustainable calm.',
     features: [
@@ -110,6 +119,8 @@ const content = {
     badgeColor: 'bg-[#419ebe]',
     title: 'Shift your state with sound.',
     icon: Headphones,
+    link: '/app/beats',
+    linktext: "Learn More",
     description:
       'Curated focus beats and ambient soundscapes to elevate productivity, meditation, and relaxation.',
     features: [
@@ -130,6 +141,8 @@ const content = {
     badgeColor: 'bg-[#c7956e]',
     title: 'Move with awareness and strength.',
     icon: Activity,
+    link: '/beta-release',
+    linktext: "Learn More",
     description:
       'Structured yoga flows and breathwork designed to support flexibility, hormonal balance, and long-term vitality.',
     features: [
@@ -321,12 +334,12 @@ export default function FeatureSection() {
                             );
                           })}
                         </div>
-                        <a href='/beta-release'>
+                        <Link href={section.link}>
                         <button className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium group w-fit border-2 border-gray-100 py-2.5 px-5 rounded-full">
-                          Learn more
+                          {section.linktext}
                           <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </button>
-                        </a>
+                        </Link>
                       </div>
 
                       {/* IMAGE */}

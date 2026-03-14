@@ -66,7 +66,7 @@ export default function AppShowcaseSection() {
                 Immerse yourself in binaural beats, calming soundscapes,
                 and mindful audio rituals designed to elevate your mood.
               </p>
-              <a href='/beta-release'>
+              <a href='/app/beats'>
               <button className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium group w-fit border-2 border-gray-100 py-2.5 px-5 rounded-full mb-10">
                 Explore beats
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -139,7 +139,7 @@ export default function AppShowcaseSection() {
                 Post your thoughts, ask late-night questions,
                 and receive genuine support from your circle.
               </p>
-              <a href='/beta-release'>
+              <a href='/app/community'>
               <button className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium group w-fit border-2 border-gray-100 py-2.5 px-5 rounded-full mb-10">
                 Share Post
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

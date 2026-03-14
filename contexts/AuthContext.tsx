@@ -13,7 +13,7 @@ interface AuthContextType {
     unverifiedEmail: string | null;
     setUnverifiedEmail: (email: string | null) => void;
     login: (email: string, password: string) => Promise<void>;
-    register: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string, metadata?: any) => Promise<void>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
 }
@@ -132,11 +132,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const register = async (email: string, password: string) => {
+    const register = async (email: string, password: string, metadata?: any) => {
         try {
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
+                options: {
+                    data: metadata
+                }
             });
 
             if (error) throw error;

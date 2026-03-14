@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/app/sidebar";
 import { Button } from "@/components/ui/button";
-import { Menu, Search, Bell, ChevronDown } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 

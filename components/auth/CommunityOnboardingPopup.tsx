@@ -163,7 +163,8 @@ export default function CommunityOnboardingPopup() {
                 </div>
 
                 {/* List */}
-                <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 pb-32">
+                <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 pb-32 custom-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
                     {loading ? (
                         <div className="flex items-center justify-center h-full">
                             <Loader2 className="w-10 h-10 animate-spin text-[#3d2f4d]" />

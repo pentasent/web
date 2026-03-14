@@ -16,9 +16,9 @@ export default function Navbar() {
             <a href="/articles" className="hover:text-gray-900 transition-colors">Articles</a>
           </div>
         </div>
-        <a href="/beta-release">
+        <a href="/signin">
           <button className="bg-[#3d2f4d] text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-[#2d1f3d] transition-all">
-            Get the App
+            Sign In
           </button>
         </a>
       </nav>

@@ -100,7 +100,7 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                         <SmartImage src={comment.user?.avatar_url || 'https://via.placeholder.com/40'} alt="avatar" className="object-cover" fallbackIconSize={16} />
                     </div>
                     <div className="flex-1">
-                        <div className="bg-warm-200 rounded-2xl px-4 py-3 relative group">
+                        <div className="bg-warm-200/50 rounded-2xl px-4 py-3 relative group">
                             <div className="flex justify-between items-start mb-1">
                                 <h5 className="text-sm font-semibold text-warm-700">{comment.user?.name}</h5>
 
@@ -330,7 +330,7 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                         </button>
                     </div>
                 )}
-                <div className={`flex items-center gap-2 bg-warm-200 pl-4 pr-1 py-1 ${replyingTo ? 'rounded-b-2xl' : 'rounded-full'}`}>
+                <div className={`flex items-center gap-2 bg-warm-200/50 pl-4 pr-1 py-1 ${replyingTo ? 'rounded-b-2xl' : 'rounded-full'}`}>
                     <input
                         className="flex-1 bg-transparent text-sm text-warm-700 placeholder:text-gray-500 outline-none h-10"
                         placeholder={replyingTo ? "Write a reply..." : "Add a comment..."}

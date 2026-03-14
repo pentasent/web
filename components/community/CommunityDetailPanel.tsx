@@ -5,8 +5,8 @@ import { Community, Channel } from '@/types/database';
 import { Users, FileText, Globe, Lock, MapPin, Hash, UserPlus, LogOut, X, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-
 import { Loader2 } from 'lucide-react';
+import { CommunityDetailShimmer } from '../shimmer/CommunityDetailShimmer';
 
 interface ExtendedChannel extends Channel {
     postsCount: number;
@@ -377,12 +377,7 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
     };
 
     if (loading || !community) {
-        return (
-            <div className="flex flex-col h-full bg-warm-100 rounded-2xl overflow-hidden shadow-sm border border-warm-300 items-center justify-center p-8">
-                <Loader2 className="w-8 h-8 animate-spin text-warm-400 mb-4" />
-                <p className="text-warm-500 font-medium">Loading Community Details...</p>
-            </div>
-        );
+        return <CommunityDetailShimmer />;
     }
 
     return (
@@ -445,12 +440,14 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
                                 </h1>
                             </div>
                         </div>
-
-                    {!isJoined && (
+                </div>
+                {/* Content Sections */}
+                <div className="space-y-10 relative -top-8 sm:-top-12">
+                                        {!isJoined && (
                         <button
                             onClick={community.visibility_type === 'private' ? () => toast({ title: 'Request Sent', description: 'Request sent to admin' }) : handleJoinLeave}
                             disabled={joining}
-                            className="w-full sm:w-auto mt-4 sm:mt-0 px-6 sm:px-8 py-3 bg-[#3d2f4d] hover:bg-[#2b2136] text-white rounded-xl font-semibold transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 shrink-0 disabled:opacity-70 h-12"
+                            className="w-full px-6 sm:px-8 py-3 bg-[#3d2f4d] hover:bg-[#2b2136] text-white rounded-xl font-semibold transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 shrink-0 disabled:opacity-70 h-12"
                         >
                             {joining ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -462,11 +459,6 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
                             )}
                         </button>
                     )}
-                </div>
-
-                {/* Content Sections */}
-                <div className="space-y-10 relative -top-8 sm:-top-12">
-                    
                     {/* About */}
                     {community.description && (
                         <section>
@@ -643,7 +635,7 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
                             )}
                             {memberSince && (
                                 <p className="text-warm-400 text-xs mt-4 flex items-center justify-center gap-1.5">
-                                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-warm-400" />
                                     Active member since {new Date(memberSince).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
                                 </p>
                             )}

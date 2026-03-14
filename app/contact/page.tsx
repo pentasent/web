@@ -19,9 +19,10 @@ import {
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from 'next/link';
+import { GlobalLayout } from '@/components/layout/global-layout';
 
 const helpTopics = [
     { name: "Channels & Communities", icon: Users2 },
@@ -81,6 +82,20 @@ export default function ContactPage() {
 
     const [videoOpen, setVideoOpen] = useState(false);
     const [selectedSupport, setSelectedSupport] = useState<typeof supportOptions[0] | null>(null);
+
+      const [showLoader, setShowLoader] = useState(true);
+    
+      useEffect(() => {
+        const timer = setTimeout(() => {
+          setShowLoader(false);
+        }, 2000); // 2 seconds
+    
+        return () => clearTimeout(timer);
+      }, []);
+    
+      if (showLoader) {
+        return <GlobalLayout />;
+      }
 
     return (
         <main className="min-h-screen bg-gradient-to-b from-pink-50 via-pink-50/50 to-white relative flex flex-col font-sans overflow-x-hidden">
@@ -216,6 +231,7 @@ export default function ContactPage() {
                             width={500}
                             height={500}
                             className="absolute inset-0 w-full h-full object-cover"
+                            priority
                         />
 
                         <div className="absolute inset-0 bg-rose-900/10"></div>

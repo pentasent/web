@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Users, FileText, Globe, Lock, MapPin } from 'lucide-react';
 import { Community } from '@/types/database';
+import { SmartImage } from '../ui/SmartImage';
 
 export type ExtendedCommunity = Community & {
     members_count: number;
@@ -31,11 +32,12 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({ community, onPress
         >
             <div className="h-32 sm:h-80 relative w-full bg-indigo-50">
                 {community.banner_url ? (
-                    <Image
+                    <SmartImage
                         src={community.banner_url}
                         alt="Banner"
                         fill
                         className="object-cover"
+                        fallbackIconSize={48}
                     />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-r from-pink-500/20 to-purple-500/20" />
@@ -60,11 +62,12 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({ community, onPress
                 <div className="absolute -bottom-6 left-4 sm:left-6 p-1 bg-warm-100 rounded-2xl shadow-sm">
                     <div className="w-14 h-14 relative rounded-xl overflow-hidden bg-warm-200 border border-warm-300">
                         {community.logo_url ? (
-                            <Image
+                            <SmartImage
                                 src={community.logo_url}
                                 alt={community.name}
                                 fill
                                 className="object-cover"
+                                fallbackIconSize={20}
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center bg-warm-200 text-warm-400 font-bold text-xl uppercase">
