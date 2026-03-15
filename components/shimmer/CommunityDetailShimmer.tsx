@@ -5,7 +5,7 @@ export const CommunityDetailShimmer = () => {
     return (
         <div className="flex flex-col h-full bg-warm-100 lg:rounded-2xl overflow-hidden relative overflow-y-auto w-full scrollbar-hide snap-x snap-mandatory">
             {/* Banner Shimmer */}
-            <div className="h-44 sm:h-52 relative w-full bg-indigo-50/30 shrink-0">
+            <div className="h-44 sm:h-52 relative w-full bg-warm-200/50 shrink-0">
                 <Skeleton className="w-full h-full rounded-none" />
             </div>
 

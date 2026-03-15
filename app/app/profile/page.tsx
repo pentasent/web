@@ -92,7 +92,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#fffbf7] pb-20">
-      <div className="max-w-[760px] mx-auto px-4 sm:pt-10 pt-20">
+      <div className="max-w-[760px] mx-auto px-4 mt-20 xl:mt-6 lg:mt-4">
 
         {/* Banner */}
         <div className="relative h-48 rounded-3xl overflow-hidden bg-gradient-to-br from-[#fdf8f4] via-[#f7f2ec] to-[#eef6f1] border border-warm-200/40">
@@ -140,15 +140,13 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Analytics */}
-        <div className="bg-warm-200/30 mt-8 rounded-2xl border border-warm-200 shadow-sm p-6">
-
-          <h2 className="text-lg font-semibold text-warm-800 mb-6">
+        {/* Analytics Card */}
+        <div className="bg-white mt-8 rounded-3xl border border-warm-200 shadow-sm p-8">
+          <h2 className="text-xl font-bold text-[#3d2f4d] mb-8 font-serif">
             Profile Analytics
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             <Stat
               icon={<Mail className="h-5 w-5"/>}
               label="Email"
@@ -187,49 +185,49 @@ export default function ProfilePage() {
               label="Location"
               value={user.country || 'Unknown'}
             />
-
           </div>
         </div>
 
-        {/* Links */}
-        <div className="bg-warm-200/30 mt-6 rounded-2xl border border-warm-200 shadow-sm">
-
+        {/* Action Links */}
+        <div className="bg-white mt-6 rounded-3xl border border-warm-200 shadow-sm overflow-hidden">
           <button
             onClick={() => router.push('/contact')}
-            className="w-full flex items-center justify-between p-5 hover:bg-warm-50 transition rounded-2xl"
+            className="w-full flex items-center justify-between p-6 hover:bg-warm-50 transition-colors"
           >
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-[#fceeea] text-[#e05e46] flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-orange-50 text-[#D49499] flex items-center justify-center">
                 <Mail className="h-5 w-5"/>
               </div>
 
-              <span className="text-sm font-medium text-warm-900">
-                Contact Us
+              <span className="text-sm font-semibold text-[#3d2f4d]">
+                Contact Support
               </span>
             </div>
 
-            <ChevronRight className="h-5 w-5 text-warm-400"/>
+            <ChevronRight className="h-5 w-5 text-warm-300"/>
           </button>
         </div>
 
-        {/* Logout */}
-        <div className="mt-8">
+        {/* Logout Section */}
+        <div className="mt-10">
           <Button
             variant="outline"
             onClick={handleLogout}
-            className="w-full py-7 rounded-2xl border-red-200 text-red-500 hover:bg-red-50 bg-warm-200/50"
+            className="w-full h-16 rounded-2xl border-warm-200 text-red-500 hover:bg-red-50 bg-white hover:border-red-100 transition-all font-medium"
           >
             Sign Out from Pentasent
           </Button>
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-10 text-xs text-warm-500 space-y-1">
-          <p>Web Version 1.0.0</p>
+        <div className="text-center mt-12 text-xs text-warm-400 space-y-2">
+          <p className="font-medium tracking-wide">WEB VERSION 1.0.0</p>
           <p>Developed by Pentasent Inc.</p>
-          <p className="font-serif text-warm-700">
-            Take Back Control of Your Mind and Senses
-          </p>
+          <div className="pt-2">
+            <p className="font-serif text-[#3d2f4d] text-base opacity-80 italic">
+              &quot;Take Back Control of Your Mind and Senses&quot;
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -240,7 +238,7 @@ export default function ProfilePage() {
 function Stat({ icon, label, value }: any) {
   return (
     <div className="flex items-start gap-3">
-      <div className="h-10 w-10 rounded-xl bg-warm-50 border border-warm-100 flex items-center justify-center text-warm-500">
+      <div className="h-10 w-10 rounded-xl bg-warm-50 border border-warm-100 flex items-center justify-center text-[#3d2f4d]/70">
         {icon}
       </div>
 

@@ -348,3 +348,23 @@ export interface Meditation {
     play_count: number;
     created_at: string;
 }
+
+export interface Notification {
+    id: string;
+    user_id: string;
+    notification_type: 'post_like' | 'post_comment' | 'comment_reply' | 'chat_message' | 'community_follow' | 'account_warning' | 'system_announcement' | 'subscription_alert' | string;
+    category: 'info' | 'success' | 'warning' | 'error';
+    title: string;
+    message: string;
+    triggered_by_user_id?: string;
+    post_id?: string;
+    comment_id?: string;
+    chat_id?: string;
+    community_id?: string;
+    redirect_url?: string;
+    metadata?: any;
+    is_seen: boolean;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+}

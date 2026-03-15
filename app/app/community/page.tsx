@@ -144,7 +144,7 @@ export default function CommunityPage() {
             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-12 gap-8 items-start max-w-[1400px] mx-auto lg:px-8">
 
                  {/* LEFT LIST */}
-                 <div className="max-w-[700px] mx-auto xl:mx-0 w-full flex flex-col mt-24 xl:mt-8">
+                 <div className="max-w-[700px] mx-auto xl:mx-0 w-full flex flex-col mt-20 xl:mt-6 lg:mt-4">
                     
                     {/* Header */}
                     <div className="px-4 md:px-0 mb-8 w-full flex justify-between items-center">
@@ -154,7 +154,7 @@ export default function CommunityPage() {
                         </div>
                     </div>
 
-                    {loading && communities.length === 0 && !communityIdFromUrl ? (
+                    {loading && communities.length === 0 ? (
                          <div className="px-4 md:px-0">
                             <CommunityListShimmer />
                         </div>
@@ -200,7 +200,7 @@ export default function CommunityPage() {
                                 </section>
                             )}
 
-                             {communities.length === 0 && (
+                             {!loading && communities.length === 0 && (
                                 <div className="text-center py-20 bg-white/50 rounded-2xl border border-warm-300 border-dashed">
                                     <p className="text-warm-500 font-medium">No communities available.</p>
                                 </div>

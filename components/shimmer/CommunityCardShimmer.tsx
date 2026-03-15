@@ -5,7 +5,7 @@ export const CommunityCardShimmer = () => {
     return (
         <div className="w-full bg-warm-100 rounded-2xl overflow-hidden shadow-sm border border-warm-300">
             {/* Banner Shimmer */}
-            <div className="h-32 sm:h-80 relative w-full bg-indigo-50/30">
+            <div className="h-32 sm:h-80 relative w-full bg-warm-200/50">
                  <Skeleton className="w-full h-full rounded-none" />
                  
                 {/* Logo Overlapping Banner */}

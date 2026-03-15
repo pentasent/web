@@ -115,7 +115,7 @@ export default function BeatsPage() {
     if (!user) return null;
 
     return (
-        <div className="">
+        <div className="pb-20">
             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-20 gap-8 items-start max-w-7xl mx-auto lg:px-16">
                 {/* LEFT FEED */}
                 <div className="max-w-[640px] mx-auto lg:mx-0 w-full flex flex-col mt-20 xl:mt-6 lg:mt-4">

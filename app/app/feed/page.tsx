@@ -774,7 +774,7 @@ export default function FeedPage() {
             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-12 gap-8 items-start max-w-[1400px] mx-auto lg:px-8">
 
                 {/* LEFT FEED */}
-                <div className="max-w-[700px] mx-auto xl:mx-0 w-full flex flex-col mt-16 lg:mt-4">
+                <div className="max-w-[700px] mx-auto xl:mx-0 w-full flex flex-col mt-20 xl:mt-6 lg:mt-4">
                     {/* Compact Header: Create Post + Community Filter */}
                     <div className="px-4 md:px-0 mb-8 z-30 mt-4 lg:mt-0">
                         <CreatePostCard

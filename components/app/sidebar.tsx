@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
-import { GlobalLayout } from "../layout/global-layout";
+import { useNotification } from "@/contexts/NotificationContext";
 
 const sidebarItems = [
     { name: "Feed", href: "/app/feed", icon: LayoutDashboard  },
@@ -38,7 +38,7 @@ const sidebarItems = [
     { name: "Tasks", href: "/app/tasks", icon: CheckSquare },
     { name: "Journal", href: "/app/journal", icon: PenBox },
     // { name: "Products", href: "/app/products", icon: ShoppingBag },
-    // { name: "Notification", href: "/app/notifications", icon: Bell },
+    { name: "Updates", href: "/app/notification", icon: Bell },
 ];
 
 export function Sidebar({
@@ -52,6 +52,7 @@ export function Sidebar({
     const [isHovered, setIsHovered] = useState(false);
     const [showDownload, setShowDownload] = useState(false);
     const { user, loading: authLoading } = useAuth();
+    const { unreadCount } = useNotification();
 
     // The sidebar is logically open if it's open on mobile OR hovered on desktop
     const isOpen = mobileOpen || isHovered;
@@ -164,7 +165,6 @@ export function Sidebar({
                                 >
                                     {item.name}
                                 </motion.span>
-
                                 {item.name === "Community" && (
                                     <div className="relative flex items-center justify-center ml-auto">
 
@@ -181,6 +181,13 @@ export function Sidebar({
 
                                         {/* Solid Dot */}
                                         <span className="relative w-3 h-3 rounded-full bg-red-900" />
+                                    </div>
+                                )}
+
+                                {item.name === "Updates" && unreadCount > 0 && (
+                                    // <div className="ml-auto bg-[#3D253B] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] flex items-center justify-center">
+                                    <div className="ml-auto bg-[#3D253B] text-white text-[10px] font-bold min-w-[20px] h-[20px] px-1 rounded-full flex items-center justify-center">    
+                                    {unreadCount > 9 ? '9+' : unreadCount}
                                     </div>
                                 )}
 

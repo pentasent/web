@@ -49,6 +49,8 @@ export const metadata: Metadata = {
 
 };
 
+import { NotificationProvider } from '@/contexts/NotificationContext';
+
 export default function RootLayout({
   children,
 }: {
@@ -58,12 +60,14 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className="antialiased">
         <AuthProvider>
-          <QueryProvider>
-            <AuthGuard />
-            <AnalyticsTracker />
-            {children}
-            <Toaster />
-          </QueryProvider>
+          <NotificationProvider>
+            <QueryProvider>
+              <AuthGuard />
+              <AnalyticsTracker />
+              {children}
+              <Toaster />
+            </QueryProvider>
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

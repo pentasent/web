@@ -7,8 +7,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { CommunityDetailShimmer } from '../shimmer/CommunityDetailShimmer';
+import { ChannelDetailModal } from './ChannelDetailModal';
 
-interface ExtendedChannel extends Channel {
+export interface ExtendedChannel extends Channel {
     postsCount: number;
     isJoined: boolean;
 }
@@ -36,6 +37,10 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
     const [moderators, setModerators] = useState<{ user: { id: string, name: string, avatar_url: string | null, country: string | null }, joined_at?: string, tag?: string }[]>([]);
     const [stats, setStats] = useState({ postsCount: 0 });
     const [channelActionLoading, setChannelActionLoading] = useState<string | null>(null);
+
+    // Modal State
+    const [selectedChannel, setSelectedChannel] = useState<ExtendedChannel | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const formatNumber = (num: number) => {
         if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -327,7 +332,7 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
         }
     };
 
-    const handleJoinChannel = async (channelId: string) => {
+    const handleJoinChannelModal = async (channelId: string) => {
         if (!user) return;
         setChannelActionLoading(channelId);
         try {
@@ -343,6 +348,11 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
                     ? { ...c, isJoined: true, followers_count: c.followers_count + 1 }
                     : c
             ));
+
+            // Update Selected Channel
+            if (selectedChannel?.id === channelId) {
+                setSelectedChannel(prev => prev ? { ...prev, isJoined: true, followers_count: prev.followers_count + 1 } : null);
+            }
         } catch (error) {
             console.error("Error joining channel", error);
             toast({ title: "Error", description: "Failed to join channel.", variant: "destructive" });
@@ -351,7 +361,7 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
         }
     };
 
-    const handleLeaveChannel = async (channelId: string) => {
+    const handleLeaveChannelModal = async (channelId: string) => {
         if (!user) return;
         setChannelActionLoading(channelId);
         try {
@@ -368,12 +378,30 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
                     ? { ...c, isJoined: false, followers_count: Math.max(0, c.followers_count - 1) }
                     : c
             ));
+
+            // Update Selected Channel
+            if (selectedChannel?.id === channelId) {
+                setSelectedChannel(prev => prev ? { ...prev, isJoined: false, followers_count: Math.max(0, prev.followers_count - 1) } : null);
+            }
         } catch (error) {
             console.error("Error leaving channel", error);
             toast({ title: "Error", description: "Failed to leave channel.", variant: "destructive" });
         } finally {
             setChannelActionLoading(null);
         }
+    };
+
+    const handleChannelClick = (channel: ExtendedChannel) => {
+        if (!isJoined) {
+            toast({
+                title: "Join Community",
+                description: "You must join the community to view channel details.",
+                variant: "default"
+            });
+            return;
+        }
+        setSelectedChannel(channel);
+        setIsModalOpen(true);
     };
 
     if (loading || !community) {
@@ -385,7 +413,7 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
             <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
 
             {/* Banner Area */}
-            <div className="h-44 sm:h-52 relative w-full bg-indigo-50 shrink-0">
+            <div className="h-44 sm:h-52 relative w-full bg-warm-50 shrink-0">
                 {community.banner_url ? (
                     <Image
                         src={community.banner_url}
@@ -394,7 +422,7 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
                         className="object-cover"
                     />
                 ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-500" />
+                    <div className="w-full h-full bg-gradient-to-br from-[#3d2f4d] to-[#5a4570]" />
                 )}
                 
                 {/* Header Controls */}
@@ -544,51 +572,38 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
                             {channels.map((channel) => (
                                 <div
                                     key={channel.id}
-                                    className={`flex items-center justify-between p-3 sm:p-4 rounded-xl border transition-all ${
-                                        !isJoined ? 'bg-warm-200 border-warm-300 opacity-70' : 'bg-warm-100 border-warm-300 hover:border-[#3d2f4d]/30'
-                                    }`}
+                                    onClick={() => handleChannelClick(channel)}
+                                    className={`group flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer bg-warm-100 border-warm-300 hover:border-[#3d2f4d]/30 hover:shadow-sm`}
                                 >
-                                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 pr-4">
-                                        <div className="w-10 h-10 rounded-full bg-warm-200 flex items-center justify-center shrink-0">
-                                            {channel.is_private ? <Lock className="w-4 h-4 text-warm-500" /> : <Hash className="w-4 h-4 text-warm-500" />}
+                                    <div className="flex items-center gap-4 min-w-0 pr-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-warm-50 flex items-center justify-center shrink-0 border border-warm-200 group-hover:scale-105 transition-transform">
+                                            {channel.is_private ? <Lock className="w-5 h-5 text-warm-500" /> : <Hash className="w-5 h-5 text-[#3d2f4d]/70" />}
                                         </div>
                                         <div className="min-w-0">
                                             <div className="flex flex-wrap items-center gap-2 mb-1">
-                                                <span className="font-semibold text-warm-700 text-sm sm:text-base truncate">{channel.name}</span>
+                                                <span className="font-bold text-[#3d2f4d] text-base truncate lowercase tracking-tight">
+                                                    {channel.name}
+                                                </span>
                                                 {channel.is_default && (
-                                                    <span className="bg-warm-200 text-warm-500 text-[10px] uppercase font-bold px-2 py-0.5 rounded tracking-wider">Default</span>
+                                                    <span className="bg-[#3d2f4d]/5 text-[#3d2f4d]/60 text-[9px] uppercase font-bold px-2 py-0.5 rounded-lg tracking-widest border border-[#3d2f4d]/10">Default</span>
                                                 )}
                                                 {channel.isJoined && (
-                                                    <span className="bg-green-50 text-green-600 text-[10px] uppercase font-bold px-2 py-0.5 rounded tracking-wider flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Joined</span>
+                                                    <span className="bg-[#3d2f4d]/5 text-[#3d2f4d]/70 text-[9px] uppercase font-bold px-2 py-0.5 rounded-lg tracking-widest flex items-center gap-1 border border-[#3d2f4d]/10">
+                                                        <CheckCircle2 className="w-3 h-3 opacity-70" /> Joined
+                                                    </span>
                                                 )}
                                             </div>
-                                            <div className="flex items-center gap-2 text-xs sm:text-sm text-warm-500 font-medium whitespace-nowrap">
+                                            <div className="flex items-center gap-2 text-xs text-warm-500 font-medium">
                                                 <span>{formatNumber(channel.followers_count)} members</span>
-                                                <span className="text-warm-400">•</span>
+                                                <span className="text-warm-300">•</span>
                                                 <span>{formatNumber(channel.postsCount)} posts</span>
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Channel Join/Leave Actions */}
-                                    {isJoined && !channel.is_default && (
-                                        <button
-                                            disabled={channelActionLoading === channel.id}
-                                            onClick={() => channel.isJoined ? handleLeaveChannel(channel.id) : handleJoinChannel(channel.id)}
-                                            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all shrink-0 disabled:opacity-50 ${
-                                                channel.isJoined 
-                                                ? 'bg-warm-200 text-warm-600 hover:bg-warm-300 hover:text-warm-700 border border-warm-300 shadow-sm' 
-                                                : 'bg-[#3d2f4d] text-white hover:bg-[#2a2035] shadow-sm hover:shadow-md'
-                                            }`}
-                                        >
-                                            {channelActionLoading === channel.id ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                            ) : channel.isJoined ? (
-                                                "Leave"
-                                            ) : (
-                                                "Join"
-                                            )}
-                                        </button>
+                                    {isJoined && (
+                                        <div className="w-8 aspect-square shrink-0 rounded-full bg-warm-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <ChevronDown className="w-4 h-4 text-warm-400 -rotate-90" />
+                                        </div>
                                     )}
                                 </div>
                             ))}
@@ -644,6 +659,16 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
 
                 </div>
             </div>
+
+            <ChannelDetailModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                channel={selectedChannel}
+                isModerator={isModerator}
+                onJoin={handleJoinChannelModal}
+                onLeave={handleLeaveChannelModal}
+                loading={!!channelActionLoading}
+            />
         </div>
     );
 };
