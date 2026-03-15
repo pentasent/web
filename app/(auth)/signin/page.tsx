@@ -206,6 +206,7 @@ export default function SignInPage() {
 
 /* ================= FORGOT PASSWORD MODAL ================= */
 const COOLDOWN_KEY = 'pentasent_forgot_pwd_cooldown';
+const FORGOT_EMAIL_KEY = 'pentasent_forgot_pwd_email';
 
 function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
   const [forgotEmail, setForgotEmail] = useState('');
@@ -216,11 +217,17 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
 
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail.trim());
 
-  // Restore cooldown from localStorage on mount
+  // Restore cooldown and email from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(COOLDOWN_KEY);
-    if (stored) {
-      const expiresAt = parseInt(stored, 10);
+    const storedCooldown = localStorage.getItem(COOLDOWN_KEY);
+    const storedEmail = localStorage.getItem(FORGOT_EMAIL_KEY);
+    
+    if (storedEmail) {
+      setForgotEmail(storedEmail);
+    }
+
+    if (storedCooldown) {
+      const expiresAt = parseInt(storedCooldown, 10);
       const remaining = Math.floor((expiresAt - Date.now()) / 1000);
       if (remaining > 0) {
         setCooldown(remaining);
@@ -279,8 +286,14 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
       // Start 2-minute cooldown and persist to localStorage
       const expiresAt = Date.now() + 120 * 1000;
       localStorage.setItem(COOLDOWN_KEY, expiresAt.toString());
+      localStorage.setItem(FORGOT_EMAIL_KEY, email);
       setCooldown(120);
       setEmailSent(true);
+      
+      toast({
+        title: "Link Sent",
+        description: "A new password reset link has been sent to your email.",
+      });
     } catch (e: any) {
       toast({
         title: "Error",

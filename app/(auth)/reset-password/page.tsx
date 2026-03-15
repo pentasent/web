@@ -17,6 +17,7 @@ export default function ResetPasswordPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [logs, setLogs] = useState<string[]>(["Initializing..."]);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -27,23 +28,31 @@ export default function ResetPasswordPage() {
     if (hasProcessed.current) return;
     hasProcessed.current = true;
 
+    const addLog = (msg: string) => {
+      setLogs(prev => [...prev, msg]);
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
+        addLog("Session established via state change.");
         setPageState("ready");
       }
     });
 
     const verify = async () => {
       try {
+        addLog("Checking for existing session...");
         // 1. Immediate check for existing session
         const { data: { session: existingSession } } = await supabase.auth.getSession();
         if (existingSession) {
+          addLog("Active session found.");
           setPageState("ready");
           subscription.unsubscribe();
           return;
         }
 
         // 2. Extract tokens and perform manual setSession
+        addLog("Parsing reset tokens from URL...");
         const hash = window.location.hash.substring(1);
         const search = window.location.search.substring(1);
         const params = new URLSearchParams(hash || search);
@@ -51,32 +60,44 @@ export default function ResetPasswordPage() {
         const refreshToken = params.get("refresh_token");
 
         if (accessToken) {
+          addLog("Authenticating with reset tokens...");
           const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken || "",
           });
 
           if (!error && data?.session) {
+            addLog("Authentication successful.");
             setPageState("ready");
             subscription.unsubscribe();
             return;
+          } else if (error) {
+            addLog(`Auth error: ${error.message}`);
           }
+        } else {
+          addLog("No reset tokens found in URL.");
         }
 
         // 3. Final safety check
         setTimeout(async () => {
           if (pageState === "loading") {
+            addLog("Executing final safety check...");
             const { data: { session: lastCheck } } = await supabase.auth.getSession();
             if (lastCheck) {
+              addLog("Session verified.");
               setPageState("ready");
             } else if (!accessToken) {
+              addLog("Link appears invalid or missing tokens.");
               setPageState("invalid");
+            } else {
+              addLog("Still waiting for session synchronization...");
             }
             subscription.unsubscribe();
           }
-        }, 2000);
+        }, 3000);
 
-      } catch (err) {
+      } catch (err: any) {
+        addLog(`Verification failed: ${err.message}`);
         console.error("Verification failed:", err);
       }
     };
@@ -100,7 +121,7 @@ export default function ResetPasswordPage() {
       if (result.error) throw result.error;
 
       setPageState("success");
-      setTimeout(() => router.push("/beta-release"), 3000);
+      setTimeout(() => router.push("/app/feed"), 3000);
     } catch (e: any) {
       toast({
         title: "Update Failed",
@@ -129,9 +150,25 @@ export default function ResetPasswordPage() {
 
         {/* ===== LOADING STATE ===== */}
         {pageState === "loading" && (
-          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
-            <Loader2 className="w-10 h-10 animate-spin text-[#3d2f4d] mx-auto mb-4" />
-            <p className="text-gray-500">Verifying your reset link...</p>
+          <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
+            <Loader2 className="w-10 h-10 animate-spin text-[#3d2f4d] mx-auto mb-6" />
+            <div className="space-y-2 mb-8">
+              {logs.map((log, idx) => (
+                <p key={idx} className={`text-xs ${idx === logs.length - 1 ? 'text-[#3d2f4d] font-medium' : 'text-gray-400 opacity-60'}`}>
+                  {log}
+                </p>
+              ))}
+            </div>
+            
+            <div className="pt-6 border-t border-gray-50">
+              <p className="text-sm text-gray-500 mb-3">Stuck on this screen?</p>
+              <button 
+                onClick={() => setPageState("ready")}
+                className="text-[#3d2f4d] font-semibold text-sm hover:underline"
+              >
+                Click here to show reset form manually
+              </button>
+            </div>
           </div>
         )}
 
