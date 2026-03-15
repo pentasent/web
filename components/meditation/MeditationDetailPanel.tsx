@@ -153,7 +153,7 @@ export const MeditationDetailPanel: React.FC<MeditationDetailPanelProps> = ({ me
                     </button>
                     <div className="hidden md:block w-10" />
 
-                    <span className="font-semibold text-white/90 tracking-wide">Meditation</span>
+                    <span className="font-semibold text-white/90 tracking-wide">Meditation • {meditation.title}</span>
 
                     <button
                         onClick={onClose}
@@ -164,9 +164,9 @@ export const MeditationDetailPanel: React.FC<MeditationDetailPanelProps> = ({ me
                     <div className="md:hidden w-10" />
                 </div>
                 
-                <div className="text-center mb-10">
+                {/* <div className="text-center mb-10">
                     <h2 className="text-xl font-bold text-white truncate px-4">{meditation.title}</h2>
-                </div>
+                </div> */}
 
                 {/* Center Animation */}
                 <div className="flex-1 flex justify-center items-center relative min-h-[250px] my-4">

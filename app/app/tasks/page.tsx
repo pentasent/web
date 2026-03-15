@@ -195,24 +195,24 @@ export default function TasksPage() {
                     {/* Filters & Search Toolbar */}
                     <div className="px-4 md:px-0 mb-6 space-y-4 relative z-10">
                         <div className="flex items-center gap-2">
-                            <div className="flex-1 flex items-center bg-warm-100 border border-warm-300 rounded-xl px-4 py-2 hover:border-gray-300 focus-within:border-[#3d2f4d] focus-within:ring-1 focus-within:ring-[#3d2f4d] transition-all">
+                          <div className="flex-1 min-w-0 flex items-center bg-warm-100 border border-warm-300 rounded-xl px-4 py-2 hover:border-gray-300 focus-within:border-[#3d2f4d] focus-within:ring-1 focus-within:ring-[#3d2f4d] transition-all">
                                 <Search className="w-5 h-5 text-warm-400 mr-2" />
                                 <input
                                     type="text"
                                     placeholder="Search tasks..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="flex-1 bg-transparent border-none outline-none text-warm-700 placeholder-gray-400 p-1"
+                                    className="flex-1 min-w-0 bg-transparent border-none outline-none text-warm-700 placeholder-gray-400 p-1"
                                 />
                                 {searchQuery && (
                                     <button onClick={() => setSearchQuery('')} className="ml-2 text-warm-400 hover:text-warm-500 outline-none">
-                                        <X className="w-4 h-4" />
+                                        <X className="w-4 h-4 shrink-0" />
                                     </button>
                                 )}
                             </div>
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className={`w-12 h-12 flex items-center justify-center rounded-xl border transition-colors ${showFilters || filterPriority !== 'all' || sortBy !== 'latest' ? 'bg-[#3d2f4d] text-white border-[#3d2f4d]' : 'bg-warm-100 border-warm-300 text-warm-500 hover:bg-warm-200'}`}
+                                className={`w-12 h-12 min-w-12 min-h-12 flex items-center justify-center rounded-xl border transition-colors ${showFilters || filterPriority !== 'all' || sortBy !== 'latest' ? 'bg-[#3d2f4d] text-white border-[#3d2f4d]' : 'bg-warm-100 border-warm-300 text-warm-500 hover:bg-warm-200'}`}
                             >
                                 <Filter className="w-6 h-6" />
                             </button>

@@ -1,8 +1,10 @@
 'use client';
 
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
 export default function Navbar() {
+  const { user, loading: authLoading } = useAuth();
   return (
       <nav className="fixed top-0 left-0 w-full backdrop-blur-md z-50 flex items-center justify-between px-6 md:px-12 lg:px-20 py-4 mx-auto bg-transparent">
         <div className="flex items-center gap-12">
@@ -16,11 +18,21 @@ export default function Navbar() {
             <a href="/articles" className="hover:text-gray-900 transition-colors">Articles</a>
           </div>
         </div>
-        <a href="/signin">
+        {
+          user ? (
+            <a href="/app/feed">
           <button className="bg-[#3d2f4d] text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-[#2d1f3d] transition-all">
-            Sign In
+            Feed
           </button>
         </a>
+          ) :(
+                    <a href="/signin">
+          <button className="bg-[#3d2f4d] text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-[#2d1f3d] transition-all">
+            Sign In 
+          </button>
+        </a>
+          )
+        }
       </nav>
   );
 }

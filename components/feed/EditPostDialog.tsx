@@ -53,7 +53,7 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
             setNewImages([]);
             setImageUrls([]);
         }
-    }, [isOpen, post]);
+    }, [isOpen, post.id, post.content, post.title,post.images]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -173,7 +173,7 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
 
                     {/* Image Previews */}
                     {(existingImages.length > 0 || imageUrls.length > 0) && (
-                        <div className="flex gap-4 mb-4 overflow-x-auto pb-4 pt-3 pl-1 pr-3 custom-scrollbar relative z-10 w-full">
+                        <div className="flex gap-4 mb-4 overflow-x-auto pb-4 pt-3 pl-1 pr-3 scrollbar-hide snap-x snap-mandatory relative z-10 w-full">
                             {existingImages.map((img: any) => (
                                 <div key={img.id} className="relative w-20 h-20 shrink-0 border border-warm-300 rounded-lg">
                                     <Image src={img.image_url} alt="existing preview" fill className="object-cover rounded-lg" />

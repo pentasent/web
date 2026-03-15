@@ -111,7 +111,7 @@ export default function MeditationPage() {
                 </div>
 
                 {/* RIGHT SIDEBAR / MOBILE OVERLAY */}
-                <div className="lg:relative lg:h-full hidden lg:block mt-8">
+                <div className="lg:relative lg:h-full lg:mt-8">
                     <div className="lg:sticky lg:top-16 lg:h-[calc(100vh-8rem)] w-full">
                         <AnimatePresence>
                             {selectedMeditation ? (
@@ -121,7 +121,7 @@ export default function MeditationPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 40 }}
                                     transition={{ type: "spring", bounce: 0, duration: 0.5 }}
-                                    className="fixed inset-0 z-50 lg:static lg:inset-auto lg:z-auto lg:h-[calc(100vh-4rem)] shadow-2xl lg:rounded-2xl bg-[#1A1A24] lg:border lg:border-white/10"
+                                    className="fixed inset-0 z-50 lg:static lg:inset-auto lg:z-auto lg:h-[calc(100vh-8rem)] shadow-2xl lg:rounded-2xl bg-warm-50 lg:border lg:border-gray-100"
                                 >
                                     <MeditationDetailPanel
                                         meditation={selectedMeditation}

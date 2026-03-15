@@ -8,12 +8,21 @@ import { CreatePostCard } from '@/components/feed/CreatePostCard';
 import { EditPostDialog } from '@/components/feed/EditPostDialog';
 import { PostDetailPanel } from '@/components/feed/PostDetailPanel';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2, MessageCircle } from 'lucide-react';
+import { Loader2, MessageCircle, ChevronDown, Filter, Info } from 'lucide-react';
+import { compressImage } from '@/lib/image-upload';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GlobalLayout } from '@/components/layout/global-layout';
+import Image from 'next/image';
+import { SmartImage } from '@/components/ui/SmartImage';
 
 export default function FeedPage() {
     const { user, loading: authLoading } = useAuth();
@@ -59,7 +68,7 @@ export default function FeedPage() {
     const channels = globalData?.channels || [];
 
     // Fetch Posts Data
-    const { data: postsData, isLoading: loadingPosts } = useQuery({
+    const { data: postsData, isLoading: loadingPosts, isError: isErrorPosts, error: errorPosts } = useQuery({
         queryKey: ['feedPosts', user?.id, selectedCommunityFilter],
         enabled: !authLoading && !!user,
         queryFn: async () => {
@@ -69,8 +78,7 @@ export default function FeedPage() {
                     *,
                     user:users(id, name, avatar_url),
                     community:communities(id, name, logo_url),
-                    images:post_images(*),
-                    channels:channels(id, name)
+                    images:post_images(*)
                 `)
                 .eq('is_active', true)
                 .order('created_at', { ascending: false })
@@ -80,15 +88,14 @@ export default function FeedPage() {
                 postsQuery = postsQuery.eq('community_id', selectedCommunityFilter);
             }
 
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Network timeout')), 10000));
-            const postsResult = await Promise.race([postsQuery, timeoutPromise]) as any;
+            const { data, error } = await postsQuery;
 
-            if (postsResult.error) {
-                console.error("Posts Error:", postsResult.error);
-                throw postsResult.error;
+            if (error) {
+                console.error("Posts Error:", error);
+                throw error;
             }
 
-            let formattedPosts = postsResult.data as any[];
+            let formattedPosts = data as any[];
 
             if (user && formattedPosts.length > 0) {
                 const postIds = formattedPosts.map(p => p.id);
@@ -113,6 +120,8 @@ export default function FeedPage() {
 
     const posts = React.useMemo(() => postsData || [], [postsData]);
     const loading = loadingPosts || loadingGlobal;
+    const isError = isErrorPosts;
+    const errorMessage = errorPosts instanceof Error ? errorPosts.message : 'Failed to load posts';
 
     // Fetch Comments Data
     const { data: commentsData, isLoading: loadingCommentsQuery } = useQuery({
@@ -216,17 +225,21 @@ export default function FeedPage() {
             }
 
             // 2. Fetch from DB
-            const { data } = await supabase
+            // Removing channels join as it might be causing query failure due to schema mismatch/junction table issues
+            const { data, error } = await supabase
                 .from('posts')
                 .select(`
                     *,
                     user:users(id, name, avatar_url),
                     community:communities(id, name, logo_url),
-                    images:post_images(*),
-                    channels:channels(id, name)
+                    images:post_images(*)
                 `)
                 .eq('id', postIdFromUrl)
                 .maybeSingle();
+
+            if (error) {
+                console.error("Shared post fetch error:", error);
+            }
 
             if (data && isMounted) {
                 // Check if user has liked it to be consistent
@@ -235,7 +248,7 @@ export default function FeedPage() {
             } else if (!data && isMounted) {
                 toast({
                     title: "Post not found",
-                    description: "The post may have been removed.",
+                    description: "The post may have been removed or you don't have access.",
                     variant: "destructive",
                 });
                 router.replace('/app/feed', { scroll: false });
@@ -250,153 +263,220 @@ export default function FeedPage() {
     const handleCreatePost = async (data: { community_id: string; channel_ids: string[]; title: string; content: string; images: File[] }) => {
         if (!user) return;
 
+        const tempId = `temp-${Date.now()}`;
+        const localImageUrls = data.images.map(file => URL.createObjectURL(file));
+
         const contentPayload = {
             type: 'doc',
             content: [{ type: 'paragraph', content: [{ type: 'text', text: data.content.trim() }] }]
         };
 
-        const { data: newPostData, error } = await supabase
-            .from('posts')
-            .insert({
-                user_id: user.id,
-                community_id: data.community_id,
-                title: data.title || null,
-                content: contentPayload,
-                likes_count: 0,
-                comments_count: 0,
-                views_count: 0,
-                is_active: true
-            })
-            .select('*').single();
+        // Optimistic UI update
+        const tempPost: Post = {
+            id: tempId,
+            user_id: user.id,
+            community_id: data.community_id,
+            title: data.title || null,
+            content: contentPayload,
+            likes_count: 0,
+            comments_count: 0,
+            views_count: 0,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            user: { id: user.id, name: user.name || 'Anonymous', avatar_url: user.avatar_url || null } as any,
+            community: globalData?.communities.find(c => c.id === data.community_id),
+            is_uploading: true,
+            local_image_urls: localImageUrls,
+            is_edited: false
+        };
 
-        if (error) throw error;
+        queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], (old: Post[] | undefined) => {
+            if (!old) return [tempPost];
+            return [tempPost, ...old];
+        });
 
-        let newPost = newPostData as any;
+        // Background Process
+        (async () => {
+            try {
+                // Compress images in parallel
+                const compressedImages = await Promise.all(data.images.map(img => compressImage(img)));
 
-        // Upload images to avatars/posts
-        if (data.images && data.images.length > 0) {
-            for (let i = 0; i < data.images.length; i++) {
-                const file = data.images[i];
-                const fileExt = file.name.split('.').pop() || 'jpg';
-                const fileName = `posts/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+                const { data: newPostData, error } = await supabase
+                    .from('posts')
+                    .insert({
+                        user_id: user.id,
+                        community_id: data.community_id,
+                        title: data.title || null,
+                        content: contentPayload,
+                        likes_count: 0,
+                        comments_count: 0,
+                        views_count: 0,
+                        is_active: true
+                    })
+                    .select('*').single();
 
-                const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: false });
-                if (uploadError) {
-                    console.error("Image upload error:", uploadError);
-                    toast({
-                        title: "Upload failed",
-                        description: `Failed to upload ${file.name}.`,
-                        variant: "destructive",
+                if (error) throw error;
+                const newPostId = newPostData.id;
+
+                // Parallel uploads and DB inserts
+                if (compressedImages.length > 0) {
+                    const uploadPromises = compressedImages.map(async (file, i) => {
+                        const fileExt = file.name.split('.').pop() || 'jpg';
+                        const fileName = `posts/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+
+                        const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: false });
+                        if (uploadError) throw uploadError;
+
+                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
+                        
+                        return {
+                            post_id: newPostId,
+                            image_url: publicUrl,
+                            order_index: i
+                        };
                     });
-                    throw uploadError;
+
+                    const imagesToInsert = await Promise.all(uploadPromises);
+                    const { error: imgError } = await supabase.from('post_images').insert(imagesToInsert);
+                    if (imgError) throw imgError;
                 }
-                const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
-                await supabase.from('post_images').insert({
-                    post_id: newPost.id,
-                    image_url: publicUrl,
-                    order_index: i
+
+                // Refetch fully hydrated post
+                const { data: fullPost } = await supabase.from('posts').select(`
+                    *,
+                    user:users(id, name, avatar_url),
+                    community:communities(id, name, logo_url),
+                    images:post_images(*)
+                `).eq('id', newPostId).single();
+
+                if (fullPost) {
+                    queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], (old: Post[] | undefined) => {
+                        if (!old) return [fullPost as any];
+                        // Replace temp post with real post
+                        return old.map(p => p.id === tempId ? (fullPost as any) : p);
+                    });
+                }
+            } catch (err) {
+                console.error("Background create post error:", err);
+                // Remove temp post on failure
+                queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], (old: Post[] | undefined) => {
+                    return old?.filter(p => p.id !== tempId);
                 });
+                toast({
+                    title: "Failed to create post",
+                    description: "An error occurred while uploading. The post has been removed.",
+                    variant: "destructive"
+                });
+            } finally {
+                // Cleanup blob URLs
+                localImageUrls.forEach(url => URL.revokeObjectURL(url));
             }
-        }
+        })();
 
-        // Refetch fully hydrated post
-        const { data: fullPost } = await supabase.from('posts').select(`
-            *,
-            user:users(id, name, avatar_url),
-            community:communities(id, name, logo_url),
-            images:post_images(*),
-            channels:channels(id, name)
-        `).eq('id', newPost.id).single();
-
-        if (fullPost) {
-            queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], (old: Post[] | undefined) => {
-                if (!old) return [fullPost as any];
-                return [fullPost as any, ...old];
-            });
-        }
+        return new Promise<void>(resolve => setTimeout(resolve, 2000));
     };
 
     const handleEditPostSubmit = async (title: string, content: string, imagesToRemove: string[], newImages: File[]) => {
         if (!user || !selectedPost) return;
 
-        const contentPayload = {
-            type: 'doc',
-            content: [{ type: 'paragraph', content: [{ type: 'text', text: content.trim() }] }]
+        // Set updating state
+        const originalPost = { ...selectedPost };
+        const localPreviews = newImages.map(img => URL.createObjectURL(img));
+        
+        const updatingPost = { 
+            ...selectedPost, 
+            is_uploading: true, 
+            local_image_urls: [...(selectedPost.images?.map(img => img.image_url) || []), ...localPreviews]
         };
+        
+        setSelectedPost(updatingPost as any);
+        queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], (old: Post[] | undefined) => {
+            return old?.map(p => p.id === selectedPost.id ? (updatingPost as any) : p);
+        });
 
-        const { error } = await supabase
-            .from('posts')
-            .update({
-                title: title || null,
-                content: contentPayload
-            })
-            .eq('id', selectedPost.id);
+        // Background process
+        (async () => {
+            try {
+                const contentPayload = {
+                    type: 'doc',
+                    content: [{ type: 'paragraph', content: [{ type: 'text', text: content.trim() }] }]
+                };
 
-        if (error) throw error;
+                const { error: postError } = await supabase
+                    .from('posts')
+                    .update({
+                        title: title || null,
+                        content: contentPayload
+                    })
+                    .eq('id', selectedPost.id);
 
-        // Handle Image Deletions
-        if (imagesToRemove.length > 0) {
-            const imagesToDeleteDb = selectedPost.images?.filter((img: any) => imagesToRemove.includes(img.id)) || [];
-            const filePaths = imagesToDeleteDb.map((img: any) => {
-                const urlObj = new URL(img.image_url);
-                const pathSegments = urlObj.pathname.split('/');
-                const fileName = pathSegments.pop();
-                return `posts/${fileName}`;
-            });
+                if (postError) throw postError;
 
-            if (filePaths.length > 0) {
-                await supabase.storage.from('avatars').remove(filePaths);
-                await supabase.from('post_images').delete().in('id', imagesToRemove);
-            }
-        }
+                // Handle Image Deletions and Uploads in parallel
+                const jobs: any[] = [];
 
-        // Handle New Image Uploads
-        if (newImages.length > 0) {
-            // Get highest current order_index
-            const currentMaxOrder = selectedPost.images?.length
-                ? Math.max(...selectedPost.images.map((img: any) => img.order_index || 0))
-                : -1;
+                if (imagesToRemove.length > 0) {
+                    const imagesToDeleteDb = (selectedPost.images || []).filter((img: any) => imagesToRemove.includes(img.id));
+                    const filePaths = imagesToDeleteDb.map((img: any) => {
+                        try {
+                            const urlObj = new URL(img.image_url);
+                            return urlObj.pathname.split('/').slice(-2).join('/'); // 'posts/filename'
+                        } catch { return null; }
+                    }).filter(Boolean) as string[];
 
-            for (let i = 0; i < newImages.length; i++) {
-                const file = newImages[i];
-                const fileExt = file.name.split('.').pop() || 'jpg';
-                const fileName = `posts/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-
-                const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: false });
-                if (uploadError) {
-                    console.error("Image upload error:", uploadError);
-                    toast({
-                        title: "Upload failed",
-                        description: `Failed to upload ${file.name}.`,
-                        variant: "destructive",
-                    });
-                    throw uploadError;
+                    if (filePaths.length > 0) {
+                        jobs.push(supabase.storage.from('avatars').remove(filePaths));
+                        jobs.push(Promise.resolve(supabase.from('post_images').delete().in('id', imagesToRemove)));
+                    }
                 }
-                const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
-                await supabase.from('post_images').insert({
-                    post_id: selectedPost.id,
-                    image_url: publicUrl,
-                    order_index: currentMaxOrder + 1 + i
+
+                if (newImages.length > 0) {
+                    const compressed = await Promise.all(newImages.map(img => compressImage(img)));
+                    const currentMaxOrder = (selectedPost.images || []).reduce((max: number, img: any) => Math.max(max, img.order_index || 0), -1);
+
+                    const uploadJobs = compressed.map(async (file, i) => {
+                        const fileExt = file.name.split('.').pop() || 'jpg';
+                        const fileName = `posts/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+                        const { error } = await supabase.storage.from('avatars').upload(fileName, file);
+                        if (error) throw error;
+                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
+                        return { post_id: selectedPost.id, image_url: publicUrl, order_index: currentMaxOrder + 1 + i };
+                    });
+                    
+                    jobs.push(Promise.all(uploadJobs).then(imgs => supabase.from('post_images').insert(imgs)));
+                }
+
+                await Promise.all(jobs);
+
+                // Refetch
+                const { data: fullPost } = await supabase.from('posts').select(`
+                    *,
+                    user:users(id, name, avatar_url),
+                    community:communities(id, name, logo_url),
+                    images:post_images(*)
+                `).eq('id', selectedPost.id).single();
+
+                if (fullPost) {
+                    setSelectedPost(fullPost as any);
+                    queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], (old: Post[] | undefined) => {
+                        return old?.map(p => p.id === selectedPost.id ? (fullPost as any) : p);
+                    });
+                }
+                toast({ title: "Post updated successfully" });
+
+            } catch (err) {
+                console.error("Background update error:", err);
+                setSelectedPost(originalPost);
+                queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], (old: Post[] | undefined) => {
+                    return old?.map(p => p.id === selectedPost.id ? originalPost : p);
                 });
+                toast({ title: "Update failed", description: "Failed to save changes. Reverting to original state.", variant: "destructive" });
+            } finally {
+                localPreviews.forEach(url => URL.revokeObjectURL(url));
             }
-        }
+        })();
 
-        // Refetch fully hydrated post to get accurate updated images
-        const { data: fullPost } = await supabase.from('posts').select(`
-            *,
-            user:users(id, name, avatar_url),
-            community:communities(id, name, logo_url),
-            images:post_images(*),
-            channels:channels(id, name)
-        `).eq('id', selectedPost.id).single();
-
-        if (fullPost) {
-            setSelectedPost(fullPost as any);
-            queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], (old: Post[] | undefined) => {
-                if (!old) return old;
-                return old.map(p => p.id === selectedPost.id ? (fullPost as any) : p);
-            });
-        }
+        return new Promise<void>(resolve => setTimeout(resolve, 2000));
     };
 
     const handleLikePost = async (postToLike: Post) => {
@@ -553,56 +633,87 @@ export default function FeedPage() {
         });
     };
 
-    // if (authLoading) {
-    //     return (
-    //         <div className="min-h-screen flex items-center justify-center bg-warm-50">
-    //             <Loader2 className="w-8 h-8 animate-spin text-warm-700 mb-4" />
-    //         </div>
-    //     );
-    // }
-
-    if (authLoading) {
-        return (
-          <GlobalLayout />
-        );
-    }
-
-    if (!user) return null;
-
     const handleDeletePost = async () => {
         if (!selectedPost) return;
-        await supabase.from('posts').delete().eq('id', selectedPost.id);
+
+        const postId = selectedPost.id;
+        const originalFeedData = queryClient.getQueryData(['feedPosts', user?.id, selectedCommunityFilter]);
+
+        // 1. Optimistic UI update
         queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], (old: Post[] | undefined) => {
             if (!old) return old;
-            return old.filter(p => p.id !== selectedPost.id);
+            return old.filter(p => p.id !== postId);
         });
         setSelectedPost(null);
-        toast({
-            title: "Post deleted",
+        router.replace('/app/feed', { scroll: false });
+
+        // 2. Background cleanup process
+        (async () => {
+            try {
+                // 2.1 Get image paths for bucket cleanup
+                const images = selectedPost.images || [];
+                const filePaths = images.map((img: any) => {
+                    try {
+                        const urlObj = new URL(img.image_url);
+                        return urlObj.pathname.split('/').slice(-2).join('/');
+                    } catch { return null; }
+                }).filter(Boolean) as string[];
+
+                if (filePaths.length > 0) {
+                    supabase.storage.from('avatars').remove(filePaths).then();
+                }
+
+                // 2.2 Delete related data from DB
+                const { error: relError } = await (async () => {
+                    const { error: e1 } = await supabase.from('likes').delete().eq('post_id', postId);
+                    if (e1) return { error: e1 };
+                    
+                    const { data: comments } = await supabase.from('comments').select('id').eq('post_id', postId);
+                    if (comments && comments.length > 0) {
+                        const commentIds = comments.map(c => c.id);
+                        const { error: e2 } = await supabase.from('comment_likes').delete().in('comment_id', commentIds);
+                        if (e2) return { error: e2 };
+                    }
+
+                    const { error: e3 } = await supabase.from('comments').delete().eq('post_id', postId);
+                    if (e3) return { error: e3 };
+                    
+                    const { error: e4 } = await supabase.from('post_images').delete().eq('post_id', postId);
+                    if (e4) return { error: e4 };
+                    
+                    return { error: null };
+                })();
+
+                if (relError) throw relError;
+
+                // 2.3 Finally delete the post itself
+                const { error: postDeleteError } = await supabase.from('posts').delete().eq('id', postId);
+                if (postDeleteError) throw postDeleteError;
+
+                console.log(`Post ${postId} deleted successfully in background.`);
+            } catch (err) {
+                console.error("Background delete error:", err);
+                // Revert optimistic UI on global error notification
+                queryClient.setQueryData(['feedPosts', user?.id, selectedCommunityFilter], originalFeedData);
+                toast({
+                    title: "Sync Error",
+                    description: "Something went wrong while deleting from the server. The post has been restored.",
+                    variant: "destructive"
+                });
+            }
+        })();
+
+        // 3. Smooth UI feedback delay
+        return new Promise<void>(resolve => {
+            setTimeout(() => {
+                toast({
+                    title: "Post deleted",
+                    description: "The post has been removed from your feed."
+                });
+                resolve();
+            }, 2000);
         });
     };
-
-    // const handleSharePost = async (post: Post) => {
-    //     const url = `${window.location.origin}/app/feed?post=${post.id}`;
-
-    //     if (navigator.share) {
-    //         try {
-    //             await navigator.share({
-    //                 title: post.title || 'Pentasent Post',
-    //                 url: url
-    //             });
-    //         } catch (err) {
-    //             console.error("Share failed:", err);
-    //         }
-    //     } else {
-    //         try {
-    //             await navigator.clipboard.writeText(url);
-    //             toast.success("Link copied to clipboard!");
-    //         } catch (err) {
-    //             toast.error("Failed to copy link.");
-    //         }
-    //     }
-    // };
 
     const handleSharePost = async (post: Post) => {
         const url = `${window.location.origin}/app/feed?post=${post.id}`;
@@ -650,75 +761,111 @@ export default function FeedPage() {
         }
     };
 
+    if (authLoading) {
+        return (
+            <GlobalLayout />
+        );
+    }
+
+    if (!user) return null;
+
     return (
         <div className="min-h-screen pb-20">
             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-12 gap-8 items-start max-w-[1400px] mx-auto lg:px-8">
 
                 {/* LEFT FEED */}
                 <div className="max-w-[700px] mx-auto xl:mx-0 w-full flex flex-col mt-16 lg:mt-4">
-                    {/* Community Filters (Moved ABOVE Create Post) */}
-                    <div className="px-4 md:px-0 mb-6 w-full">
-                        <div className="flex items-center gap-3 overflow-x-auto pb-4 px-1 scrollbar-hide snap-x snap-mandatory">
-
-                            {communities.length > 0 ? (
-                                <>
-                                    <button
-                                        onClick={() => setSelectedCommunityFilter(null)}
-                                        className={`shrink-0 px-5 py-2.5 mt-4 rounded-full text-sm font-semibold transition-transform hover:scale-105 active:scale-95 shadow-md ${selectedCommunityFilter === null
-                                            ? "bg-[#3c2a34] text-white"
-                                            : "bg-warm-100 border border-warm-300 text-warm-700 hover:bg-warm-200"
-                                            }`}
-                                    >
-                                        All Communities
-                                    </button>
-
-                                    {communities.map((comm) => (
-                                        <button
-                                            key={comm.id}
-                                            onClick={() => setSelectedCommunityFilter(comm.id)}
-                                            className={`shrink-0 px-5 py-2.5 mt-4 rounded-full text-sm font-medium transition-transform hover:scale-105 active:scale-95 shadow-sm ${selectedCommunityFilter === comm.id
-                                                ? "bg-[#3c2a34] text-white"
-                                                : "bg-warm-100 border border-warm-300 text-warm-700 hover:bg-warm-200"
-                                                }`}
-                                        >
-                                            {comm.name}
-                                        </button>
-                                    ))}
-                                </>
-                            ) : (
-                                <>
-                                    {[1, 2, 3, 4].map(i => (
-                                        <div
-                                            key={i}
-                                            className="px-20 py-5 rounded-full bg-warm-200 animate-pulse shrink-0 mt-4"
-                                        />
-                                    ))}
-                                </>
-
-                            )}
-
-                        </div>
-                    </div>
-
-                    <div className="px-4 md:px-0 mb-6">
+                    {/* Compact Header: Create Post + Community Filter */}
+                    <div className="px-4 md:px-0 mb-8 z-30 mt-4 lg:mt-0">
                         <CreatePostCard
                             communities={communities}
                             channels={channels}
                             onSubmit={handleCreatePost}
                             userAvatar={user?.avatar_url || 'https://via.placeholder.com/40'}
+                            minimal={true}
+                            trailing={
+                                <div className="flex items-center gap-1 sm:gap-2">
+                                    <div className="h-8 w-[1.5px] bg-warm-200/60 mx-1 hidden sm:block" />
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-warm-50/50 hover:bg-warm-100/80 transition-all rounded-full text-[13px] sm:text-sm font-bold text-warm-700 border border-transparent whitespace-nowrap active:scale-95">
+                                                <Filter size={16} className="text-warm-500 hidden xs:block" />
+                                                <span className="max-w-[100px] sm:max-w-[150px] truncate">
+                                                    {selectedCommunityFilter
+                                                        ? communities.find(c => c.id === selectedCommunityFilter)?.name
+                                                        : 'All Communities'}
+                                                </span>
+                                                <ChevronDown size={14} className="text-warm-400" />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="sm:w-[260px] w-full rounded-2xl p-2 bg-white/95 backdrop-blur-xl border-warm-200 shadow-2xl z-[100]">
+                                            <div className="px-3 py-2 text-[11px] font-bold text-warm-400 uppercase tracking-wider">Feed Filter</div>
+                                            <DropdownMenuItem
+                                                onClick={() => setSelectedCommunityFilter(null)}
+                                                className={`rounded-xl cursor-pointer py-2.5 px-3 mb-1 transition-colors ${!selectedCommunityFilter ? 'bg-[#3c2a34] text-white font-bold hover:bg-[#3c2a34] hover:text-white' : 'text-warm-600 hover:bg-warm-50'}`}
+                                            >
+                                                All Communities
+                                            </DropdownMenuItem>
+                                            <div className="h-px bg-warm-100 my-1 mx-2" />
+                                            <div className="max-h-[300px] overflow-y-auto scrollbar-hide snap-x snap-mandatory">
+                                                {communities.length > 0 ? (
+                                                    communities.map((comm) => (
+                                                        <DropdownMenuItem
+                                                            key={comm.id}
+                                                            onClick={() => setSelectedCommunityFilter(comm.id)}
+                                                            className={`rounded-xl cursor-pointer py-2.5 px-3 mb-1 transition-colors ${selectedCommunityFilter === comm.id
+                                                                ? 'bg-[#3c2a34] text-white font-bold hover:bg-[#3c2a34] hover:text-white'
+                                                                : 'text-warm-600 hover:bg-warm-50'
+                                                                }`}
+                                                        >
+                                                            <div className="flex items-center gap-3 w-full min-w-0">
+
+                                                                {comm.logo_url ? (
+                                                                    <Image
+                                                                        src={comm.logo_url}
+                                                                        alt="Logo"
+                                                                        width={24}
+                                                                        height={24}
+                                                                        className="rounded-full w-6 h-6 shrink-0"
+                                                                    />
+                                                                    // <div className="w-12 h-12 rounded-full bg-warm-200 overflow-hidden shrink-0 relative">
+                                                                    //     <SmartImage
+                                                                    //         src={comm.logo_url}
+                                                                    //         alt="avatar"
+                                                                    //         className="object-cover"
+                                                                    //         fallbackIconSize={20}
+                                                                    //     />
+                                                                    // </div>
+                                                                ) : (
+                                                                    <div className="w-6 h-6 rounded-full bg-[#3c2a34] shrink-0" />
+                                                                )}
+
+                                                                <span className="font-medium text-warm-700 truncate">
+                                                                    {comm.name}
+                                                                </span>
+
+                                                            </div>
+                                                        </DropdownMenuItem>
+                                                    ))
+                                                ) : (
+                                                    <div className="px-3 py-8 text-center">
+                                                        <Info size={24} className="mx-auto text-warm-200 mb-2" />
+                                                        <p className="text-xs text-warm-400">Join communities to see them here</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            }
                         />
                     </div>
 
-                    <div className="space-y-0 px-4 md:px-0">
+                    <div className="space-y-0">
                         {loadingPosts && posts.length === 0 ? (
                             <div className="space-y-6 px-4 md:px-0">
-
                                 {[1, 2, 3].map((i) => (
-                                    <div
-                                        key={i}
-                                        className="bg-warm-100 border border-warm-200 rounded-[20px] p-5 animate-pulse"
-                                    >
-                                        {/* header */}
+                                    <div key={i} className="bg-warm-100 border border-warm-200 rounded-[20px] p-5 animate-pulse">
                                         <div className="flex items-center gap-3 mb-4">
                                             <div className="w-10 h-10 rounded-full bg-warm-200" />
                                             <div className="flex-1">
@@ -726,20 +873,12 @@ export default function FeedPage() {
                                                 <div className="h-2 w-24 bg-warm-200 rounded" />
                                             </div>
                                         </div>
-
-                                        {/* title */}
                                         <div className="h-4 w-2/3 bg-warm-200 rounded mb-3" />
-
-                                        {/* text */}
                                         <div className="space-y-2 mb-4">
                                             <div className="h-3 bg-warm-200 rounded" />
                                             <div className="h-3 bg-warm-200 rounded w-5/6" />
                                         </div>
-
-                                        {/* image */}
                                         <div className="h-[220px] rounded-xl bg-warm-200 mb-4" />
-
-                                        {/* actions */}
                                         <div className="flex gap-6">
                                             <div className="h-4 w-16 bg-warm-200 rounded" />
                                             <div className="h-4 w-20 bg-warm-200 rounded" />
@@ -747,13 +886,10 @@ export default function FeedPage() {
                                         </div>
                                     </div>
                                 ))}
-
                             </div>
                         ) : posts.length === 0 ? (
                             <div className="text-center py-20 bg-white/50 rounded-2xl border border-warm-300 border-dashed">
-                                <p className="text-warm-500 font-medium">
-                                    No posts in your feed yet.
-                                </p>
+                                <p className="text-warm-500 font-medium">No posts in your feed yet.</p>
                             </div>
                         ) : (
                             posts.map((post) => (
@@ -777,6 +913,7 @@ export default function FeedPage() {
                                 </div>
                             ))
                         )}
+                        
                         {!loading && posts.length > 0 && (
                             <div className="text-center py-10 pt-4">
                                 <p className="text-warm-400 font-medium text-sm">You&apos;ve reached the end of the feed.</p>
@@ -878,14 +1015,83 @@ export default function FeedPage() {
                             className="w-full max-w-[1400px] mx-auto lg:px-16 px-0 pointer-events-none"
                         >
                             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-12 gap-8 md:px-0">
-                                <div className="max-w-[700px] mx-auto xl:mx-0 w-full px-2 lg:px-0 z-40 bg-warm-100 border-t border-warm-300 lg:border shadow-[0_-4px_20px_-15px_rgba(0,0,0,0.1)] lg:rounded-t-3xl md:rounded-t-3xl pointer-events-auto">
-                                    <CreatePostCard
-                                        communities={communities}
-                                        channels={channels}
-                                        onSubmit={handleCreatePost}
-                                        userAvatar={user?.avatar_url || 'https://via.placeholder.com/40'}
-                                        minimal={true}
-                                    />
+                                <div className="max-w-[700px] mx-auto xl:mx-0 w-full px-2 lg:px-4 z-40 bg-white/60 backdrop-blur-xl border-t border-warm-200/60 lg:border lg:shadow-[0_-8px_30px_-10px_rgba(0,0,0,0.12)] lg:rounded-t-[32px] md:rounded-t-[32px] pointer-events-auto">
+                                    <div className="py-2">
+                                        <CreatePostCard
+                                            communities={communities}
+                                            channels={channels}
+                                            onSubmit={handleCreatePost}
+                                            userAvatar={user?.avatar_url || 'https://via.placeholder.com/40'}
+                                            minimal={true}
+                                            trailing={
+                                                <div className="flex items-center gap-1 sm:gap-2">
+                                                    <div className="h-8 w-[1.5px] bg-warm-200/60 mx-1 hidden sm:block" />
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <button className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-warm-50/50 hover:bg-warm-100/80 transition-all rounded-full text-[13px] sm:text-sm font-bold text-warm-700 border border-transparent whitespace-nowrap shadow-sm active:scale-95">
+                                                                <Filter size={16} className="text-warm-500 hidden xs:block" />
+                                                                <span className="max-w-[100px] sm:max-w-[150px] truncate">
+                                                                    {selectedCommunityFilter
+                                                                        ? communities.find(c => c.id === selectedCommunityFilter)?.name
+                                                                        : 'All Communities'}
+                                                                </span>
+                                                                <ChevronDown size={14} className="text-warm-400" />
+                                                            </button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" side="top" className="w-[240px] rounded-2xl p-2 bg-white/95 backdrop-blur-xl border-warm-200 shadow-2xl z-[100] mb-2">
+                                                            <div className="px-3 py-2 text-[11px] font-bold text-warm-400 uppercase tracking-wider">Feed Filter</div>
+                                                            <DropdownMenuItem
+                                                                onClick={() => setSelectedCommunityFilter(null)}
+                                                                className={`rounded-xl cursor-pointer py-2.5 px-3 mb-1 transition-colors ${!selectedCommunityFilter ? 'bg-[#3c2a34] text-white font-bold hover:bg-[#3c2a34] hover:text-white' : 'text-warm-600 hover:bg-warm-50'}`}
+                                                            >
+                                                                All Communities
+                                                            </DropdownMenuItem>
+                                                            <div className="h-px bg-warm-100 my-1 mx-2" />
+                                                            <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                                                {communities.length > 0 ? (
+                                                                    communities.map((comm) => (
+                                                                        <DropdownMenuItem
+                                                                            key={comm.id}
+                                                                            onClick={() => setSelectedCommunityFilter(comm.id)}
+                                                                            className={`rounded-xl cursor-pointer py-2.5 px-3 mb-1 transition-colors ${selectedCommunityFilter === comm.id
+                                                                                ? 'bg-[#3c2a34] text-white font-bold hover:bg-[#3c2a34] hover:text-white'
+                                                                                : 'text-warm-600 hover:bg-warm-50'
+                                                                                }`}
+                                                                        >
+                                                                            <div className="flex items-center gap-3 w-full min-w-0">
+
+                                                                                {comm.logo_url ? (
+                                                                                    <Image
+                                                                                        src={comm.logo_url}
+                                                                                        alt="Logo"
+                                                                                        width={24}
+                                                                                        height={24}
+                                                                                        className="rounded-full w-6 h-6 shrink-0"
+                                                                                    />
+                                                                                ) : (
+                                                                                    <div className="w-6 h-6 rounded-full bg-[#3c2a34] shrink-0" />
+                                                                                )}
+
+                                                                                <span className="font-medium text-warm-700 truncate">
+                                                                                    {comm.name}
+                                                                                </span>
+
+                                                                            </div>
+                                                                        </DropdownMenuItem>
+                                                                    ))
+                                                                ) : (
+                                                                    <div className="px-3 py-8 text-center">
+                                                                        <Info size={24} className="mx-auto text-warm-200 mb-2" />
+                                                                        <p className="text-xs text-warm-400">Join communities to see them here</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            }
+                                        />
+                                    </div>
                                 </div>
                                 <div className="hidden xl:block" />
                             </div>

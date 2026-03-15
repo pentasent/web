@@ -5,8 +5,10 @@ import { Post, Comment } from '@/types/database';
 import { Loader2, MoreVertical, Heart, MessageCircle, Share2, CornerDownRight, X, ChevronLeft, ChevronRight, Trash2, BarChart2, Send } from 'lucide-react';
 import { formatNumber, parseContent } from '@/lib/format';
 import { SmartImage } from '@/components/ui/SmartImage';
+import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { createPortal } from 'react-dom';
+import { CommentListShimmer } from '@/components/shimmer/CommentShimmer';
 
 interface PostDetailPanelProps {
     post: Post;
@@ -230,48 +232,79 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar bg-warm-100">
+            <div className="flex-1 overflow-y-auto scrollbar-hide snap-x snap-mandatory bg-warm-100">
                 <div className="p-5">
                     {/* Post Author */}
                     <div className="flex items-center mb-4">
                         <div className="w-12 h-12 rounded-full bg-warm-200 overflow-hidden mr-3 shrink-0 relative">
                             <SmartImage src={post.user?.avatar_url || 'https://via.placeholder.com/40'} alt="avatar" className="object-cover" fallbackIconSize={24} />
                         </div>
-                        <div>
+                        <div className="flex flex-col">
                             <h4 className="text-[16px] font-bold text-warm-700 leading-tight">
                                 {post.user?.name || 'Anonymous'}
                             </h4>
-                            <div className="flex items-center text-xs text-warm-500 mt-0.5">
-                                {post.community && <span className="font-semibold mr-1">{post.community.name} •</span>}
-                                <span> {new Date(post.created_at).toLocaleDateString(undefined, {
-                                    month: 'short',
-                                    day: 'numeric'
-                                })}</span>
+                            <div className="flex flex-col text-xs text-warm-500 mt-0.5">
+                                {post.is_uploading && (
+                                    <div className="flex items-center gap-1.5 text-[#3c2a34] font-bold mb-0.5 animate-pulse">
+                                        <span>{post.id.toString().startsWith('temp-') ? 'Uploading' : 'Updating'}</span>
+                                        <div className="flex gap-1">
+                                            {[0, 1, 2].map((i) => (
+                                                <div
+                                                    key={i}
+                                                    className="w-1 h-1 bg-[#3c2a34] rounded-full animate-bounce"
+                                                    style={{ animationDelay: `${i * 0.15}s` }}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="flex items-center">
+                                    {post.community && <span className="font-semibold mr-1">{post.community.name} •</span>}
+                                    <span> {new Date(post.created_at).toLocaleDateString(undefined, {
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Text Content */}
                     {post.title && <h3 className="text-lg font-bold text-warm-700 mb-2">{post.title}</h3>}
-                    <p className="text-[15px] text-warm-700 leading-relaxed whitespace-pre-line mb-4">
+                    <p className="text-[15px] text-warm-700 leading-relaxed whitespace-pre-line break-words overflow-hidden mb-4">
                         {postContent}
                     </p>
 
                     {/* Media */}
                     {post.images && post.images.length > 0 && (
                         <div className="relative mb-4 group/media">
-                            <div ref={scrollContainerRef} className="flex overflow-x-auto gap-3 pb-2 w-full custom-scrollbar snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                                <style>{`.custom-scrollbar::-webkit-scrollbar { display: none; }`}</style>
-                                {post.images.map((img, idx) => (
-                                    <div
-                                        key={idx}
-                                        onClick={() => setSelectedImageIndex(idx)}
-                                        className={`h-[250px] sm:h-[300px] bg-warm-200 rounded-xl overflow-hidden relative shrink-0 snap-center cursor-pointer hover:opacity-95 transition-opacity ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
-                                            }`}
-                                    >
-                                        <SmartImage src={img.image_url} alt="Post media" className="object-cover" fallbackIconSize={48} />
-                                    </div>
-                                ))}
+                            <div ref={scrollContainerRef} className="flex overflow-x-auto gap-3 pb-2 w-full scrollbar-hide snap-x snap-mandatory">
+                                {post.local_image_urls && post.local_image_urls.length > 0 ? (
+                                    post.local_image_urls.map((url, idx) => (
+                                        <div
+                                            key={`local-${idx}`}
+                                            className={`h-[250px] sm:h-[300px] bg-warm-200 rounded-xl overflow-hidden relative shrink-0 snap-center ${post.local_image_urls!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'}`}
+                                        >
+                                            <Image
+                                                src={url}
+                                                fill
+                                                alt={`Uploading media ${idx}`}
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                    ))
+                                ) : (
+                                    post.images?.map((img, idx) => (
+                                        <div
+                                            key={idx}
+                                            onClick={() => setSelectedImageIndex(idx)}
+                                            className={`h-[250px] sm:h-[300px] bg-warm-200 rounded-xl overflow-hidden relative shrink-0 snap-center cursor-pointer hover:opacity-95 transition-opacity ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
+                                                }`}
+                                        >
+                                            <SmartImage src={img.image_url} alt="Post media" className="object-cover" fallbackIconSize={48} />
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     )}
@@ -298,9 +331,7 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                     {/* Comments List */}
                     <div className="space-y-2 pb-6">
                         {loadingComments ? (
-                            <div className="flex justify-center py-8">
-                                <Loader2 className="w-6 h-6 animate-spin text-warm-400" />
-                            </div>
+                            <CommentListShimmer />
                         ) : comments.length === 0 ? (
                             <div className="text-center py-8 text-warm-400 italic">No comments yet. Be the first to share your thoughts!</div>
                         ) : (
@@ -357,8 +388,8 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
 
             {/* Full Screen Image Viewer via Portal */}
             {selectedImageIndex !== null && post.images && typeof window !== 'undefined' && createPortal(
-                <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/10 backdrop-blur-md">
-
+                // <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/10 backdrop-blur-md">
+                <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/35 backdrop-blur-lg">
                     {/* Close Button */}
                     <button
                         onClick={() => setSelectedImageIndex(null)}

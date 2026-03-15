@@ -99,16 +99,16 @@ export function JournalEditPanel({ journal, onClose, onSaved }: JournalEditPanel
             {/* Header */}
             <div className="px-6 py-4 flex items-center justify-between border-b border-warm-300 bg-warm-100 sticky top-0 z-10">
                 <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-warm-200 rounded-full transition-colors"
-                        title="Cancel"
-                    >
-                        <X className="w-5 h-5 text-warm-500" />
-                    </button>
-                    <h2 className="text-lg font-bold text-warm-700">
-                        {journal ? 'Edit Entry' : 'New Entry'}
-                    </h2>
-                
+                    onClick={onClose}
+                    className="p-2 hover:bg-warm-200 rounded-full transition-colors"
+                    title="Cancel"
+                >
+                    <X className="w-5 h-5 text-warm-500" />
+                </button>
+                <h2 className="text-lg font-bold text-warm-700">
+                    {journal ? 'Edit Entry' : 'New Entry'}
+                </h2>
+
                 <button
                     onClick={handleSave}
                     disabled={isSaving || !content.trim()}
@@ -141,16 +141,15 @@ export function JournalEditPanel({ journal, onClose, onSaved }: JournalEditPanel
                         <label className="text-sm font-semibold text-warm-500 flex items-center gap-2">
                             <Smile className="w-4 h-4" /> How are you feeling?
                         </label>
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 snap-x p-2">
                             {MOODS.map((emoji) => (
                                 <button
                                     key={emoji}
                                     onClick={() => setMoodEmoji(emoji === moodEmoji ? '' : emoji)}
-                                    className={`text-2xl w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${
-                                        emoji === moodEmoji 
-                                            ? 'bg-blue-50 border-blue-200 border-2 scale-110 shadow-sm' 
+                                    className={`shrink-0 snap-start text-2xl w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${emoji === moodEmoji
+                                            ? 'bg-blue-50 border-warm-300 border-2 scale-110 shadow-sm'
                                             : 'bg-warm-200 border border-transparent hover:bg-warm-200 hover:scale-105'
-                                    }`}
+                                        }`}
                                 >
                                     {emoji}
                                 </button>

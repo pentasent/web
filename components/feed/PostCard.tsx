@@ -1,8 +1,9 @@
 import React from 'react';
-import { Heart, MessageCircle, Share2, BarChart2 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, BarChart2, Loader2 } from 'lucide-react';
 import { Post } from '@/types/database';
 import { formatNumber, parseContent } from '@/lib/format';
 import { SmartImage } from '@/components/ui/SmartImage';
+import Image from 'next/image';
 
 interface PostCardProps {
     post: Post;
@@ -11,6 +12,18 @@ interface PostCardProps {
     onComment: (e: React.MouseEvent) => void;
     onShare: (e: React.MouseEvent) => void;
 }
+
+const DotsLoader = () => (
+    <div className="flex gap-1.5 items-center justify-center">
+        {[0, 1, 2].map((i) => (
+            <div
+                key={i}
+                className="w-2.5 h-2.5 bg-white rounded-full animate-bounce"
+                style={{ animationDelay: `${i * 0.15}s` }}
+            />
+        ))}
+    </div>
+);
 
 export const PostCard: React.FC<PostCardProps> = ({
     post,
@@ -24,7 +37,7 @@ export const PostCard: React.FC<PostCardProps> = ({
     return (
         <div
             // className="bg-warm-100 border hover:border-warm-300 border-transparent rounded-[20px] shadow-sm mb-4 cursor-pointer overflow-hidden transition-all duration-200"
-            className="bg-warm-100 border hover:border-warm-300 border-transparent rounded-[20px] shadow-sm hover:shadow-md mb-4 cursor-pointer overflow-hidden transition-all duration-200"
+            className="bg-warm-100 border hover:border-warm-300 border-transparent lg:rounded-[20px] md:rounded-[20px] lg:shadow-sm lg:hover:shadow-md mb-4 cursor-pointer overflow-hidden transition-all duration-200"
             onClick={onPress}
         >
             {/* Header */}
@@ -42,16 +55,32 @@ export const PostCard: React.FC<PostCardProps> = ({
                         <h4 className="text-[15px] font-semibold text-warm-700 leading-none mb-1">
                             {post.user?.name || 'Anonymous'}
                         </h4>
-                        <div className="flex items-center text-xs text-warm-500">
-                            {post.community && (
-                                <span className="font-medium mr-1">{post.community.name} •</span>
+                        <div className="flex flex-col text-xs text-warm-500">
+                            {post.is_uploading && (
+                                <div className="flex items-center gap-1.5 text-[#3c2a34] font-bold mb-0.5 animate-pulse">
+                                    <span>{post.id.toString().startsWith('temp-') ? 'Uploading' : 'Updating'}</span>
+                                    <div className="flex gap-1">
+                                        {[0, 1, 2].map((i) => (
+                                            <div
+                                                key={i}
+                                                className="w-1 h-1 bg-[#3c2a34] rounded-full animate-bounce"
+                                                style={{ animationDelay: `${i * 0.15}s` }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
                             )}
-                            <span>
-                                {new Date(post.created_at).toLocaleDateString(undefined, {
-                                    month: 'short',
-                                    day: 'numeric'
-                                })}
-                            </span>
+                            <div className="flex items-center">
+                                {post.community && (
+                                    <span className="font-medium mr-1">{post.community.name} •</span>
+                                )}
+                                <span>
+                                    {new Date(post.created_at).toLocaleDateString(undefined, {
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -68,25 +97,41 @@ export const PostCard: React.FC<PostCardProps> = ({
             </div>
 
             {/* Media */}
-            {post.images && post.images.length > 0 && (
+            {(post.images && post.images.length > 0) || (post.is_uploading && post.local_image_urls && post.local_image_urls.length > 0) ? (
                 <div className="mt-1 flex overflow-x-auto gap-2 pb-2 px-5 scrollbar-hide snap-x snap-mandatory">
-                   
-                    {post.images.map((img, idx) => (
-                        <div
-                            key={idx}
-                            className={`relative h-[300px] sm:h-[400px] bg-warm-200 rounded-xl overflow-hidden shrink-0 snap-center ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
-                                }`}
-                        >
-                            <SmartImage
-                                src={img.image_url}
-                                alt={`Post media ${idx}`}
-                                className="object-cover"
-                                fallbackIconSize={48}
-                            />
-                        </div>
-                    ))}
+                    {post.is_uploading && post.local_image_urls ? (
+                        post.local_image_urls.map((url, idx) => (
+                            <div
+                                key={`local-${idx}`}
+                                className={`relative h-[300px] sm:h-[400px] bg-black/10 rounded-xl overflow-hidden shrink-0 snap-center ${post.local_image_urls!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'}`}
+                            >
+                                <Image
+                                    src={url}
+                                    width={100}
+                                    height={100}
+                                    alt={`Uploading media ${idx}`}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        post.images?.map((img, idx) => (
+                            <div
+                                key={idx}
+                                className={`relative h-[300px] sm:h-[400px] bg-black/20 rounded-xl overflow-hidden shrink-0 snap-center ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
+                                    }`}
+                            >
+                                <SmartImage
+                                    src={img.image_url}
+                                    alt={`Post media ${idx}`}
+                                    className="object-cover"
+                                    fallbackIconSize={48}
+                                />
+                            </div>
+                        ))
+                    )}
                 </div>
-            )}
+            ) : null}
 
             {/* Actions */}
             <div className="flex items-center gap-6 px-5 py-3 border-t border-gray-50">

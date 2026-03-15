@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { parseContent } from '@/lib/format';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import { SmartImage } from '../ui/SmartImage';
 
 interface CreatePostCardProps {
     communities: Community[];
@@ -21,6 +22,7 @@ interface CreatePostCardProps {
     }) => Promise<void>;
     userAvatar?: string;
     minimal?: boolean;
+    trailing?: React.ReactNode;
 }
 
 export const CreatePostCard: React.FC<CreatePostCardProps> = ({
@@ -28,7 +30,8 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
     channels,
     onSubmit,
     userAvatar = 'https://via.placeholder.com/40',
-    minimal = false
+    minimal = false,
+    trailing
 }) => {
     const { toast } = useToast();
     const [open, setOpen] = useState(false);
@@ -161,8 +164,8 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
     };
 
     return (
-        <div className={`bg-warm-100/50 ${minimal ? 'p-2 rounded-full' : 'rounded-[20px] shadow-sm mb-6 p-4'} border border-transparent`}>
-            <div className="flex items-center gap-3">
+        <div className={`bg-white/80 backdrop-blur-md shadow-sm border border-warm-200/60 ${minimal ? 'p-1.5 px-2 rounded-full' : 'rounded-[20px] mb-6 p-4'}`}>
+            <div className="flex items-center gap-3 w-full">
                 <Image
                     src={userAvatar}
                     alt="User"
@@ -173,10 +176,11 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
 
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <button className="flex-1 bg-[#F8F2EE] hover:bg-[#F0EBE7] transition-colors rounded-full px-4 py-3 text-left text-warm-500 font-medium border border-transparent truncate">
+                        <button className={`flex-1 ${minimal ? 'bg-warm-50/50 py-2.5' : 'bg-[#F8F2EE] py-3'} hover:bg-warm-100/80 transition-colors rounded-full px-5 text-left text-warm-500 font-medium border border-transparent truncate`}>
                             What do you want to share?
                         </button>
                     </DialogTrigger>
+                    {trailing}
                     <DialogContent className="w-full h-full sm:max-h-[90vh] sm:max-w-[600px] overflow-hidden sm:overflow-visible rounded-none sm:rounded-3xl p-0 gap-0 border-0 flex flex-col pt-3 sm:pt-0">
                         <DialogHeader className="px-6 pb-4 md:pt-4 lg:pt-4 border-b border-warm-300">
                             <div className="flex items-center justify-between">
@@ -185,7 +189,7 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                             </div>
                         </DialogHeader>
 
-                        <div className="flex flex-col p-6 overflow-y-auto max-h-[80vh] custom-scrollbar">
+                        <div className="flex flex-col p-6 overflow-y-auto max-h-[80vh] scrollbar-hide snap-x snap-mandatory">
                             {/* Pickers container */}
                             <div className="flex flex-col gap-4 mb-4 relative z-50">
                                 {/* Community Selector */}
@@ -208,18 +212,48 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                                     </button>
 
                                     {showCommPicker && (
-                                        <div className="absolute top-14 left-0 w-full bg-warm-100 border border-warm-300 rounded-xl shadow-lg z-[60] max-h-60 overflow-y-auto py-2">
+                                        <div className="absolute top-14 left-0 w-full bg-warm-100 border border-warm-300 rounded-xl shadow-lg z-[60] max-h-60 overflow-y-auto py-2 scrollbar-hide">
+
                                             {communities.map(comm => (
                                                 <button
                                                     key={comm.id}
-                                                    onClick={() => { setSelectedCommunityId(comm.id); setSelectedChannelId(null); setShowCommPicker(false); }}
-                                                    className="flex w-full items-center justify-between px-4 py-3 hover:bg-warm-200"
+                                                    onClick={() => {
+                                                        setSelectedCommunityId(comm.id);
+                                                        setSelectedChannelId(null);
+                                                        setShowCommPicker(false);
+                                                    }}
+                                                    className="flex w-full items-center px-4 py-3 hover:bg-warm-200"
                                                 >
-                                                    <div className="flex items-center gap-3">
-                                                        {comm.logo_url ? <Image src={comm.logo_url} alt="logo" width={24} height={24} className="rounded-full w-6 h-6 object-cover" /> : <div className="min-w-6 min-h-6 rounded-full bg-gray-200" />}
-                                                        <span className={`text-sm ${selectedCommunityId === comm.id ? 'font-semibold text-[#3c2a34]' : 'text-warm-700'}`}>{comm.name}</span>
+                                                    {/* LEFT SIDE */}
+                                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+
+                                                        {comm.logo_url ? (
+                                                            <div className="w-6 h-6 rounded-full bg-warm-200 overflow-hidden shrink-0 relative">
+                                                                <SmartImage
+                                                                    src={comm.logo_url || 'https://via.placeholder.com/40'}
+                                                                    alt="avatar"
+                                                                    className="object-cover"
+                                                                    fallbackIconSize={20}
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-6 h-6 rounded-full bg-gray-200 shrink-0" />
+                                                        )}
+
+                                                        <span
+                                                            className={`text-sm truncate ${selectedCommunityId === comm.id
+                                                                ? "font-semibold text-[#3c2a34]"
+                                                                : "text-warm-700"
+                                                                }`}
+                                                        >
+                                                            {comm.name}
+                                                        </span>
                                                     </div>
-                                                    {selectedCommunityId === comm.id && <Check size={16} className="text-[#3c2a34]" />}
+
+                                                    {/* RIGHT ICON */}
+                                                    {selectedCommunityId === comm.id && (
+                                                        <Check size={16} className="text-[#3c2a34] shrink-0 ml-3" />
+                                                    )}
                                                 </button>
                                             ))}
                                         </div>
@@ -240,7 +274,7 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                                         </button>
 
                                         {showChanPicker && (
-                                            <div className="absolute top-14 left-0 w-[60%] bg-warm-100 border border-warm-300 rounded-xl shadow-lg z-[60] max-h-60 overflow-y-auto py-2">
+                                            <div className="absolute top-14 left-0 sm:w-[60%] w-full bg-warm-100 border border-warm-300 rounded-xl shadow-lg z-[60] max-h-60 overflow-y-auto py-2 scrollbar-hide snap-x snap-mandatory">
                                                 {filteredChannels.length > 0 ? filteredChannels.map(ch => (
                                                     <button
                                                         key={ch.id}
@@ -265,10 +299,16 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
 
                             {/* Image Previews */}
                             {imagePreviews.length > 0 && (
-                                <div className="flex gap-4 mb-4 overflow-x-auto pb-4 pt-3 pl-1 pr-3 custom-scrollbar">
+                                <div className="flex gap-4 mb-4 overflow-x-auto pb-4 pt-3 pl-1 pr-3 scrollbar-hide snap-x snap-mandatory">
                                     {imagePreviews.map((img, idx) => (
                                         <div key={idx} className="relative w-20 h-20 shrink-0 border border-warm-300 rounded-lg">
-                                            <Image src={img} alt="preview" fill className="object-cover rounded-lg" />
+                                            {/* <Image src={img} alt="preview" fill className="object-cover rounded-lg" /> */}
+                                            <SmartImage
+                                                src={img}
+                                                alt="preview"
+                                                className="object-cover rounded-lg"
+                                                fallbackIconSize={40}
+                                            />
                                             <button
                                                 onClick={() => removeImage(idx)}
                                                 className="absolute top-1 right-1 bg-gray-900 bg-opacity-70 p-1 rounded-full text-white hover:bg-opacity-100 z-10 shadow-sm"
