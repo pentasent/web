@@ -20,6 +20,7 @@ import {
     Book,
     PenBox,
     User,
+    MessageSquare,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -37,6 +38,7 @@ const sidebarItems = [
     // { name: "Yoga", href: "/app/yoga", icon: Activity },
     { name: "Tasks", href: "/app/tasks", icon: CheckSquare },
     { name: "Journal", href: "/app/journal", icon: PenBox },
+    { name: "Chats", href: "/app/chats", icon: MessageSquare },
     // { name: "Products", href: "/app/products", icon: ShoppingBag },
     { name: "Updates", href: "/app/notification", icon: Bell },
 ];

@@ -2,28 +2,29 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    Bell, 
-    Heart, 
-    MessageCircle, 
-    MessageSquare, 
-    Users, 
-    AlertTriangle, 
-    CheckCircle, 
+import {
+    Bell,
+    Heart,
+    MessageCircle,
+    MessageSquare,
+    Users,
+    AlertTriangle,
+    CheckCircle,
     Info,
     CheckCheck,
-    Calendar,
-    ArrowLeft
+    Calendar
 } from 'lucide-react';
 import { useNotification } from '@/contexts/NotificationContext';
-import { Notification } from '@/types/database';
 import { formatDistanceToNow } from 'date-fns';
-import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { GlobalLayout } from '@/components/layout/global-layout';
 
 export default function NotificationPage() {
+    const { user, loading: authLoading } = useAuth();
     const { notifications, unreadCount, markAsRead, markAllAsRead, loading } = useNotification();
-    const [isUpdating, setIsUpdating] = useState(false);
+    const [isUpdating, setIsUpdating] = React.useState(false);
 
+    
     const getIcon = (type: string, category: string) => {
         const size = 20;
         switch (type) {
@@ -57,15 +58,20 @@ export default function NotificationPage() {
         setIsUpdating(false);
     };
 
+        if (authLoading) {
+            return (
+              <GlobalLayout />
+            );
+        }
+    
+        if (!user) return null;
+
     return (
         <div className="max-w-4xl mx-auto pb-20 mt-20 xl:mt-6 lg:mt-4 px-4 md:px-0">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
                   <div className="flex items-center gap-3 mb-1">
-                    {/* <Link href="/app/feed" className="lg:hidden p-2 hover:bg-gray-100 rounded-full transition-colors">
-                      <ArrowLeft size={20} className="text-gray-600" />
-                    </Link> */}
                     <h1 className="text-3xl font-bold text-gray-900">Updates</h1>
                   </div>
                   <p className="text-gray-500">Stay updated with your community actions</p>
@@ -84,29 +90,43 @@ export default function NotificationPage() {
             </div>
 
             {/* Notifications List */}
-            <div className="bg-white rounded-3xl shadow-sm border border-warm-200 overflow-hidden">
-                {loading ? (
-                    <div className="p-20 text-center">
-                        <div className="animate-spin w-8 h-8 border-4 border-[#3d2f4d] border-t-transparent rounded-full mx-auto mb-4"></div>
-                        <p className="text-gray-400">Loading notifications...</p>
+            <div className="bg-white rounded-2xl shadow-sm border border-warm-200 overflow-hidden">
+                {loading || notifications === null ? (
+                    <div className="divide-y divide-warm-100">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <div key={i} className="p-6 flex gap-4 animate-pulse">
+                                <div className="shrink-0 w-12 h-12 bg-gray-200 rounded-2xl" />
+                                <div className="flex-1 space-y-3">
+                                    <div className="flex justify-between items-start">
+                                        <div className="h-4 bg-gray-200 rounded-full w-1/3" />
+                                        <div className="h-3 bg-gray-100 rounded-full w-16" />
+                                    </div>
+                                    <div className="h-3 bg-gray-100 rounded-full w-full" />
+                                    <div className="h-3 bg-gray-100 rounded-full w-2/3" />
+                                    <div className="h-3 bg-gray-100 rounded-full w-24 mt-4" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : notifications.length === 0 ? (
                     <div className="p-20 text-center">
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Bell size={32} className="text-gray-300" />
+                        <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-warm-100 shadow-sm">
+                            <Bell size={32} className="text-warm-300" />
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-1">No notifications yet</h3>
-                        <p className="text-gray-400">We&apos;ll notify you when something important happens.</p>
+                        <h3 className="text-lg font-bold text-warm-700 mb-1">No updates yet</h3>
+                        <p className="text-warm-400 text-sm">We&apos;ll notify you when something important happens.</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-warm-200">
                         <AnimatePresence initial={false}>
                             {notifications.map((notification) => (
                                 <motion.div
-                                    key={notification.id}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
+                                    layout
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    key = {notification.id}
                                     className={`p-5 flex gap-4 transition-colors cursor-pointer hover:bg-warm-50/50 ${!notification.is_seen ? 'bg-[#3d2f4d]/[0.02]' : ''}`}
                                     onClick={() => !notification.is_seen && markAsRead(notification.id)}
                                 >

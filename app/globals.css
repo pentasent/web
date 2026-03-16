@@ -146,6 +146,34 @@
   display: none; /* Chrome / Safari */
 }
 
+.chat-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cfcfd4 transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background: #cfcfd4;
+  border-radius: 999px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8b3;
+}
+
+.chat-scrollbar::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+  scrollbar-color: #cfcfd4 transparent;
+}
+
 }
 
 

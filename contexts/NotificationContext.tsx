@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Notification } from '@/types/database';
 
 interface NotificationContextType {
-    notifications: Notification[];
+    notifications: Notification[] | null;
     unreadCount: number;
     loading: boolean;
     markAsRead: (id: string) => Promise<void>;
@@ -18,78 +18,120 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user } = useAuth();
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [notifications, setNotifications] = useState<Notification[] | null>(null);
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    const fetchNotifications = useCallback(async () => {
-        if (!user) {
-            setLoading(false);
-            return;
+
+
+const fetchNotifications = useCallback(async () => {
+    if (!user) {
+        setLoading(false);
+        return;
+    }
+
+    const start = Date.now();
+
+    try {
+        const { data, error } = await supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (data) {
+            setNotifications(data);
+            setUnreadCount(data.filter(n => !n.is_seen).length);
         }
 
-        try {
-            const { data, error } = await supabase
-                .from('notifications')
-                .select('*')
-                .eq('user_id', user.id)
-                .eq('is_active', true)
-                .order('created_at', { ascending: false });
+    } catch (error) {
+        console.error(error);
+    } finally {
+        const elapsed = Date.now() - start;
+        const delay = Math.max(0, 200 - elapsed);
 
-            if (error) throw error;
-
-            if (data) {
-                setNotifications(data);
-                setUnreadCount(data.filter(n => !n.is_seen).length);
-            }
-        } catch (error) {
-            console.error('Error fetching notifications:', error);
-        } finally {
-            setLoading(false);
-        }
-    }, [user]);
+        setTimeout(() => setLoading(false), delay);
+    }
+}, [user]);
 
     useEffect(() => {
         let channel: any;
 
-        if (user) {
-            fetchNotifications();
+if (!user) return;
 
-            // Real-time subscription
-            channel = supabase
-                .channel(`notifications_user_${user.id}`)
-                .on(
-                    'postgres_changes',
-                    {
-                        event: '*',
-                        schema: 'public',
-                        table: 'notifications',
-                        filter: `user_id=eq.${user.id}`
-                    },
-                    (payload) => {
-                        console.log('Real-time notification update:', payload);
-                        fetchNotifications();
-                    }
-                )
-                .subscribe();
-        } else {
-            setNotifications([]);
-            setUnreadCount(0);
-            setLoading(false);
+fetchNotifications();
+
+channel = supabase
+  .channel(`notifications_user_${user.id}`)
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'notifications',
+      filter: `user_id=eq.${user.id}`
+    },
+    (payload) => {
+      const { eventType, new: newRow, old: oldRow } = payload;
+
+      const newNotification = newRow as Notification;
+      const oldNotification = oldRow as Notification;
+
+      if (eventType === "INSERT") {
+        setNotifications(prev => {
+          if (!prev) return [newNotification];
+
+          const exists = prev.find(n => n.id === newNotification.id);
+          if (exists) return prev;
+
+          return [newNotification, ...prev];
+        });
+
+        if (!newNotification.is_seen) {
+          setUnreadCount(prev => prev + 1);
         }
+      }
+
+      if (eventType === "UPDATE") {
+        setNotifications(prev =>
+          prev
+            ? prev.map(n =>
+                n.id === newNotification.id ? newNotification : n
+              )
+            : null
+        );
+      }
+
+      if (eventType === "DELETE") {
+        setNotifications(prev =>
+          prev
+            ? prev.filter(n => n.id !== oldNotification.id)
+            : null
+        );
+      }
+    }
+  )
+  .subscribe();
 
         return () => {
             if (channel) {
                 supabase.removeChannel(channel);
             }
         };
-    }, [user, fetchNotifications]);
+    }, [user]);
 
     const markAsRead = async (id: string) => {
         try {
             // Optimistic update
-            setNotifications(prev => 
-                prev.map(n => n.id === id ? { ...n, is_seen: true } : n)
+            setNotifications(prev =>
+                prev
+                    ? prev.map(n =>
+                        n.id === id ? { ...n, is_seen: true } : n
+                    )
+                    : null
             );
             setUnreadCount(prev => Math.max(0, prev - 1));
 
@@ -109,7 +151,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (!user) return;
         try {
             // Optimistic update
-            setNotifications(prev => prev.map(n => ({ ...n, is_seen: true })));
+            setNotifications(prev =>
+                prev
+                    ? prev.map(n => ({ ...n, is_seen: true }))
+                    : null
+            );
             setUnreadCount(0);
 
             const { error } = await supabase
