@@ -50,6 +50,7 @@ export const metadata: Metadata = {
 };
 
 import { NotificationProvider } from '@/contexts/NotificationContext';
+import { FeedbackWidget } from '@/components/app/FeedbackWidget';
 
 export default function RootLayout({
   children,
@@ -65,6 +66,7 @@ export default function RootLayout({
               <AuthGuard />
               <AnalyticsTracker />
               {children}
+              <FeedbackWidget />
               <Toaster />
             </QueryProvider>
           </NotificationProvider>

@@ -32,7 +32,7 @@ import { useNotification } from "@/contexts/NotificationContext";
 
 const sidebarItems = [
     { name: "Feed", href: "/app/feed", icon: LayoutDashboard  },
-    { name: "Beats", href: "/app/beats", icon: Headphones },
+    // { name: "Beats", href: "/app/beats", icon: Headphones },
     { name: "Community", href: "/app/community", icon: Users },
     { name: "Meditation", href: "/app/meditation", icon: Brain },
     // { name: "Yoga", href: "/app/yoga", icon: Activity },
