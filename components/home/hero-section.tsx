@@ -14,7 +14,7 @@ export default function HeroSection() {
       </div>
 
       <div className="relative z-10 mx-auto pt-32 pb-12">
-<div className="px-6 md:px-12 lg:px-20 mb-16">
+<div className="px-6 md:px-12 lg:px-20 mb-32">
   <div className="max-w-7xl mx-auto">
     
     <div className="grid lg:grid-cols-[2fr_1fr] gap-12 lg:gap-16 items-center">
