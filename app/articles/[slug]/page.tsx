@@ -310,12 +310,15 @@ export default function ArticleDetailPage() {
 </div>
 
   return (
-    <div className="bg-gradient-to-b from-pink-50 via-pink-50/50 to-white text-gray-700 min-h-screen italic-none">
+    <div className="relative bg-gradient-to-b from-pink-50 via-pink-50/50 to-white overflow-hidden text-gray-700 min-h-screen italic-none">
 
       <Navbar />
+            <div className="absolute inset-0 opacity-30">
+        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-200 rounded-full blur-3xl translate-x-1/4 translate-y-1/4"></div>
+        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-white rounded-full blur-3xl -translate-x-1/3 -translate-y-1/3"></div>
+      </div>
       
-      
-      <div className="max-w-7xl mx-auto px-6 xl:px-20 py-12 lg:py-20">
+      <div className="max-w-7xl relative mx-auto px-6 xl:px-20 py-12 lg:py-20">
         
         <div className="flex flex-col lg:flex-row gap-16">
           

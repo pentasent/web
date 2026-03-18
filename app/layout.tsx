@@ -51,16 +51,20 @@ export const metadata: Metadata = {
 
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import { FeedbackWidget } from '@/components/app/FeedbackWidget';
+import { cookies } from 'next/headers';
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = cookies();
+  const initialAuthHint = cookieStore.get('pentasent_auth_hint')?.value === 'true';
+
   return (
     <html lang="en" className="scroll-smooth">
       <body className="antialiased">
-        <AuthProvider>
+        <AuthProvider initialAuthHint={initialAuthHint}>
           <NotificationProvider>
             <QueryProvider>
               <AuthGuard />

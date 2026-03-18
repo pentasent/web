@@ -16,22 +16,27 @@ interface AuthContextType {
     register: (email: string, password: string, metadata?: any) => Promise<void>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
+    initialAuthHint: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint?: boolean }> = ({ children, initialAuthHint = false }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true); // Always start true to sync with client-side supabase check
     const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+
+    const setAuthCookie = (isLoggedIn: boolean) => {
+        if (typeof document !== 'undefined') {
+            document.cookie = `pentasent_auth_hint=${isLoggedIn}; path=/; max-age=31536000; SameSite=Lax`;
+        }
+    };
 
     useEffect(() => {
         // 1. Initial Load
         const initializeAuth = async () => {
             try {
-                // If we are on the reset-password page or have recovery tokens, 
-                // don't sign out automatically.
                 const isRecovery = typeof window !== 'undefined' && 
                     (window.location.pathname === '/reset-password' || 
                      window.location.hash.includes('type=recovery') ||
@@ -41,13 +46,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 if ((error || !authUser) && !isRecovery) {
                     await supabase.auth.signOut();
+                    setAuthCookie(false);
                     setLoading(false);
                     return;
                 }
 
                 if (authUser) {
+                    setAuthCookie(true);
                     await fetchAndSetUserData(authUser.id, authUser.email || '');
                 } else {
+                    setAuthCookie(false);
                     setLoading(false);
                 }
             } catch (e) {
@@ -61,9 +69,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 2. Listen for Auth State Changes (Login, Logout, Token Refresh)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN' && session?.user) {
+                setAuthCookie(true);
                 await fetchAndSetUserData(session.user.id, session.user.email || '');
                 setUnverifiedEmail(null);
             } else if (event === 'SIGNED_OUT') {
+                setAuthCookie(false);
                 setUser(null);
                 setIsAdmin(false);
                 setLoading(false);
@@ -210,7 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAdmin, loading, unverifiedEmail, setUnverifiedEmail, login, register, logout, refreshUser }}>
+        <AuthContext.Provider value={{ user, isAdmin, loading, unverifiedEmail, setUnverifiedEmail, login, register, logout, refreshUser, initialAuthHint }}>
             {children}
         </AuthContext.Provider>
     );

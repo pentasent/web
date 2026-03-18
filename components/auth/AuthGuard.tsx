@@ -9,22 +9,24 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 export default function AuthGuard() {
-    const { user, loading, unverifiedEmail } = useAuth();
+    const { user, loading, unverifiedEmail, initialAuthHint } = useAuth();
     const { toast } = useToast();
     const pathname = usePathname();
     const router = useRouter();
 
     useEffect(() => {
-        // Redirection logic for fully onboarded users
-        if (user && user.is_onboarded) {
-            const isAuthPage = pathname === '/signin' || pathname === '/signup';
-            // Also if they try to access /beta-release but they are admin, move them to feed
-            // const isAdminOnBeta = user.role === 'admin' && pathname === '/beta-release';
+        const isAuthPage = pathname === '/signin' || pathname === '/signup';
 
+        // 1. FAST REDIRECT: Use initialAuthHint to pivot away from auth pages immediately
+        if (isAuthPage && initialAuthHint && !user && loading) {
+            router.replace('/app/feed');
+            return;
+        }
+
+        // 2. CONFIRMED REDIRECT: Logic for authenticated users
+        if (user) {
             if (isAuthPage) {
                 router.push('/app/feed');
-            // if (isAuthPage || isAdminOnBeta) {
-                // router.push(user.role === 'admin' ? '/app/feed' : '/beta-release');
             }
         }
 
@@ -44,7 +46,7 @@ export default function AuthGuard() {
             //     router.replace('/beta-release');
             // }
         }
-    }, [user, loading, pathname, router, toast]);
+    }, [user, loading, pathname, router, toast, initialAuthHint]);
 
     // Do not guard during initial loading to prevent flashes
     if (loading) return null;

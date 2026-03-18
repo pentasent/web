@@ -39,6 +39,7 @@ export default function SignInPage() {
         title: "Login successful",
         description: "Login successful, redirecting...",
       });
+      router.push('/app/feed');
       reset();
     } catch (error: any) {
       if (error.message.includes('Email not confirmed')) {

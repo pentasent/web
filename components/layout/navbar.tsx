@@ -4,7 +4,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
 export default function Navbar() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, initialAuthHint } = useAuth();
+  
+  // Decide which button to show instantly based on server hint or confirmed user
+  const isUserLoggedIn = !!user || (authLoading && initialAuthHint);
+  const showSkeleton = authLoading && !initialAuthHint;
+
   return (
 <nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-transparent"> 
   
@@ -26,7 +31,9 @@ export default function Navbar() {
 
     </div>
 
-    {user ? (
+    {showSkeleton ? (
+      <div className="w-[100px] h-10 bg-gray-200/50 rounded-full animate-pulse" />
+    ) : isUserLoggedIn ? (
       <a href="/app/feed">
         <button className="bg-[#3d2f4d] text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-[#2d1f3d] transition-all">
           Explore Feed
