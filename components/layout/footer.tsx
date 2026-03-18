@@ -251,8 +251,8 @@ export default function Footer() {
       </div>
 
       {/* ===== BOTTOM BAR ===== */}
-      <div className="bg-[#4b2a3f] text-white/70 text-xs py-6 max-w-7xl mx-auto px-6 md:px-12 lg:px-20 border-t border-white/10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-4">
+      <div className="bg-[#4b2a3f] text-white/70 text-xs py-6 border-t border-white/10">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-4 px-6 md:px-12 lg:px-20 ">
           <span>© {currentYear} Pentasent. All rights reserved.</span>
 
           <div className="flex gap-6">

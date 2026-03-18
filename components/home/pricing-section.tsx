@@ -58,8 +58,8 @@ const plans = [
 ]
 
   return (
-    <section className="bg-[#f5f3f4] py-20 max-w-7xl mx-auto px-6 md:px-12 lg:px-20" id='pricing'>
-      <div className="max-w-7xl mx-auto">
+    <section className="bg-[#f5f3f4] py-20" id='pricing'>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20"> 
 
         {/* HEADER */}
         <div className="text-center max-w-3xl mx-auto mb-16">

@@ -104,19 +104,19 @@ const departments = [
 /* ================= PAGE ================= */
 
 export default function AboutPage() {
-    const [showLoader, setShowLoader] = useState(true);
+    // const [showLoader, setShowLoader] = useState(true);
   
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setShowLoader(false);
-      }, 2000); // 2 seconds
+    // useEffect(() => {
+    //   const timer = setTimeout(() => {
+    //     setShowLoader(false);
+    //   }, 2000); // 2 seconds
   
-      return () => clearTimeout(timer);
-    }, []);
+    //   return () => clearTimeout(timer);
+    // }, []);
   
-    if (showLoader) {
-      return <GlobalLayout />;
-    }
+    // if (showLoader) {
+    //   return <GlobalLayout />;
+    // }
 
   return (
     <div className="bg-gradient-to-b from-pink-50 via-pink-50/50 to-white text-gray-700 overflow-x-hidden">

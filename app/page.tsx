@@ -26,19 +26,19 @@ export default function Home() {
   //   }
   // }, []);
 
-  const [showLoader, setShowLoader] = useState(true);
+  // const [showLoader, setShowLoader] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoader(false);
-    }, 2000); // 2 seconds
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setShowLoader(false);
+  //   }, 2000); // 2 seconds
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
-  if (showLoader) {
-    return <GlobalLayout />;
-  }
+  // if (showLoader) {
+  //   return <GlobalLayout />;
+  // }
   return (
     <main className="min-h-screen overflow-x-hidden">
       <Navbar />

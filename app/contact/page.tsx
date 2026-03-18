@@ -83,19 +83,19 @@ export default function ContactPage() {
     const [videoOpen, setVideoOpen] = useState(false);
     const [selectedSupport, setSelectedSupport] = useState<typeof supportOptions[0] | null>(null);
 
-      const [showLoader, setShowLoader] = useState(true);
+    //   const [showLoader, setShowLoader] = useState(true);
     
-      useEffect(() => {
-        const timer = setTimeout(() => {
-          setShowLoader(false);
-        }, 2000); // 2 seconds
+    //   useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //       setShowLoader(false);
+    //     }, 2000); // 2 seconds
     
-        return () => clearTimeout(timer);
-      }, []);
+    //     return () => clearTimeout(timer);
+    //   }, []);
     
-      if (showLoader) {
-        return <GlobalLayout />;
-      }
+    //   if (showLoader) {
+    //     return <GlobalLayout />;
+    //   }
 
     return (
         <main className="min-h-screen bg-gradient-to-b from-pink-50 via-pink-50/50 to-white relative flex flex-col font-sans overflow-x-hidden">

@@ -7,12 +7,12 @@ import Link from "next/link";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { Article } from "@/types/database";
-import { Search } from "lucide-react";
+import { Search, Image as ImageIcon } from "lucide-react";
 import { ArticlesPageShimmer, GridArticleCardShimmer } from "@/components/shimmer/ArticleShimmer";
 
 /* ================= TYPES ================= */
 
-type ArticleWithDetails = Article & {
+export type ArticleWithDetails = Article & {
   tags: { name: string; slug: string }[];
 };
 
@@ -186,14 +186,15 @@ export default function ArticlesPage() {
                 {/* FEATURED ARTICLE */}
                 {featured && (
                   <Link href={`/articles/${featured.slug}`} className="group space-y-6">
-                    <div className="relative w-full h-[320px] rounded-3xl overflow-hidden shadow-md bg-gray-100">
+                    <div className="relative w-full h-[320px] rounded-3xl overflow-hidden shadow-md bg-gray-100 flex items-center justify-center">
+                      <ImageIcon className="text-gray-300 absolute" size={48} />
                       <Image
                         src={featured.banner_image || ""}
                         alt={featured.title}
                         fill
                         priority
                         sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 600px"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500 relative z-10"
                       />
                     </div>
 
@@ -300,14 +301,15 @@ function HorizontalMiniCard({ article }: { article: ArticleWithDetails }) {
   return (
     <Link href={`/articles/${article.slug}`} className="flex gap-6 items-start group flex-wrap lg:flex-nowrap">
 
-      <div className="relative lg:w-[160px] lg:h-[140px] w-full h-[200px] md:h-[320px] rounded-2xl overflow-hidden shadow-sm flex-shrink-0 bg-gray-100">
+      <div className="relative lg:w-[160px] lg:h-[140px] w-full h-[200px] md:h-[320px] rounded-2xl overflow-hidden shadow-sm flex-shrink-0 bg-gray-100 flex items-center justify-center">
+        <ImageIcon className="text-gray-300 absolute" size={24} />
         <Image
           src={article.banner_image || ""}
           alt={article.title}
           fill
           loading="lazy"
           sizes="160px"
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          className="object-cover group-hover:scale-105 transition-transform duration-500 relative z-10"
         />
       </div>
 
@@ -340,14 +342,15 @@ function BlogHorizontalCard({ article }: { article: ArticleWithDetails }) {
     <Link href={`/articles/${article.slug}`} className="group block">
       <div className="bg-white rounded-3xl hover:shadow-sm transition-all duration-300 p-6 md:p-8 flex flex-col md:flex-row gap-8 items-start">
 
-        <div className="relative w-full md:w-[340px] h-[170px] rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100">
+        <div className="relative w-full md:w-[340px] h-[170px] rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
+          <ImageIcon className="text-gray-300 absolute" size={32} />
           <Image
             src={article.banner_image || ""}
             alt={article.title}
             fill
             loading="lazy"
             sizes="(max-width:768px) 100vw, 340px"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover group-hover:scale-105 transition-transform duration-500 relative z-10"
           />
         </div>
 
@@ -379,35 +382,38 @@ function BlogHorizontalCard({ article }: { article: ArticleWithDetails }) {
 
 /* ================= GRID CARD ================= */
 
-function GridArticleCard({ article }: { article: ArticleWithDetails }) {
+export function GridArticleCard({ article }: { article: ArticleWithDetails }) {
   return (
     <Link href={`/articles/${article.slug}`} className="group block">
 
       <div className="space-y-4">
 
-        <div className="relative w-full h-[180px] rounded-2xl overflow-hidden bg-gray-100">
-          <Image
-            src={article.banner_image || ""}
-            alt={article.title}
-            fill
-            loading="lazy"
-            sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 300px"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+        <div className="relative w-full h-[180px] rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center border border-pink-50">
+          <ImageIcon className="text-gray-300 absolute" size={32} />
+          {article.banner_image && (
+            <Image
+              src={article.banner_image}
+              alt={article.title}
+              fill
+              loading="lazy"
+              sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 300px"
+              className="object-cover group-hover:scale-105 transition-transform duration-500 relative z-10"
+            />
+          )}
         </div>
 
         <div>
 
           <div className="flex items-center gap-3 text-sm text-gray-500 mb-2">
             {article.tags?.[0] && (
-              <span className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-xs font-medium">
+              <span className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-xs font-medium">
                 {article.tags[0].name}
               </span>
             )}
             <span>{article.reading_time || 0} min read</span>
           </div>
 
-          <h4 className="text-lg font-medium text-[#3c2a34] leading-snug line-clamp-2">
+          <h4 className="text-lg font-medium text-[#3c2a34] leading-snug line-clamp-2 group-hover:text-pink-600 transition-colors">
             {article.title}
           </h4>
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, ThumbsUp, ThumbsDown, Send, X, Loader2 } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { 
   Dialog, 
   DialogContent, 
@@ -12,7 +13,6 @@ import {
   DialogFooter
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,23 +25,15 @@ export function FeedbackWidget() {
   const [userIp, setUserIp] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const pathname = usePathname();
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
     message: '',
     rating: 'liked' as 'liked' | 'disliked' | null,
   });
 
-  useEffect(() => {
-    if (user) {
-      setFormData(prev => ({
-        ...prev,
-        name: user.name || '',
-        email: user.email || '',
-      }));
-    }
-  }, [user]);
+  // Only show on internal routes starting with /app/
+  const isInternalRoute = pathname?.startsWith('/app/');
 
   useEffect(() => {
     // Attempt to get IP
@@ -70,7 +62,7 @@ export function FeedbackWidget() {
     return {
       browser,
       os,
-      app_version: "1.0.1",
+      app_version: "1.2.0",
       user_ip: userIp,
       viewport: `${window.innerWidth}x${window.innerHeight}`,
       language: window.navigator.language
@@ -79,10 +71,11 @@ export function FeedbackWidget() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.message) {
+    
+    if (!formData.message || formData.message.length < 20) {
       toast({
-        title: "Missing fields",
-        description: "Please provide your name and message.",
+        title: "Message too short",
+        description: "Please provide at least 20 characters of feedback.",
         variant: "destructive",
       });
       return;
@@ -97,8 +90,8 @@ export function FeedbackWidget() {
       const { error } = await supabase.from('feedback').insert([
         {
           user_id: user?.id || null,
-          name: formData.name,
-          email: formData.email || user?.email || null,
+          name: user?.name || 'Authenticated User',
+          email: user?.email || null,
           message: formData.message,
           rating: formData.rating,
           page_url: page_url,
@@ -139,6 +132,8 @@ export function FeedbackWidget() {
       setIsSubmitting(false);
     }
   };
+
+  if (!isInternalRoute) return null;
 
   return (
     <>
@@ -181,31 +176,6 @@ export function FeedbackWidget() {
             </DialogHeader>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2.5">
-                  <Label htmlFor="fb-name" className="text-[10px] font-bold uppercase tracking-[0.1em] text-warm-400 ml-1">Full Name *</Label>
-                  <Input
-                    id="fb-name"
-                    placeholder="Ankit"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="bg-warm-50/50 border-warm-200 focus:border-warm-700 focus:ring-0 rounded-xl h-12 px-4 text-warm-700 transition-all shadow-sm"
-                  />
-                </div>
-                <div className="space-y-2.5">
-                  <Label htmlFor="fb-email" className="text-[10px] font-bold uppercase tracking-[0.1em] text-warm-400 ml-1">Email (Optional)</Label>
-                  <Input
-                    id="fb-email"
-                    type="email"
-                    placeholder="email@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="bg-warm-50/50 border-warm-200 focus:border-warm-700 focus:ring-0 rounded-xl h-12 px-4 text-warm-700 transition-all shadow-sm"
-                  />
-                </div>
-              </div>
-
               <div className="space-y-3">
                 <Label className="text-[10px] font-bold uppercase tracking-[0.1em] text-warm-400 ml-1">How was your experience?</Label>
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -258,7 +228,7 @@ export function FeedbackWidget() {
               <DialogFooter className="pt-4 pb-2 flex flex-col sm:flex-row-reverse gap-3">
                 <Button
                   type="submit"
-                  disabled={isSubmitting || !formData.name.trim() || formData.message.length < 20}
+                  disabled={isSubmitting || formData.message.length < 20}
                   className="w-full sm:flex-1 bg-warm-700 hover:bg-warm-800 text-warm-50 rounded-2xl h-14 text-base font-bold group shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:grayscale"
                 >
                   {isSubmitting ? (
