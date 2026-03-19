@@ -703,7 +703,7 @@ export default function FeedPage() {
     };
 
     const handleSharePost = async (post: Post) => {
-        const url = `${window.location.origin}/app/feed?post=${post.id}`;
+        const url = `${window.location.origin}/post/${post.id}`;
 
         if (navigator.share) {
             try {
