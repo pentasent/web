@@ -9,6 +9,7 @@ import { parseContent } from '@/lib/format';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { SmartImage } from '../ui/SmartImage';
+import { getImageUrl } from '@/lib/get-image-url';
 
 interface CreatePostCardProps {
     communities: Community[];
@@ -165,14 +166,15 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
 
     return (
         <div className={`bg-white/80 backdrop-blur-md shadow-sm border border-warm-200/60 ${minimal ? 'p-1.5 px-2 rounded-full' : 'rounded-[20px] mb-6 p-4'}`}>
-            <div className="flex items-center gap-3 w-full">
-                <Image
-                    src={userAvatar}
-                    alt="User"
-                    width={minimal ? 40 : 48}
-                    height={minimal ? 40 : 48}
-                    className={`rounded-full bg-warm-200 object-cover ${minimal ? 'w-10 h-10' : 'w-12 h-12'} shrink-0 border border-warm-300`}
-                />
+            <div className={`flex items-center gap-3 w-full`}>
+                <div className={`${minimal ? 'w-10 h-10' : 'w-12 h-12'} relative shrink-0`}>
+                    <SmartImage
+                        src={userAvatar}
+                        alt="User"
+                        className="rounded-full bg-warm-200 object-cover border border-warm-300"
+                        fallbackIconSize={minimal ? 20 : 24}
+                    />
+                </div>
 
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
@@ -200,7 +202,14 @@ export const CreatePostCard: React.FC<CreatePostCardProps> = ({
                                     >
                                         <div className="flex items-center gap-3">
                                             {selectedCommunity?.logo_url ? (
-                                                <Image src={selectedCommunity.logo_url} alt="Logo" width={24} height={24} className="rounded-full w-6 h-6" />
+                                                <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 relative">
+                                                    <SmartImage
+                                                        src={selectedCommunity.logo_url}
+                                                        alt="Logo"
+                                                        className="object-cover"
+                                                        fallbackIconSize={20}
+                                                    />
+                                                </div>
                                             ) : (
                                                 <div className="w-6 h-6 rounded-full bg-[#3c2a34]" />
                                             )}

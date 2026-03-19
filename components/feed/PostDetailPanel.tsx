@@ -285,11 +285,11 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                                             key={`local-${idx}`}
                                             className={`h-[250px] sm:h-[300px] bg-warm-200 rounded-xl overflow-hidden relative shrink-0 snap-center ${post.local_image_urls!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'}`}
                                         >
-                                            <Image
+                                            <SmartImage
                                                 src={url}
-                                                fill
                                                 alt={`Uploading media ${idx}`}
                                                 className="object-cover"
+                                                fallbackIconSize={48}
                                             />
                                         </div>
                                     ))

@@ -322,16 +322,14 @@ export default function FeedPage() {
                 if (compressedImages.length > 0) {
                     const uploadPromises = compressedImages.map(async (file, i) => {
                         const fileExt = file.name.split('.').pop() || 'jpg';
-                        const fileName = `posts/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+                        const fileName = `posts/${user.id}/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
 
                         const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: false });
                         if (uploadError) throw uploadError;
 
-                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
-                        
                         return {
                             post_id: newPostId,
-                            image_url: publicUrl,
+                            image_url: fileName, // Store relative path
                             order_index: i
                         };
                     });
@@ -417,16 +415,11 @@ export default function FeedPage() {
 
                 if (imagesToRemove.length > 0) {
                     const imagesToDeleteDb = (selectedPost.images || []).filter((img: any) => imagesToRemove.includes(img.id));
-                    const filePaths = imagesToDeleteDb.map((img: any) => {
-                        try {
-                            const urlObj = new URL(img.image_url);
-                            return urlObj.pathname.split('/').slice(-2).join('/'); // 'posts/filename'
-                        } catch { return null; }
-                    }).filter(Boolean) as string[];
+                    const filePaths = imagesToDeleteDb.map((img: any) => img.image_url).filter(Boolean); // image_url IS the relative path now
 
                     if (filePaths.length > 0) {
                         jobs.push(supabase.storage.from('avatars').remove(filePaths));
-                        jobs.push(Promise.resolve(supabase.from('post_images').delete().in('id', imagesToRemove)));
+                        jobs.push(supabase.from('post_images').delete().in('id', imagesToRemove));
                     }
                 }
 
@@ -436,11 +429,10 @@ export default function FeedPage() {
 
                     const uploadJobs = compressed.map(async (file, i) => {
                         const fileExt = file.name.split('.').pop() || 'jpg';
-                        const fileName = `posts/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+                        const fileName = `posts/${user.id}/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
                         const { error } = await supabase.storage.from('avatars').upload(fileName, file);
                         if (error) throw error;
-                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
-                        return { post_id: selectedPost.id, image_url: publicUrl, order_index: currentMaxOrder + 1 + i };
+                        return { post_id: selectedPost.id, image_url: fileName, order_index: currentMaxOrder + 1 + i };
                     });
                     
                     jobs.push(Promise.all(uploadJobs).then(imgs => supabase.from('post_images').insert(imgs)));
@@ -652,12 +644,7 @@ export default function FeedPage() {
             try {
                 // 2.1 Get image paths for bucket cleanup
                 const images = selectedPost.images || [];
-                const filePaths = images.map((img: any) => {
-                    try {
-                        const urlObj = new URL(img.image_url);
-                        return urlObj.pathname.split('/').slice(-2).join('/');
-                    } catch { return null; }
-                }).filter(Boolean) as string[];
+                const filePaths = images.map((img: any) => img.image_url).filter(Boolean);
 
                 if (filePaths.length > 0) {
                     supabase.storage.from('avatars').remove(filePaths).then();
@@ -821,21 +808,14 @@ export default function FeedPage() {
                                                             <div className="flex items-center gap-3 w-full min-w-0">
 
                                                                 {comm.logo_url ? (
-                                                                    <Image
-                                                                        src={comm.logo_url}
-                                                                        alt="Logo"
-                                                                        width={24}
-                                                                        height={24}
-                                                                        className="rounded-full w-6 h-6 shrink-0"
-                                                                    />
-                                                                    // <div className="w-12 h-12 rounded-full bg-warm-200 overflow-hidden shrink-0 relative">
-                                                                    //     <SmartImage
-                                                                    //         src={comm.logo_url}
-                                                                    //         alt="avatar"
-                                                                    //         className="object-cover"
-                                                                    //         fallbackIconSize={20}
-                                                                    //     />
-                                                                    // </div>
+                                                                    <div className="w-6 h-6 rounded-full bg-warm-200 overflow-hidden shrink-0 relative">
+                                                                        <SmartImage
+                                                                            src={comm.logo_url}
+                                                                            alt="Logo"
+                                                                            className="object-cover"
+                                                                            fallbackIconSize={20}
+                                                                        />
+                                                                    </div>
                                                                 ) : (
                                                                     <div className="w-6 h-6 rounded-full bg-[#3c2a34] shrink-0" />
                                                                 )}
@@ -1061,13 +1041,14 @@ export default function FeedPage() {
                                                                             <div className="flex items-center gap-3 w-full min-w-0">
 
                                                                                 {comm.logo_url ? (
-                                                                                    <Image
-                                                                                        src={comm.logo_url}
-                                                                                        alt="Logo"
-                                                                                        width={24}
-                                                                                        height={24}
-                                                                                        className="rounded-full w-6 h-6 shrink-0"
-                                                                                    />
+                                                                                    <div className="w-6 h-6 rounded-full bg-warm-200 overflow-hidden shrink-0 relative">
+                                                                                        <SmartImage
+                                                                                            src={comm.logo_url}
+                                                                                            alt="Logo"
+                                                                                            className="object-cover"
+                                                                                            fallbackIconSize={20}
+                                                                                        />
+                                                                                    </div>
                                                                                 ) : (
                                                                                     <div className="w-6 h-6 rounded-full bg-[#3c2a34] shrink-0" />
                                                                                 )}

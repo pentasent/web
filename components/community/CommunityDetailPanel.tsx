@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { CommunityDetailShimmer } from '../shimmer/CommunityDetailShimmer';
 import { ChannelDetailModal } from './ChannelDetailModal';
+import { SmartImage } from '../ui/SmartImage';
 
 export interface ExtendedChannel extends Channel {
     postsCount: number;
@@ -415,11 +416,11 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
             {/* Banner Area */}
             <div className="h-44 sm:h-52 relative w-full bg-warm-50 shrink-0">
                 {community.banner_url ? (
-                    <Image
+                    <SmartImage
                         src={community.banner_url}
                         alt="Banner"
-                        fill
                         className="object-cover"
+                        fallbackIconSize={48}
                     />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-br from-[#3d2f4d] to-[#5a4570]" />
@@ -449,11 +450,11 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
                         <div className="flex items-end gap-4 sm:gap-5 mb-3">
                             <div className="w-20 h-20 sm:w-28 sm:h-28 relative rounded-2xl overflow-hidden bg-warm-100 border-4 border-white shadow-md shrink-0">
                                 {community.logo_url ? (
-                                    <Image
+                                    <SmartImage
                                         src={community.logo_url}
                                         alt={community.name}
-                                        fill
                                         className="object-cover"
+                                        fallbackIconSize={32}
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-warm-200 text-warm-400 font-bold text-3xl sm:text-4xl uppercase">
@@ -539,7 +540,7 @@ export const CommunityDetailPanel: React.FC<CommunityDetailPanelProps> = ({ comm
                                     <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-warm-100 border border-warm-300 rounded-xl shadow-sm hover:border-warm-300 transition-colors">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 relative rounded-full overflow-hidden bg-gray-200 shrink-0">
-                                                <Image src={mod.user.avatar_url || 'https://via.placeholder.com/40'} alt={mod.user.name} fill className="object-cover" />
+                                                <SmartImage src={mod.user.avatar_url || 'https://via.placeholder.com/40'} alt={mod.user.name} className="object-cover" fallbackIconSize={20} />
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-2">

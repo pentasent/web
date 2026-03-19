@@ -10,6 +10,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArticleDetailShimmer } from "@/components/shimmer/ArticleDetailShimmer";
+import { SmartImage } from "@/components/ui/SmartImage";
+import { getImageUrl } from "@/lib/get-image-url";
 import { 
   Heart, 
   MessageCircle, 
@@ -149,7 +151,7 @@ export default function ArticleDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [slug, user?.id]);
+  }, [slug, user]);
 
   useEffect(() => {
     fetchArticle();
@@ -343,7 +345,16 @@ export default function ArticleDetailPage() {
               <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-500">
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full ring-1 ring-pink-100/50">
                   <div className="w-5 h-5 rounded-full overflow-hidden relative bg-gray-100">
-                    {article.author?.avatar_url ? <Image src={article.author.avatar_url} alt={""} fill className="object-cover" /> : <UserIcon size={12} className="m-1" />}
+                    {article.author?.avatar_url ? (
+                      <SmartImage
+                        src={article.author.avatar_url}
+                        alt="Author"
+                        className="object-cover"
+                        fallbackIconSize={12}
+                      />
+                    ) : (
+                      <UserIcon size={12} className="m-1" />
+                    )}
                   </div>
                   <span className="text-[#3c2a34]">{article.author?.name || "Author"}</span>
                 </div>
@@ -381,7 +392,12 @@ export default function ArticleDetailPage() {
             <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden mb-16 shadow-sm bg-gray-50 flex items-center justify-center border border-pink-100/30">
               <ImageIcon size={64} className="absolute text-pink-100/40" />
               {article.banner_image && (
-                <Image src={article.banner_image} alt={article.title} fill className="object-cover relative z-10" priority />
+                <SmartImage
+                  src={article.banner_image}
+                  alt={article.title}
+                  className="object-cover relative z-10"
+                  priority
+                />
               )}
             </div>
 
@@ -393,7 +409,16 @@ export default function ArticleDetailPage() {
 
             <section className="mt-20 p-10 rounded-2xl bg-white border border-pink-100/50 flex flex-col sm:flex-row items-center sm:items-start gap-8 shadow-sm">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 border-4 border-white shadow-md">
-                {article.author?.avatar_url ? <Image src={article.author.avatar_url} alt={""} fill className="object-cover" /> : <UserIcon size={40} className="m-5 text-gray-300" />}
+                {article.author?.avatar_url ? (
+                  <SmartImage
+                    src={article.author.avatar_url}
+                    alt="Author"
+                    className="object-cover"
+                    fallbackIconSize={40}
+                  />
+                ) : (
+                  <UserIcon size={40} className="m-5 text-gray-300" />
+                )}
                 </div>
                 <div className="flex-1 text-center sm:text-left">
                 <h3 className="text-2xl font-semibold text-[#3c2a34] mb-2">{article.author?.name || "Author"}</h3>
@@ -465,7 +490,15 @@ export default function ArticleDetailPage() {
                 {relatedArticles.map((rel) => (
                   <Link href={`/articles/${rel.slug}`} key={rel.id} className="group flex gap-4">
                     <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 shadow-sm border border-pink-50">
-                      {rel.banner_image ? <Image src={rel.banner_image} alt={""} fill className="object-cover group-hover:scale-110 transition-transform duration-500" /> : <ImageIcon className="m-6 text-pink-100" size={32} />}
+                      {rel.banner_image ? (
+                        <SmartImage
+                          src={rel.banner_image}
+                          alt="Banner"
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <ImageIcon className="m-6 text-pink-100" size={32} />
+                      )}
                     </div>
                     <div className="flex-1 space-y-1.5">
                       <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
@@ -530,7 +563,13 @@ function BlockRenderer({ block }: { block: any }) {
         <figure className="my-8 space-y-3">
           <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-white/50 border border-pink-100/30 flex items-center justify-center shadow-sm ring-1 ring-black/5">
             <ImageIcon size={32} className="absolute text-pink-100" />
-            {content.url && <Image src={content.url} alt={content.alt || ""} fill className="object-cover relative z-10" />}
+            {content.url && (
+              <SmartImage
+                src={content.url}
+                alt={content.alt || ""}
+                className="object-cover relative z-10"
+              />
+            )}
           </div>
           {content.caption && <figcaption className="text-center text-xs text-gray-400 italic font-semibold">{content.caption}</figcaption>}
         </figure>
@@ -769,7 +808,12 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
     <div className={`flex gap-4 group ${isReply ? 'ml-0' : ''}`}>
       <div className={`relative ${isReply ? 'w-10 h-10' : 'w-11 h-11'} rounded-full overflow-hidden bg-gray-100 flex-shrink-0 shadow-sm border border-white mt-1`}>
         {localComment.user?.avatar_url ? (
-          <Image src={localComment.user.avatar_url} alt={""} fill className="object-cover" />
+          <SmartImage
+            src={localComment.user.avatar_url}
+            alt="User"
+            className="object-cover"
+            fallbackIconSize={isReply ? 16 : 18}
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300">
              <UserIcon size={isReply ? 16 : 18} />

@@ -105,12 +105,11 @@ export const PostCard: React.FC<PostCardProps> = ({
                                 key={`local-${idx}`}
                                 className={`relative h-[300px] sm:h-[400px] bg-black/10 rounded-xl overflow-hidden shrink-0 snap-center ${post.local_image_urls!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'}`}
                             >
-                                <Image
+                                <SmartImage
                                     src={url}
-                                    width={100}
-                                    height={100}
                                     alt={`Uploading media ${idx}`}
-                                    className="object-cover w-full h-full"
+                                    className="object-cover"
+                                    fallbackIconSize={48}
                                 />
                             </div>
                         ))

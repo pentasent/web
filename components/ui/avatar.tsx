@@ -20,12 +20,15 @@ const Avatar = React.forwardRef<
 ));
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
+import { getImageUrl } from '@/lib/get-image-url';
+
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, ...props }, ref) => (
+>(({ className, src, ...props }, ref) => (
   <AvatarPrimitive.Image
     ref={ref}
+    src={getImageUrl(src as string)}
     className={cn('aspect-square h-full w-full', className)}
     {...props}
   />

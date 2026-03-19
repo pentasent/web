@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, X } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import { SmartImage } from '../ui/SmartImage';
 
 interface EditPostDialogProps {
     post: Post;
@@ -138,7 +139,14 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
                             <button className="flex items-center justify-between w-full p-3 rounded-xl border border-warm-300 bg-warm-200 text-left pointer-events-none opacity-70">
                                 <div className="flex items-center gap-3">
                                     {selectedCommunity?.logo_url ? (
-                                        <Image src={selectedCommunity.logo_url} alt="Logo" width={24} height={24} className="rounded-full w-6 h-6 object-cover" />
+                                        <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 relative">
+                                            <SmartImage
+                                                src={selectedCommunity.logo_url}
+                                                alt="Logo"
+                                                className="object-cover"
+                                                fallbackIconSize={20}
+                                            />
+                                        </div>
                                     ) : (
                                         <div className="w-6 h-6 rounded-full bg-[#3c2a34]" />
                                     )}
@@ -175,8 +183,13 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
                     {(existingImages.length > 0 || imageUrls.length > 0) && (
                         <div className="flex gap-4 mb-4 overflow-x-auto pb-4 pt-3 pl-1 pr-3 scrollbar-hide snap-x snap-mandatory relative z-10 w-full">
                             {existingImages.map((img: any) => (
-                                <div key={img.id} className="relative w-20 h-20 shrink-0 border border-warm-300 rounded-lg">
-                                    <Image src={img.image_url} alt="existing preview" fill className="object-cover rounded-lg" />
+                                <div key={img.id} className="relative w-20 h-20 shrink-0 border border-warm-300 rounded-lg overflow-hidden">
+                                    <SmartImage
+                                        src={img.image_url}
+                                        alt="existing preview"
+                                        className="object-cover"
+                                        fallbackIconSize={40}
+                                    />
                                     <button
                                         onClick={() => removeExistingImage(img.id)}
                                         className="absolute top-1 right-1 bg-gray-900 bg-opacity-70 p-1 rounded-full text-white hover:bg-opacity-100 z-10 shadow-sm"
@@ -186,8 +199,13 @@ export const EditPostDialog: React.FC<EditPostDialogProps> = ({
                                 </div>
                             ))}
                             {imageUrls.map((url, index) => (
-                                <div key={index} className="relative w-20 h-20 shrink-0 border border-warm-300 rounded-lg">
-                                    <Image src={url} alt={`preview ${index}`} fill className="object-cover rounded-lg" />
+                                <div key={index} className="relative w-20 h-20 shrink-0 border border-warm-300 rounded-lg overflow-hidden">
+                                    <SmartImage
+                                        src={url}
+                                        alt={`preview ${index}`}
+                                        className="object-cover"
+                                        fallbackIconSize={40}
+                                    />
                                     <button
                                         onClick={() => removeNewImage(index)}
                                         className="absolute top-1 right-1 bg-gray-900 bg-opacity-70 p-1 rounded-full text-white hover:bg-opacity-100 z-10 shadow-sm"

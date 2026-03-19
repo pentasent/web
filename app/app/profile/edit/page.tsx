@@ -60,6 +60,8 @@ export default function EditProfilePage() {
         setAvatarUrl(URL.createObjectURL(file));
     };
 
+    const { updateProfile } = useAuth();
+    
     const handleSave = async () => {
         if (!user) return;
 
@@ -93,54 +95,28 @@ export default function EditProfilePage() {
         setIsSaving(true);
 
         try {
-
-            let finalAvatarUrl = user.avatar_url;
-
-            if (avatarFile) {
-
-                const fileExt = avatarFile.name.split('.').pop() || 'jpg';
-                const fileName = `${user.id}_${Date.now()}.${fileExt}`;
-                const filePath = `avatars/${fileName}`;
-
-                const { error: uploadError } = await supabase.storage
-                    .from('avatars')
-                    .upload(filePath, avatarFile, { cacheControl: '3600', upsert: false });
-
-                if (uploadError) throw uploadError;
-
-                const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
-                finalAvatarUrl = data.publicUrl;
-
-            }
-
-            const { error } = await supabase
-                .from('users')
-                .update({
-                    name: name.trim(),
-                    country: country.label,
-                    bio: bio.trim(),
-                    avatar_url: finalAvatarUrl
-                })
-                .eq('id', user.id);
-
-            if (error) throw error;
+            await updateProfile({
+                name: name.trim(),
+                bio: bio.trim(),
+                country: country.label,
+                avatar_file: avatarFile || undefined,
+                avatar_uri: avatarUrl || undefined
+            });
 
             toast({
                 title: "Profile Updated",
-                description: "Your profile has been saved successfully.",
+                description: "Your changes are being saved in the background.",
             });
 
-            await refreshUser();
+            // We can redirect immediately since UI will be optimistically updated
             router.push('/app/profile');
 
         } catch (error: any) {
-
             toast({
                 title: "Update Failed",
                 description: error.message || "Failed to update profile.",
                 variant: "destructive",
             });
-
         } finally {
             setIsSaving(false);
         }

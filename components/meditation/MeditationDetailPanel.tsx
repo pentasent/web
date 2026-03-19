@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { Play, Pause, Volume2, VolumeX, Clock, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Meditation } from '@/types/database';
+import { getImageUrl } from '@/lib/get-image-url';
+import { SmartImage } from '../ui/SmartImage';
 
 interface MeditationDetailPanelProps {
     meditation: Meditation;
@@ -77,7 +79,7 @@ export const MeditationDetailPanel: React.FC<MeditationDetailPanelProps> = ({ me
         if (audioRef.current && meditation.audio_url) {
             const audio = audioRef.current;
             audio.pause();
-            audio.src = meditation.audio_url;
+            audio.src = getImageUrl(meditation.audio_url);
             audio.loop = true;
             audio.load();
 
@@ -130,11 +132,11 @@ export const MeditationDetailPanel: React.FC<MeditationDetailPanelProps> = ({ me
             {/* Background Image / Gradient */}
             <div className="absolute inset-0 z-0">
                 {meditation.banner_url ? (
-                    <Image
+                    <SmartImage
                         src={meditation.banner_url}
                         alt="Background"
-                        fill
                         className="object-cover opacity-30"
+                        fallbackIconSize={100}
                     />
                 ) : (
                     <div className="w-full h-full bg-[#1A1A24]" />

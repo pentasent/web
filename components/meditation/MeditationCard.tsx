@@ -10,9 +10,9 @@ interface MeditationCardProps {
     isPlaying?: boolean;
 }
 
-export const MeditationCard: React.FC<MeditationCardProps> = ({ meditation, onPlay, isPlaying }) => {
-    const [imageLoaded, setImageLoaded] = useState(false);
+import { SmartImage } from '../ui/SmartImage';
 
+export const MeditationCard: React.FC<MeditationCardProps> = ({ meditation, onPlay, isPlaying }) => {
     const formatNumber = (num: number) => {
         if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
         if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
@@ -29,12 +29,11 @@ export const MeditationCard: React.FC<MeditationCardProps> = ({ meditation, onPl
         >
             <div className="relative w-20 h-16 rounded-xl overflow-hidden shrink-0 bg-warm-200">
                 {meditation.banner_url ? (
-                    <Image
+                    <SmartImage
                         src={meditation.banner_url}
                         alt={meditation.title || 'Meditation'}
-                        fill
-                        className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                        onLoad={() => setImageLoaded(true)}
+                        className="object-cover"
+                        fallbackIconSize={24}
                     />
                 ) : (
                     <div className="w-full h-full bg-indigo-100/50 flex items-center justify-center">
@@ -44,14 +43,14 @@ export const MeditationCard: React.FC<MeditationCardProps> = ({ meditation, onPl
 
                 {/* Overlays */}
                 {!isPlaying && (
-                    <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
                         <div className="bg-white/80 p-1.5 rounded-full shadow-sm backdrop-blur-sm">
                             <Play className="w-4 h-4 text-warm-700 ml-0.5" fill="currentColor" />
                         </div>
                     </div>
                 )}
                 {isPlaying && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
                         <div className="flex items-end gap-[2px] h-4">
                             <motion.div className="w-[3px] bg-warm-100 rounded-full" animate={{ height: ["40%", "100%", "40%"] }} transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }} />
                             <motion.div className="w-[3px] bg-warm-100 rounded-full" animate={{ height: ["60%", "100%", "60%"] }} transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut", delay: 0.2 }} />

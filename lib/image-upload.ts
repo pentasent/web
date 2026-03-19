@@ -1,3 +1,5 @@
+import { supabase } from './supabase';
+
 export async function compressImage(file: File, maxWidth = 1200, quality = 0.8): Promise<File> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -41,4 +43,19 @@ export async function compressImage(file: File, maxWidth = 1200, quality = 0.8):
         };
         reader.onerror = (e) => reject(e);
     });
+}
+
+export async function uploadImage(file: File, fileName: string): Promise<string> {
+    try {
+        const compressedFile = await compressImage(file);
+        const { error } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, compressedFile, { cacheControl: '3600', upsert: false });
+
+        if (error) throw error;
+        return fileName;
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        throw error;
+    }
 }

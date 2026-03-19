@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { User } from '../types/database';
 import { trackEvent } from "@/lib/analytics/track";
 import { identifyUser } from "@/lib/analytics/identify";
+import { uploadImage } from "@/lib/image-upload";
 
 interface AuthContextType {
     user: User | null;
@@ -16,6 +17,14 @@ interface AuthContextType {
     register: (email: string, password: string, metadata?: any) => Promise<void>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
+    updateProfile: (updates: {
+        name?: string;
+        bio?: string;
+        country?: string;
+        avatar_file?: File;
+        avatar_uri?: string;
+        is_onboarded?: boolean;
+    }) => Promise<void>;
     initialAuthHint: boolean;
 }
 
@@ -219,8 +228,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
         }
     };
 
+    const updateProfile = async (updates: {
+        name?: string;
+        bio?: string;
+        country?: string;
+        avatar_file?: File;
+        avatar_uri?: string;
+        is_onboarded?: boolean;
+    }) => {
+        if (!user) return;
+
+        // 1. Optimistic UI update
+        const optimisticUser = {
+            ...user,
+            ...updates,
+            avatar_url: updates.avatar_uri || user.avatar_url, // Use local URI/Blob as preview
+        };
+        setUser(optimisticUser);
+
+        // 2. Background Process
+        (async () => {
+            try {
+                let finalAvatarUrl = user.avatar_url;
+
+                // If a new file is provided, upload it
+                if (updates.avatar_file) {
+                    const fileExt = updates.avatar_file.name.split('.').pop() || 'jpg';
+                    const fileName = `avatars/${user.id}_${Date.now()}.${fileExt}`;
+                    const uploadResult = await uploadImage(updates.avatar_file, fileName);
+                    if (uploadResult) {
+                        finalAvatarUrl = fileName;
+                    }
+                }
+
+                const { error } = await supabase
+                    .from('users')
+                    .update({
+                        name: updates.name !== undefined ? updates.name : user.name,
+                        bio: updates.bio !== undefined ? updates.bio : user.bio,
+                        country: updates.country !== undefined ? updates.country : user.country,
+                        avatar_url: finalAvatarUrl,
+                        is_onboarded: updates.is_onboarded !== undefined ? updates.is_onboarded : user.is_onboarded
+                    })
+                    .eq('id', user.id);
+
+                if (error) throw error;
+
+                // Refresh to get final server state
+                await refreshUser();
+            } catch (error) {
+                console.error('Background Profile Update Failed:', error);
+                // On failure, revert optimistic update
+                await refreshUser();
+            }
+        })();
+    };
+
     return (
-        <AuthContext.Provider value={{ user, isAdmin, loading, unverifiedEmail, setUnverifiedEmail, login, register, logout, refreshUser, initialAuthHint }}>
+        <AuthContext.Provider value={{ user, isAdmin, loading, unverifiedEmail, setUnverifiedEmail, login, register, logout, refreshUser, updateProfile, initialAuthHint }}>
             {children}
         </AuthContext.Provider>
     );
