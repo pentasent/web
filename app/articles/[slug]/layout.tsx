@@ -1,3 +1,4 @@
+import { getImageUrl } from "@/lib/get-image-url";
 import { supabase } from "@/lib/supabase";
 import type { Metadata, ResolvingMetadata } from "next";
 
@@ -14,6 +15,8 @@ export async function generateMetadata(
   if (!article) return { title: "Article Not Found" };
 
   const previousImages = (await parent).openGraph?.images || [];
+  const og_image = getImageUrl(article.seo?.og_image || article.banner_image);
+  const twitter_image = getImageUrl(article.seo?.twitter_image || article.banner_image);
 
   return {
     title: article.seo?.meta_title || article.title,
@@ -21,7 +24,7 @@ export async function generateMetadata(
     openGraph: {
       title: article.seo?.og_title || article.title,
       description: article.seo?.og_description || article.description,
-      images: [article.seo?.og_image || article.banner_image || "", ...previousImages],
+      images: og_image,
       type: "article",
       publishedTime: article.published_at || undefined,
     },
@@ -29,7 +32,7 @@ export async function generateMetadata(
       card: "summary_large_image",
       title: article.seo?.twitter_title || article.title,
       description: article.seo?.twitter_description || article.description,
-      images: [article.seo?.twitter_image || article.banner_image || ""],
+      images: twitter_image,
     },
   };
 }

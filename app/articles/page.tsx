@@ -10,6 +10,7 @@ import { Article } from "@/types/database";
 import { Search, Image as ImageIcon } from "lucide-react";
 import { ArticlesPageShimmer, GridArticleCardShimmer } from "@/components/shimmer/ArticleShimmer";
 import { ArticleWithDetails, GridArticleCard, HorizontalMiniCard, BlogHorizontalCard } from "@/components/app/ArticleCards";
+import { SmartImage } from "@/components/ui/SmartImage";
 
 const PAGE_SIZE = 20;
 
@@ -69,14 +70,14 @@ export default function ArticlesPage() {
           .select('*')
           .order('created_at', { ascending: false })
           .range(pageNum * PAGE_SIZE, (pageNum + 1) * PAGE_SIZE - 1);
-        
+
         if (fallbackError) throw fallbackError;
-        
+
         const formatted = (fallbackData || []).map((art: any) => ({
           ...art,
           tags: []
         })) as ArticleWithDetails[];
-        
+
         if (append) {
           setArticles((prev) => [...prev, ...formatted]);
         } else {
@@ -150,18 +151,18 @@ export default function ArticlesPage() {
               </p>
             </div>
           </div>
-            <div className="w-full md:w-[540px] relative group py-10">
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <Search className="w-5 h-5 text-gray-400 group-focus-within:text-warm-500 transition-colors" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search articles..."
-                className="w-full bg-white/80 backdrop-blur-sm border border-warm-300/50 rounded-2xl py-4 px-8 text-gray-700 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-warm-300/50 focus:border-warm-300 transition-all"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+          <div className="w-full md:w-[540px] relative group py-10">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <Search className="w-5 h-5 text-gray-400 group-focus-within:text-warm-500 transition-colors" />
             </div>
+            <input
+              type="text"
+              placeholder="Search articles..."
+              className="w-full bg-white/80 backdrop-blur-sm border border-warm-300/50 rounded-2xl py-4 px-8 text-gray-700 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-warm-300/50 focus:border-warm-300 transition-all"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
       </section>
 
@@ -183,14 +184,20 @@ export default function ArticlesPage() {
                   <Link href={`/articles/${featured.slug}`} className="group space-y-6">
                     <div className="relative w-full h-[320px] rounded-3xl overflow-hidden shadow-md bg-gray-100 flex items-center justify-center">
                       <ImageIcon className="text-gray-300 absolute" size={48} />
-                      <Image
+                      <SmartImage
+                        src={featured.banner_image || ""}
+                        alt={featured.title}
+                        className="object-cover relative z-10"
+                        priority
+                      />
+                      {/* <Image
                         src={featured.banner_image || ""}
                         alt={featured.title}
                         fill
                         priority
                         sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 600px"
                         className="object-cover group-hover:scale-105 transition-transform duration-500 relative z-10"
-                      />
+                      /> */}
                     </div>
 
                     <div>
@@ -273,13 +280,13 @@ export default function ArticlesPage() {
         <div className="py-32 text-center space-y-4">
           <div className="w-16 h-[1px] bg-pink-200 mx-auto opacity-50" />
           <p className="text-xl text-[#3c2a34] font-light">
-            {searchQuery 
-              ? `No articles found matching "${searchQuery}"` 
+            {searchQuery
+              ? `No articles found matching "${searchQuery}"`
               : "We're preparing something special for you."}
           </p>
           <p className="text-gray-400 text-sm max-w-xs mx-auto">
-            {searchQuery 
-              ? "Try adjusting your search terms or stay tuned for new updates." 
+            {searchQuery
+              ? "Try adjusting your search terms or stay tuned for new updates."
               : "Check back soon for latest insights and stories."}
           </p>
         </div>

@@ -12,12 +12,12 @@ import { useParams } from "next/navigation";
 import { ArticleDetailShimmer } from "@/components/shimmer/ArticleDetailShimmer";
 import { SmartImage } from "@/components/ui/SmartImage";
 import { getImageUrl } from "@/lib/get-image-url";
-import { 
-  Heart, 
-  MessageCircle, 
-  Share2, 
-  ChevronDown, 
-  ChevronUp, 
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  ChevronDown,
+  ChevronUp,
   Send,
   User as UserIcon,
   Loader2,
@@ -41,7 +41,7 @@ import { useToast } from "@/hooks/use-toast";
 type ArticleFull = Article & {
   author: User | null;
   tags: ArticleTag[];
-  blocks: ArticleBlock[];
+  blocks: any[];
   user_has_liked?: boolean;
 };
 
@@ -52,7 +52,7 @@ export default function ArticleDetailPage() {
   const slug = params?.slug as string;
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   const [article, setArticle] = useState<ArticleFull | null>(null);
   const [loading, setLoading] = useState(true);
   const [relatedArticles, setRelatedArticles] = useState<any[]>([]);
@@ -61,7 +61,7 @@ export default function ArticleDetailPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
-  
+
   const [newsEmail, setNewsEmail] = useState("");
   const [newsLoading, setNewsLoading] = useState(false);
 
@@ -93,13 +93,13 @@ export default function ArticleDetailPage() {
         viewLoggedRef.current = true;
         (async () => {
           try {
-            await supabase.from('article_views').insert({ 
-              article_id: art.id, 
-              user_id: user?.id || null, 
-              ip_hash: 'anonymous' 
+            await supabase.from('article_views').insert({
+              article_id: art.id,
+              user_id: user?.id || null,
+              ip_hash: 'anonymous'
             });
             await supabase.rpc('increment_article_view', { art_id: art.id });
-          } catch (e) {}
+          } catch (e) { }
         })();
       }
 
@@ -115,13 +115,13 @@ export default function ArticleDetailPage() {
         authorData = author;
       }
 
-      const { data: blocks } = await supabase.from('article_blocks').select('*').eq('article_id', art.id).order('position', { ascending: true });
-      const processedBlocks = (blocks || []).map(block => {
-        let content = block.content;
-        if (typeof content === 'string') {
-          try { content = JSON.parse(content); } catch (e) { }
-        }
-        return { ...block, content };
+      // Get blocks from article_data JSON
+      const processedBlocks = (art.article_data?.blocks || []).map((block: any, index: number) => {
+        return {
+          id: index,            // temporary id for React key
+          type: block.type,
+          content: block
+        };
       });
 
       const formattedArticle = {
@@ -133,7 +133,7 @@ export default function ArticleDetailPage() {
       } as ArticleFull;
 
       setArticle(formattedArticle);
-      
+
       const { data: tags } = await supabase.from('article_tags').select('*').limit(15);
       setAllTags(tags || []);
 
@@ -170,7 +170,7 @@ export default function ArticleDetailPage() {
         setArticle(prev => prev ? { ...prev, user_has_liked: true, like_count: (prev.like_count || 0) + 1 } : null);
         toast({ title: "Success", description: "Added to favorites" });
       }
-    } catch (err) {} finally { setIsLiking(false); }
+    } catch (err) { } finally { setIsLiking(false); }
   };
 
   const handleNewsletterSubscribe = async () => {
@@ -223,7 +223,7 @@ export default function ArticleDetailPage() {
   const shareOnSocial = (platform: string) => {
     const url = window.location.href;
     const title = article?.title || "Check out this article on Pentasent";
-    
+
     if (platform === 'copy' || platform === 'instagram') {
       try {
         navigator.clipboard.writeText(url);
@@ -254,76 +254,76 @@ export default function ArticleDetailPage() {
     try {
       const { error } = await supabase.from('article_comments').insert({ article_id: article.id, user_id: user.id, content: commentText.trim() });
       if (error) throw error;
-      
+
       // Also increment article comment count
       await supabase.rpc('increment_article_comment', { art_id: article.id });
-      
+
       setArticle(prev => prev ? { ...prev, comment_count: (prev.comment_count || 0) + 1 } : null);
       setCommentText("");
       window.dispatchEvent(new CustomEvent('refresh-comments'));
       toast({ title: "Success", description: "Response posted" });
-    } catch (err) {} finally { setIsSubmitting(false); }
+    } catch (err) { } finally { setIsSubmitting(false); }
   };
 
   if (loading) return <ArticleDetailShimmer />;
   if (!article) return <div className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-[#0f0a12] via-[#1a0f1f] to-black overflow-hidden">
-  
-  {/* 🌌 Background Glow */}
-  <div className="absolute top-[-150px] right-[-150px] w-[500px] h-[500px] bg-pink-500/20 rounded-full blur-[140px]" />
-  <div className="absolute bottom-[-150px] left-[-150px] w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[140px]" />
 
-  {/* 🧬 DNA-style gradient lines */}
-  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(255,0,150,0.2),transparent_40%)]" />
+    {/* 🌌 Background Glow */}
+    <div className="absolute top-[-150px] right-[-150px] w-[500px] h-[500px] bg-pink-500/20 rounded-full blur-[140px]" />
+    <div className="absolute bottom-[-150px] left-[-150px] w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[140px]" />
 
-  {/* ✨ Floating particles */}
-  <div className="absolute inset-0 overflow-hidden">
-    {[...Array(20)].map((_, i) => (
-      <div
-        key={i}
-        className="absolute w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse"
-        style={{
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-          animationDuration: `${2 + Math.random() * 3}s`
-        }}
-      />
-    ))}
+    {/* 🧬 DNA-style gradient lines */}
+    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(255,0,150,0.2),transparent_40%)]" />
+
+    {/* ✨ Floating particles */}
+    <div className="absolute inset-0 overflow-hidden">
+      {[...Array(20)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse"
+          style={{
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            animationDuration: `${2 + Math.random() * 3}s`
+          }}
+        />
+      ))}
+    </div>
+
+    {/* 🧘 Content */}
+    <div className="relative z-10 text-center px-6">
+
+      <h1 className="text-6xl font-semibold text-white mb-6 tracking-tight">
+        Lost in Space
+      </h1>
+
+      <p className="text-pink-100/70 text-lg mb-10 max-w-md mx-auto leading-relaxed">
+        This article seems to have drifted into the cosmic void.
+        Let’s guide you back to something meaningful.
+      </p>
+
+      <Link
+        href="/articles"
+        className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#1a0f1f] rounded-full font-semibold hover:scale-105 transition-all shadow-lg"
+      >
+        Explore Articles →
+      </Link>
+    </div>
   </div>
-
-  {/* 🧘 Content */}
-  <div className="relative z-10 text-center px-6">
-    
-    <h1 className="text-6xl font-semibold text-white mb-6 tracking-tight">
-      Lost in Space
-    </h1>
-
-    <p className="text-pink-100/70 text-lg mb-10 max-w-md mx-auto leading-relaxed">
-      This article seems to have drifted into the cosmic void.  
-      Let’s guide you back to something meaningful.
-    </p>
-
-    <Link
-      href="/articles"
-      className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#1a0f1f] rounded-full font-semibold hover:scale-105 transition-all shadow-lg"
-    >
-      Explore Articles →
-    </Link>
-  </div>
-</div>
 
   return (
     <div className="relative bg-gradient-to-b from-pink-50 via-pink-50/50 to-white overflow-hidden text-gray-700 min-h-screen italic-none">
 
       <Navbar />
-            <div className="absolute inset-0 opacity-30">
+      <div className="absolute inset-0 opacity-30">
         <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-200 rounded-full blur-3xl translate-x-1/4 translate-y-1/4"></div>
         <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-white rounded-full blur-3xl -translate-x-1/3 -translate-y-1/3"></div>
       </div>
-      
+
       <div className="max-w-7xl relative mx-auto px-6 xl:px-20 py-12 lg:py-20">
-        
+
         <div className="flex flex-col lg:flex-row gap-16">
-          
+
           <div className="flex-1 max-w-4xl">
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-8 font-medium">
               <Link href="/" className="hover:text-[#3c2a34] transition-colors">Home</Link>
@@ -358,7 +358,7 @@ export default function ArticleDetailPage() {
                   </div>
                   <span className="text-[#3c2a34]">{article.author?.name || "Author"}</span>
                 </div>
-                
+
                 {article.tags?.[0] && (
                   <span className="bg-pink-50 text-[#3c2a34]/80 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border border-[#3c2a34]/20">
                     {article.tags[0].name}
@@ -374,15 +374,15 @@ export default function ArticleDetailPage() {
                   <Calendar size={16} className="text-[#3c2a34]" />
                   <span>{article.published_at ? format(new Date(article.published_at), 'dd MMM yyyy') : "Recently"}</span>
                 </div>
-                
+
                 <div className="flex items-center gap-1.5 ml-2">
-                   <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                   <span>{article.view_count || 0} Views</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                  <span>{article.view_count || 0} Views</span>
                 </div>
               </div>
 
-              <button 
-                onClick={handleLike} 
+              <button
+                onClick={handleLike}
                 className={`p-3 rounded-full shadow-sm ring-1 transition-all ${article.user_has_liked ? 'bg-[#3c2a34] text-white ring-[#3c2a34]' : 'bg-white text-gray-400 ring-pink-100/50 hover:bg-pink-50'}`}
               >
                 <Heart size={16} className={article.user_has_liked ? 'fill-current' : ''} />
@@ -408,46 +408,46 @@ export default function ArticleDetailPage() {
             </div>
 
             <section className="mt-20 p-10 rounded-2xl bg-white border border-pink-100/50 flex flex-col sm:flex-row items-center sm:items-start gap-8 shadow-sm">
-                <div className="relative w-24 h-24 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 border-4 border-white shadow-md">
-                {article.author?.avatar_url ? (
-                  <SmartImage
-                    src={article.author.avatar_url}
-                    alt="Author"
-                    className="object-cover"
-                    fallbackIconSize={40}
-                  />
-                ) : (
-                  <UserIcon size={40} className="m-5 text-gray-300" />
-                )}
-                </div>
-                <div className="flex-1 text-center sm:text-left">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 border-4 border-white shadow-md flex items-center justify-center">
+  {article.author?.avatar_url ? (
+    <SmartImage
+      src={article.author.avatar_url}
+      alt="Author"
+      className="object-cover"
+      fallbackIconSize={40}
+    />
+  ) : (
+    <UserIcon size={32} className="text-gray-300" />
+  )}
+</div>
+              <div className="flex-1 text-center sm:text-left">
                 <h3 className="text-2xl font-semibold text-[#3c2a34] mb-2">{article.author?.name || "Author"}</h3>
                 <p className="text-gray-600 leading-relaxed text-base">{article.author?.bio || "Expert contributor at Pentasent."}</p>
-                </div>
+              </div>
             </section>
 
             <section className="mt-24 pt-16 border-t border-[#3c2a34]/10" id="comments">
-                <div className="flex items-center justify-between mb-12">
-                   <h3 className="text-3xl font-semibold text-[#3c2a34]">Join the discussion ({article.comment_count || 0})</h3>
-                </div>
+              <div className="flex items-center justify-between mb-12">
+                <h3 className="text-3xl font-semibold text-[#3c2a34]">Join the discussion ({article.comment_count || 0})</h3>
+              </div>
 
-                {user ? (
-                   <div className="relative mb-16 group">
-                     <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Type your comment..." className="w-full p-6 bg-white border border-pink-100 rounded-3xl min-h-[120px] focus:ring-1 focus:ring-[#3c2a34] outline-none transition-all resize-none text-base text-[#3c2a34] placeholder:text-gray-300 shadow-sm" />
-                     <button onClick={handleSubmitComment} disabled={!commentText.trim() || isSubmitting} className="absolute bottom-4 right-4 bg-[#3c2a34] text-white px-8 py-2.5 rounded-full hover:opacity-90 disabled:opacity-40 transition-all font-semibold shadow-md active:scale-95">{isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Post response"}</button>
-                   </div>
-                ) : (
-                  <div onClick={() => setShowLoginPopup(true)} className="p-12 border-2 border-dashed border-pink-200 rounded-3xl text-center cursor-pointer hover:bg-white transition-all mb-16 group">
-                    <p className="text-gray-400 font-medium italic group-hover:text-[#3c2a34]">Sign in to leave a response</p>
-                  </div>
-                )}
-                
-                <CommentList articleId={article.id} onLoginRequest={() => setShowLoginPopup(true)} />
+              {user ? (
+                <div className="relative mb-16 group">
+                  <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Type your comment..." className="w-full p-6 bg-white border border-pink-100 rounded-3xl min-h-[120px] focus:ring-1 focus:ring-[#3c2a34] outline-none transition-all resize-none text-base text-[#3c2a34] placeholder:text-gray-300 shadow-sm" />
+                  <button onClick={handleSubmitComment} disabled={!commentText.trim() || isSubmitting} className="absolute bottom-4 right-4 bg-[#3c2a34] text-white px-8 py-2.5 rounded-full hover:opacity-90 disabled:opacity-40 transition-all font-semibold shadow-md active:scale-95">{isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Post response"}</button>
+                </div>
+              ) : (
+                <div onClick={() => setShowLoginPopup(true)} className="p-12 border-2 border-dashed border-pink-200 rounded-3xl text-center cursor-pointer hover:bg-white transition-all mb-16 group">
+                  <p className="text-gray-400 font-medium italic group-hover:text-[#3c2a34]">Sign in to leave a response</p>
+                </div>
+              )}
+
+              <CommentList articleId={article.id} onLoginRequest={() => setShowLoginPopup(true)} />
             </section>
           </div>
 
           <aside className="w-full lg:w-[380px] space-y-12">
-            
+
             <div className="bg-white/60 p-8 rounded-2xl border border-pink-100/50">
               <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-6">Share on Social Media</h4>
               <div className="flex items-center gap-5">
@@ -458,8 +458,8 @@ export default function ArticleDetailPage() {
                   { id: 'linkedin', icon: <Linkedin size={20} /> },
                   { id: 'copy', icon: <Share2 size={20} /> }
                 ].map(item => (
-                  <button 
-                    key={item.id} 
+                  <button
+                    key={item.id}
                     onClick={() => shareOnSocial(item.id)}
                     className="w-11 h-11 flex items-center justify-center rounded-full bg-pink-50/50 text-gray-500 hover:bg-[#3c2a34] hover:text-white transition-all duration-300 shadow-sm border border-white"
                   >
@@ -473,8 +473,8 @@ export default function ArticleDetailPage() {
               <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-6">All Tags</h4>
               <div className="flex flex-wrap gap-3">
                 {allTags.map(tag => (
-                  <Link 
-                    key={tag.id} 
+                  <Link
+                    key={tag.id}
                     href={`/articles?tag=${tag.slug}`}
                     className="px-5 py-2.5 bg-pink-50/30 text-gray-700 text-sm font-medium rounded-full border border-pink-100/50 hover:bg-white hover:border-[#3c2a34] hover:text-[#3c2a34] transition-all"
                   >
@@ -520,15 +520,15 @@ export default function ArticleDetailPage() {
                 <h4 className="text-2xl font-semibold mb-3">Join Our Newsletter</h4>
                 <p className="text-pink-100/70 text-sm mb-8 leading-relaxed">Stay updated with the latest wellness insights from our experts.</p>
                 <div className="space-y-4">
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     value={newsEmail}
                     onChange={(e) => setNewsEmail(e.target.value)}
-                    placeholder="Your email address" 
-                    className="w-full bg-white/10 border border-white/20 rounded-2xl px-6 py-4 text-sm placeholder:text-white/40 focus:outline-none focus:bg-white/20 transition-all font-medium" 
+                    placeholder="Your email address"
+                    className="w-full bg-white/10 border border-white/20 rounded-2xl px-6 py-4 text-sm placeholder:text-white/40 focus:outline-none focus:bg-white/20 transition-all font-medium"
                     disabled={newsLoading}
                   />
-                  <button 
+                  <button
                     onClick={handleNewsletterSubscribe}
                     disabled={newsLoading}
                     className="w-full bg-white text-[#3c2a34] font-bold py-4 rounded-2xl hover:bg-pink-50 transition-all flex items-center justify-center gap-2 group/btn disabled:opacity-50"
@@ -560,47 +560,47 @@ function BlockRenderer({ block }: { block: any }) {
       return level === 2 ? <h2 className="text-2xl md:text-3xl font-semibold text-[#3c2a34] pt-8 mb-2 tracking-tight">{content.text}</h2> : <h3 className="text-xl md:text-2xl font-semibold text-[#3c2a34] pt-4 mb-2 tracking-tight">{content.text}</h3>;
     case 'paragraph': return <p className="text-gray-600 leading-relaxed text-base mb-2 antialiased">{content.text}</p>;
     case 'image': return (
-        <figure className="my-8 space-y-3">
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-white/50 border border-pink-100/30 flex items-center justify-center shadow-sm ring-1 ring-black/5">
-            <ImageIcon size={32} className="absolute text-pink-100" />
-            {content.url && (
-              <SmartImage
-                src={content.url}
-                alt={content.alt || ""}
-                className="object-cover relative z-10"
-              />
-            )}
-          </div>
-          {content.caption && <figcaption className="text-center text-xs text-gray-400 italic font-semibold">{content.caption}</figcaption>}
-        </figure>
-      );
-    case 'bullet_list': return (
-        <ul className="space-y-3 text-gray-600 leading-relaxed text-base pl-2 my-4">
-          {content.items?.map((item: string, i: number) => (
-            <li key={i} className="flex gap-3">
-              <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-[#3c2a34] mt-[0.6rem]" />
-              <span className="font-medium">{item}</span>
-            </li>
-          ))}
-        </ul>
-      );
-    case 'numbered_list': return (
-        <ol className="space-y-3 text-gray-600 leading-relaxed text-base my-4">
-          {content.items?.map((item: string, i: number) => (
-            <li key={i} className="flex gap-3">
-              <span className="font-bold text-[#3c2a34] shrink-0">{i + 1}.</span>
-              <span className="font-medium">{item}</span>
-            </li>
-          ))}
-        </ol>
-      );
-    case 'quote': return (
-        <div className="border-l-[4px] border-[#3c2a34] pl-8 my-12 bg-white/50 p-10 rounded-r-lg italic relative overflow-hidden">
-          <div className="absolute top-0 left-4 opacity-5 text-[#3c2a34] text-8xl font-serif">“</div>
-          <p className="text-xl text-[#3c2a34] mb-4 leading-relaxed font-medium relative z-10">{content.text}</p>
-          {content.author && <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] relative z-10">— {content.author}</p>}
+      <figure className="my-8 space-y-3">
+        <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-white/50 border border-pink-100/30 flex items-center justify-center shadow-sm ring-1 ring-black/5">
+          <ImageIcon size={32} className="absolute text-pink-100" />
+          {content.url && (
+            <SmartImage
+              src={content.url}
+              alt={content.alt || ""}
+              className="object-cover relative z-10"
+            />
+          )}
         </div>
-      );
+        {content.caption && <figcaption className="text-center text-xs text-gray-400 italic font-semibold">{content.caption}</figcaption>}
+      </figure>
+    );
+    case 'bullet_list': return (
+      <ul className="space-y-3 text-gray-600 leading-relaxed text-base pl-2 my-4">
+        {content.items?.map((item: string, i: number) => (
+          <li key={i} className="flex gap-3">
+            <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-[#3c2a34] mt-[0.6rem]" />
+            <span className="font-medium">{item}</span>
+          </li>
+        ))}
+      </ul>
+    );
+    case 'numbered_list': return (
+      <ol className="space-y-3 text-gray-600 leading-relaxed text-base my-4">
+        {content.items?.map((item: string, i: number) => (
+          <li key={i} className="flex gap-3">
+            <span className="font-bold text-[#3c2a34] shrink-0">{i + 1}.</span>
+            <span className="font-medium">{item}</span>
+          </li>
+        ))}
+      </ol>
+    );
+    case 'quote': return (
+      <div className="border-l-[4px] border-[#3c2a34] pl-8 my-12 bg-white/50 p-10 rounded-r-lg italic relative overflow-hidden">
+        <div className="absolute top-0 left-4 opacity-5 text-[#3c2a34] text-8xl font-serif">“</div>
+        <p className="text-xl text-[#3c2a34] mb-4 leading-relaxed font-medium relative z-10">{content.text}</p>
+        {content.author && <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] relative z-10">— {content.author}</p>}
+      </div>
+    );
     case 'divider': return <div className="flex items-center justify-center gap-2 py-10"><div className="w-1 h-1 rounded-full bg-rose-200" /><div className="w-1.5 h-1.5 rounded-full bg-rose-300" /><div className="w-1 h-1 rounded-full bg-rose-200" /></div>;
     case 'highlight': return <div className="bg-[#3c2a34] p-10 rounded-lg my-10 border border-white/5 relative overflow-hidden group shadow-xl"><div className="absolute inset-0 bg-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity" /><p className="text-pink-50 text-xl font-semibold italic leading-relaxed relative z-10">{content.text}</p></div>;
     case 'video': return <div className="my-10 relative aspect-video rounded-lg overflow-hidden shadow-2xl bg-black border border-pink-100/30"><iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${content.video_id}`} title="Video" allowFullScreen /></div>;
@@ -618,7 +618,7 @@ function CommentList({ articleId, onLoginRequest }: { articleId: string, onLogin
   const fetchComments = useCallback(async () => {
     if (!articleId) return;
     setLoading(true);
-    
+
     try {
       // 1. Fetch comments
       const { data: baseComments, error: commentError } = await supabase
@@ -682,8 +682,8 @@ function CommentList({ articleId, onLoginRequest }: { articleId: string, onLogin
         <div key={i} className="flex gap-4">
           <div className="w-11 h-11 bg-pink-100 rounded-full" />
           <div className="flex-1 space-y-3">
-             <div className="h-4 w-32 bg-pink-100 rounded" />
-             <div className="h-16 w-full bg-pink-100 rounded-2xl" />
+            <div className="h-4 w-32 bg-pink-100 rounded" />
+            <div className="h-16 w-full bg-pink-100 rounded-2xl" />
           </div>
         </div>
       ))}
@@ -708,7 +708,7 @@ function CommentList({ articleId, onLoginRequest }: { articleId: string, onLogin
 function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { comment: any, onLoginRequest: () => void, articleId: string, level?: number }) {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   const [showReplies, setShowReplies] = useState(false);
   const [replies, setReplies] = useState<any[]>([]);
   const [isReplying, setIsReplying] = useState(false);
@@ -728,7 +728,7 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
         .select('*')
         .eq('parent_id', localComment.id)
         .order('created_at', { ascending: true });
-      
+
       if (error) throw error;
       if (!baseReplies) return;
 
@@ -758,7 +758,7 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
 
       setReplies(merged);
       setShowReplies(true);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const handleLike = async () => {
@@ -773,7 +773,7 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
         await supabase.from('article_comment_likes').insert({ comment_id: localComment.id, user_id: user.id });
         setLocalComment((prev: any) => ({ ...prev, user_has_liked: true, like_count: (prev.like_count || 0) + 1 }));
       }
-    } catch (err) {} finally { setIsLiking(false); }
+    } catch (err) { } finally { setIsLiking(false); }
   };
 
   const handleSubmitReply = async () => {
@@ -791,10 +791,10 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
 
       setReplyText("");
       setIsReplying(false);
-      
+
       setLocalComment((prev: any) => ({ ...prev, reply_count: (prev.reply_count || 0) + 1 }));
       fetchReplies();
-      
+
       toast({ title: "Success", description: "Reply posted" });
     } catch (err) {
       toast({ title: "Error", description: "Failed to post reply", variant: "destructive" });
@@ -816,7 +816,7 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300">
-             <UserIcon size={isReply ? 16 : 18} />
+            <UserIcon size={isReply ? 16 : 18} />
           </div>
         )}
       </div>
@@ -831,15 +831,15 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
           {localComment.content}
         </p>
         <div className="flex items-center gap-6 pl-1">
-          <button 
+          <button
             onClick={handleLike}
             className={`text-[11px] font-bold flex items-center gap-1.5 transition-colors ${localComment.user_has_liked ? 'text-pink-600' : 'text-gray-400 hover:text-pink-600'}`}
           >
             <Heart size={14} className={localComment.user_has_liked ? 'fill-current' : ''} /> {localComment.like_count || 0}
           </button>
-          
+
           {canReply && (
-            <button 
+            <button
               onClick={() => {
                 if (!user) { onLoginRequest(); return; }
                 setIsReplying(!isReplying);
@@ -851,11 +851,11 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
           )}
 
           {(localComment.reply_count > 0) ? (
-            <button 
+            <button
               onClick={() => {
                 if (!showReplies) fetchReplies();
                 else setShowReplies(false);
-              }} 
+              }}
               className={`text-[11px] font-bold text-gray-400 hover:text-[#3c2a34] flex items-center gap-1.5 transition-colors ${showReplies ? 'text-[#3c2a34]' : ''}`}
             >
               <MessageCircle size={14} /> {localComment.reply_count || 0} {showReplies ? 'Hide' : 'Replies'}
@@ -865,23 +865,23 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
 
         {isReplying && (
           <div className="mt-4 relative animate-in slide-in-from-top-2 duration-300">
-            <textarea 
-              value={replyText} 
-              onChange={(e) => setReplyText(e.target.value)} 
-              placeholder={`Reply to ${localComment.user?.name || "Member"}...`} 
+            <textarea
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder={`Reply to ${localComment.user?.name || "Member"}...`}
               className="w-full p-4 bg-white border border-[#3c2a34]/80 rounded-3xl min-h-[100px] focus:ring-1 focus:ring-[#3c2a34] outline-none transition-all resize-none text-sm text-[#3c2a34] placeholder:text-gray-300 shadow-sm"
               autoFocus
             />
             <div className="flex justify-end gap-3 mt-3">
-              <button 
+              <button
                 onClick={() => setIsReplying(false)}
                 className="px-6 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-[#3c2a34] transition-colors"
               >
                 Cancel
               </button>
-              <button 
-                onClick={handleSubmitReply} 
-                disabled={!replyText.trim() || isSubmittingReply} 
+              <button
+                onClick={handleSubmitReply}
+                disabled={!replyText.trim() || isSubmittingReply}
                 className="bg-[#3c2a34] text-white px-8 py-2 rounded-full hover:opacity-90 disabled:opacity-40 transition-all font-bold shadow-md active:scale-95 text-xs flex items-center gap-2"
               >
                 {isSubmittingReply ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Send size={12} /> Post Reply</>}
@@ -893,12 +893,12 @@ function CommentItem({ comment, onLoginRequest, articleId, level = 1 }: { commen
         {showReplies && replies.length > 0 && (
           <div className="mt-6 pt-6 space-y-8 pl-8 border-l-2">
             {replies.map(r => (
-              <CommentItem 
-                key={r.id} 
-                comment={r} 
-                onLoginRequest={onLoginRequest} 
-                articleId={articleId} 
-                level={level + 1} 
+              <CommentItem
+                key={r.id}
+                comment={r}
+                onLoginRequest={onLoginRequest}
+                articleId={articleId}
+                level={level + 1}
               />
             ))}
           </div>

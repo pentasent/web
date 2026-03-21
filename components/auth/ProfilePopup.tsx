@@ -180,6 +180,9 @@ export default function ProfilePopup() {
                                 />
                             </div>
                         </div>
+                        {
+                            avatarUrl ? <p className="text-xs text-gray-500 text-center"><span className="text-red-500">*</span> Change your profile picture</p> : <p className="text-xs text-gray-500 text-center"><span className="text-red-500">*</span> Upload your profile picture</p>
+                        }
 
                         {/* Email (Disabled) */}
                         <div>
@@ -194,7 +197,7 @@ export default function ProfilePopup() {
 
                         {/* Name */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 placeholder="Enter your name"
@@ -206,7 +209,7 @@ export default function ProfilePopup() {
 
                         {/* Country */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Location (Country)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Location (Country) <span className="text-red-500">*</span></label>
                             <button
                                 onClick={() => setShowCountryModal(true)}
                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition flex justify-between items-center text-left"
@@ -225,7 +228,9 @@ export default function ProfilePopup() {
 
                         {/* Bio */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Bio <span className="text-red-500">*</span> 
+                            {bio.length < 20 && <span className='text-xs text-gray-500 ml-1'>(min 20 chars)</span>}
+                            </label>
                             <textarea
                                 placeholder="Share a little about yourself..."
                                 value={bio}
