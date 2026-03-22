@@ -26,6 +26,8 @@ interface AuthContextType {
         avatar_file?: File;
         avatar_uri?: string;
         is_onboarded?: boolean;
+        is_verified?: boolean;
+        is_active?: boolean;
     }) => Promise<void>;
     isResetVerified: boolean;
     setIsResetVerified: (verified: boolean) => void;
@@ -290,9 +292,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
         name?: string;
         bio?: string;
         country?: string;
-        avatar_file?: File;
         avatar_uri?: string;
+        avatar_file?: File;
         is_onboarded?: boolean;
+        is_verified?: boolean;
+        is_active?: boolean;
     }) => {
         if (!user) return;
 
@@ -326,7 +330,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
                         bio: updates.bio !== undefined ? updates.bio : user.bio,
                         country: updates.country !== undefined ? updates.country : user.country,
                         avatar_url: finalAvatarUrl,
-                        is_onboarded: updates.is_onboarded !== undefined ? updates.is_onboarded : user.is_onboarded
+                        is_onboarded: updates.is_onboarded !== undefined ? updates.is_onboarded : user.is_onboarded,
+                        is_verified: updates.is_verified !== undefined ? updates.is_verified : user.is_verified,
+                        is_active: updates.is_active !== undefined ? updates.is_active : user.is_active
                     })
                     .eq('id', user.id);
 

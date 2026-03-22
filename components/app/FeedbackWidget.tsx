@@ -146,14 +146,14 @@ export function FeedbackWidget() {
       >
         <button
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center bg-warm-100 dark:bg-zinc-900 border-l border-y border-warm-300 dark:border-zinc-800 rounded-l-2xl py-5 px-3 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] transition-all duration-300 hover:pr-5 active:scale-95"
+          className="group relative flex items-center bg-warm-100 dark:bg-zinc-900 border-l border-y border-warm-300 dark:border-[#3d253b] rounded-l-2xl py-5 px-3 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] transition-all duration-300 hover:pr-5 active:scale-95"
         >
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-3"> 
             <div className="relative">
-              <MessageSquare className="w-5 h-5 text-warm-700 dark:text-warm-100 group-hover:scale-110 transition-transform" />
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-warm-700 dark:bg-warm-100 rounded-full animate-pulse" />
+              <MessageSquare className="w-5 h-5 text-[#3d253b] dark:text-warm-100 group-hover:scale-110 transition-transform" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#3d253b] dark:bg-warm-100 rounded-full animate-pulse" />
             </div>
-            <span className="[writing-mode:vertical-lr] text-[10px] uppercase font-bold tracking-[0.2em] text-warm-500 group-hover:text-warm-700 dark:group-hover:text-warm-100 transition-colors">
+            <span className="[writing-mode:vertical-lr] text-[10px] uppercase font-bold tracking-[0.2em] text-warm-500 group-hover:text-[#3d253b] dark:group-hover:text-warm-100 transition-colors">
               Feedback
             </span>
           </div>
@@ -162,14 +162,14 @@ export function FeedbackWidget() {
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-[100vw] sm:max-w-[480px] w-full h-full sm:h-auto bg-white border-warm-200 shadow-[24px_24px_80px_-16px_rgba(0,0,0,0.15)] rounded-none sm:rounded-[2rem] p-0 overflow-hidden border-none flex flex-col sm:max-h-[90vh] [&>button]:hidden">
-          <div className="h-1.5 w-full bg-gradient-to-r from-warm-200 via-warm-700 to-warm-200 shrink-0" />
+          <div className="h-1.5 w-full bg-gradient-to-r from-warm-200 via-[#3d253b] to-warm-200 shrink-0" />
           
           <div className="flex-1 overflow-y-auto post-scroll scrollbar-hide snap-x snap-mandatory p-6 sm:px-10">
             <DialogHeader className="mb-8">
               <div className="w-14 h-14 bg-warm-50 rounded-2xl flex items-center justify-center mb-5 shadow-inner border border-warm-100">
-                <MessageSquare className="w-7 h-7 text-warm-700" />
+                <MessageSquare className="w-7 h-7 text-[#3d253b]" />
               </div>
-              <DialogTitle className="text-2xl sm:text-3xl font-serif text-warm-700 tracking-tight leading-tight">Your Feedback Matters</DialogTitle>
+              <DialogTitle className="text-2xl sm:text-3xl font-serif text-[#3d253b] tracking-tight leading-tight">Your Feedback Matters</DialogTitle>
               <DialogDescription className="text-warm-500 text-base mt-2">
                 Help us build a better Pentasent. Tell us what&apos;s working and what&apos;s not.
               </DialogDescription>
@@ -184,7 +184,7 @@ export function FeedbackWidget() {
                     onClick={() => setFormData({ ...formData, rating: formData.rating === 'liked' ? null : 'liked' })}
                     className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border transition-all duration-300 ${
                       formData.rating === 'liked'
-                        ? 'bg-warm-700 border-warm-700 text-white shadow-lg'
+                        ? 'bg-[#3d253b] border-[#3d253b] text-white shadow-lg'
                         : 'bg-warm-50/50 border-warm-200 text-warm-500 hover:border-warm-400 shadow-sm'
                     }`}
                   >
@@ -196,7 +196,7 @@ export function FeedbackWidget() {
                     onClick={() => setFormData({ ...formData, rating: formData.rating === 'disliked' ? null : 'disliked' })}
                     className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border transition-all duration-300 ${
                       formData.rating === 'disliked'
-                        ? 'bg-zinc-800 border-zinc-800 text-white shadow-lg'
+                        ? 'bg-[#3d253b] border-[#3d253b] text-white shadow-lg'
                         : 'bg-warm-50/50 border-warm-200 text-warm-500 hover:border-warm-400 shadow-sm'
                     }`}
                   >
@@ -215,13 +215,13 @@ export function FeedbackWidget() {
                 </div>
                 <Textarea
                   id="fb-message"
-                  placeholder="What's on your mind? (Minimum 20 characters)"
+                  placeholder="How can we improve? (Minimum 20 characters)"
                   rows={4}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   maxLength={500}
                   required
-                  className="bg-warm-50/50 border-warm-200 focus:border-warm-700 focus:ring-0 rounded-2xl h-32 px-4 py-3 text-warm-700 transition-all shadow-sm resize-none"
+                  className="bg-warm-50/50 border-warm-200 focus:border-warm-200 focus:ring-0 rounded-2xl h-32 px-4 py-3 text-black transition-all shadow-sm resize-none"
                 />
               </div>
 
@@ -229,7 +229,7 @@ export function FeedbackWidget() {
                 <Button
                   type="submit"
                   disabled={isSubmitting || formData.message.length < 20}
-                  className="w-full sm:flex-1 bg-warm-700 hover:bg-warm-800 text-warm-50 rounded-2xl h-14 text-base font-bold group shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:grayscale"
+                  className="w-full sm:flex-1 bg-[#3d253b] hover:bg-warm-800 text-warm-50 rounded-2xl h-14 text-base font-bold group shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:grayscale"
                 >
                   {isSubmitting ? (
                     <>

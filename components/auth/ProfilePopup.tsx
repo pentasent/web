@@ -8,10 +8,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Camera, ChevronDown, Check, X, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { COUNTRIES } from '@/lib/country';
+import { SmartImage } from '../ui/SmartImage';
 
 
 export default function ProfilePopup() {
-    const { user, refreshUser } = useAuth();
+    const { user, refreshUser, updateProfile } = useAuth();
     const { toast } = useToast();
 
     const capitalizeWords = (text: string) =>
@@ -75,40 +76,14 @@ export default function ProfilePopup() {
 
         setLoading(true);
         try {
-            let finalAvatarUrl = avatarUrl;
-
-            // Upload Image if it's a new file
-            if (avatarFile) {
-                const filename = `${user.id}_${Date.now()}.jpg`;
-                const path = `avatars/${filename}`;
-
-                const arrayBuffer = await avatarFile.arrayBuffer();
-
-                const { error: uploadError } = await supabase.storage
-                    .from('avatars')
-                    .upload(path, arrayBuffer, { contentType: avatarFile.type });
-
-                if (uploadError) {
-                    throw new Error('Failed to upload avatar. Ensure "avatars" bucket allows uploads.');
-                }
-
-                const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(path);
-                finalAvatarUrl = publicUrlData.publicUrl;
-            }
-
-            // Upsert into public.users
-            const { error } = await supabase.from('users').upsert({
-                id: user.id,
-                email: user.email,
+            await updateProfile({
                 name: name.trim(),
-                country: country?.label,
                 bio: bio.trim(),
-                avatar_url: finalAvatarUrl,
-                is_verified: true, // Should be true since they got past OTP
-                is_active: true
-            }, { onConflict: 'id' });
-
-            if (error) throw error;
+                country: country?.label,
+                avatar_file: avatarFile || undefined,
+                avatar_uri: avatarUrl || undefined,
+                is_verified: true, // Mark as verified once they complete this mandatory step
+            });
 
             // Welcome Notification
             await supabase.from('notifications').insert({
@@ -124,7 +99,6 @@ export default function ProfilePopup() {
             toast({
                 title: "Profile saved!",
             });
-            await refreshUser();
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -161,14 +135,14 @@ export default function ProfilePopup() {
                                 className="relative cursor-pointer group"
                                 onClick={() => fileInputRef.current?.click()}
                             >
-                                <div className="w-24 h-24 rounded-full border-2 border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center">
+                                <div className="w-24 h-24 rounded-full border-2 border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center relative shadow-inner">
                                     {avatarUrl ? (
-                                        <Image src={avatarUrl} alt="Avatar" width={96} height={96} className="object-cover w-full h-full" />
+                                        <SmartImage key={avatarUrl} src={avatarUrl} alt="Avatar" className="object-cover" />
                                     ) : (
                                         <Camera className="w-8 h-8 text-gray-400 group-hover:text-gray-600 transition" />
                                     )}
                                 </div>
-                                <div className="absolute bottom-0 right-0 bg-[#3d2f4d] w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shadow-md">
+                                <div className="absolute bottom-0 right-0 bg-[#3d2f4d] w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shadow-md z-40">
                                     <Camera className="w-4 h-4 text-white" />
                                 </div>
                                 <input
@@ -236,7 +210,7 @@ export default function ProfilePopup() {
                                 value={bio}
                                 onChange={(e) => setBio(e.target.value)}
                                 maxLength={500}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition h-28 resize-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition h-28 resize-none overflow-y-auto scrollbar-hide snap-x snap-mandatory"
                             />
                             <div className="text-right text-xs text-gray-400 mt-1">
                                 {bio.length}/500

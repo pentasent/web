@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { Community } from '@/types/database';
 import { useRouter } from 'next/navigation';
 import { trackEvent } from "@/lib/analytics/track";
+import { SmartImage } from '../ui/SmartImage';
 
 export default function CommunityOnboardingPopup() {
     const { user, refreshUser } = useAuth();
@@ -181,12 +182,18 @@ export default function CommunityOnboardingPopup() {
                                         {/* Logo */}
                                         <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0">
                                             {item.logo_url && (
-                                                <Image
-                                                    src={item.logo_url}
+                                                // <Image
+                                                //     src={item.logo_url}
+                                                //     alt={item.name}
+                                                //     width={64}
+                                                //     height={64}
+                                                //     className="w-full h-full object-cover"
+                                                // /> 
+                                                <SmartImage
+                                                    src={item.logo_url || ""}
                                                     alt={item.name}
-                                                    width={64}
-                                                    height={64}
-                                                    className="w-full h-full object-cover"
+                                                    className="object-cover relative z-10"
+                                                    priority
                                                 />
                                             )}
                                         </div>
@@ -218,7 +225,7 @@ export default function CommunityOnboardingPopup() {
                 </div>
 
                 {/* Footer */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-white/80 border-t border-gray-100">
+                <div className="absolute z-50 bottom-0 left-0 right-0 p-6 bg-white border-t border-gray-100">
                     <button
                         onClick={handleJoin}
                         disabled={!requirementMet || saving}

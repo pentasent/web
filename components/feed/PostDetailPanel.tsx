@@ -5,6 +5,7 @@ import { Post, Comment } from '@/types/database';
 import { Loader2, MoreVertical, Heart, MessageCircle, Share2, CornerDownRight, X, ChevronLeft, ChevronRight, Trash2, BarChart2, Send } from 'lucide-react';
 import { formatNumber, parseContent } from '@/lib/format';
 import { SmartImage } from '@/components/ui/SmartImage';
+import { FeedImage } from './FeedImage';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { createPortal } from 'react-dom';
@@ -277,19 +278,17 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
 
                     {/* Media */}
                     {post.images && post.images.length > 0 && (
-                        <div className="relative mb-4 group/media">
-                            <div ref={scrollContainerRef} className="flex overflow-x-auto gap-3 pb-2 w-full scrollbar-hide snap-x snap-mandatory">
+                        <div className="relative mb-6 group/media">
+                            <div ref={scrollContainerRef} className="flex overflow-x-auto gap-3 pb-2 w-full scrollbar-hide snap-x snap-mandatory px-1">
                                 {post.local_image_urls && post.local_image_urls.length > 0 ? (
                                     post.local_image_urls.map((url, idx) => (
                                         <div
                                             key={`local-${idx}`}
-                                            className={`h-[250px] sm:h-[300px] bg-warm-200 rounded-xl overflow-hidden relative shrink-0 snap-center ${post.local_image_urls!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'}`}
+                                            className={`bg-warm-50/50 rounded-2xl overflow-hidden relative shrink-0 snap-center shadow-sm border border-warm-200/50 ${post.local_image_urls!.length > 1 ? 'w-[88%] sm:w-[82%]' : 'w-full'}`}
                                         >
-                                            <SmartImage
+                                            <FeedImage
                                                 src={url}
                                                 alt={`Uploading media ${idx}`}
-                                                className="object-cover"
-                                                fallbackIconSize={48}
                                             />
                                         </div>
                                     ))
@@ -298,10 +297,10 @@ export const PostDetailPanel: React.FC<PostDetailPanelProps> = ({
                                         <div
                                             key={idx}
                                             onClick={() => setSelectedImageIndex(idx)}
-                                            className={`h-[250px] sm:h-[300px] bg-warm-200 rounded-xl overflow-hidden relative shrink-0 snap-center cursor-pointer hover:opacity-95 transition-opacity ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
+                                            className={`bg-warm-50/50 rounded-2xl overflow-hidden relative shrink-0 snap-center cursor-pointer hover:opacity-95 transition-all shadow-sm border border-warm-200/50 ${post.images!.length > 1 ? 'w-[88%] sm:w-[82%]' : 'w-full'
                                                 }`}
                                         >
-                                            <SmartImage src={img.image_url} alt="Post media" className="object-cover" fallbackIconSize={48} />
+                                            <FeedImage src={img.image_url} alt="Post media" />
                                         </div>
                                     ))
                                 )}

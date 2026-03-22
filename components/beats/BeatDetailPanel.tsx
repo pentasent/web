@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Play, Pause, RotateCcw, RotateCw, ChevronDown, Repeat, Heart, Info, X } from 'lucide-react';
 import { Beat } from '@/types/database';
 import { SmartImage } from '../ui/SmartImage';
+import { getImageUrl } from '@/lib/get-image-url';
 
 interface BeatDetailPanelProps {
     beat: Beat;
@@ -29,7 +30,7 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
         if (audioRef.current && beat.audio_url) {
             const audio = audioRef.current;
             audio.pause();
-            audio.src = beat.audio_url;
+            audio.src = getImageUrl(beat.audio_url);
             audio.load();
 
             return () => {
@@ -108,16 +109,16 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
             />
 
             {/* Background Blur Image */}
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 text-white">
                 {beat.banner_url && (
                     <Image
-                        src={beat.banner_url}
+                        src={getImageUrl(beat.banner_url)}
                         alt="Background"
                         fill
-                        className="object-cover opacity-30 blur-3xl pointer-events-none"
+                        className="object-cover opacity-50 blur-3xl pointer-events-none"
                     />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFFBF7]/80 to-[#FFFBF7]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFFBF7]/80 to-[#FFFBF7] bg-[#FFFBF7]/30" />
             </div>
 
             <div className="relative z-10 flex flex-col h-full p-6 pb-8">
@@ -147,7 +148,7 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
                     {beat.banner_url ? (
                         <SmartImage
                             src={beat.banner_url}
-                            alt={`${beat.title} || 'Cover'`}
+                            alt={beat.title || 'Cover'}
                             className="object-cover"
                             fallbackIconSize={48}
                         />
@@ -164,9 +165,6 @@ export const BeatDetailPanel: React.FC<BeatDetailPanelProps> = ({ beat, onClose 
                             {beat.beat_tags?.name || 'Unknown Genre'}
                         </p>
                     </div>
-                    {/* <button className="p-2 hover:bg-black/5 rounded-full transition-colors shrink-0">
-                        <Heart className="w-6 h-6 text-warm-400 hover:text-red-500 transition-colors" />
-                    </button> */}
                 </div>
 
                 {/* Progress Bar */}

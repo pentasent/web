@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Play, BarChart2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Beat } from '@/types/database';
+import { getImageUrl } from '@/lib/get-image-url';
 
 interface BeatCardProps {
     beat: Beat;
@@ -37,7 +38,7 @@ export const BeatCard: React.FC<BeatCardProps> = ({ beat, onPlay, isPlaying }) =
             <div className="relative w-20 h-16 rounded-xl overflow-hidden shrink-0 bg-warm-200">
                 {beat.banner_url ? (
                     <Image
-                        src={beat.banner_url}
+                        src={getImageUrl(beat.banner_url)}
                         alt={beat.title || 'Beat'}
                         fill
                         className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}

@@ -3,6 +3,7 @@ import { Heart, MessageCircle, Share2, BarChart2, Loader2 } from 'lucide-react';
 import { Post } from '@/types/database';
 import { formatNumber, parseContent } from '@/lib/format';
 import { SmartImage } from '@/components/ui/SmartImage';
+import { FeedImage } from './FeedImage';
 import Image from 'next/image';
 
 interface PostCardProps {
@@ -98,18 +99,16 @@ export const PostCard: React.FC<PostCardProps> = ({
 
             {/* Media */}
             {(post.images && post.images.length > 0) || (post.is_uploading && post.local_image_urls && post.local_image_urls.length > 0) ? (
-                <div className="mt-1 flex overflow-x-auto gap-2 pb-2 px-5 scrollbar-hide snap-x snap-mandatory">
+                <div className="mt-2 flex overflow-x-auto gap-2 pb-2 px-1 lg:px-2 scrollbar-hide snap-x snap-mandatory">
                     {post.is_uploading && post.local_image_urls ? (
                         post.local_image_urls.map((url, idx) => (
                             <div
                                 key={`local-${idx}`}
-                                className={`relative h-[300px] sm:h-[400px] bg-black/10 rounded-xl overflow-hidden shrink-0 snap-center ${post.local_image_urls!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'}`}
+                                className={`relative bg-warm-50/50 rounded-xl overflow-hidden shrink-0 snap-center shadow-sm border border-warm-200/50 ${post.local_image_urls!.length > 1 ? 'w-[85%] sm:w-[80%]' : 'w-full'}`}
                             >
-                                <SmartImage
+                                <FeedImage
                                     src={url}
                                     alt={`Uploading media ${idx}`}
-                                    className="object-cover"
-                                    fallbackIconSize={48}
                                 />
                             </div>
                         ))
@@ -117,14 +116,12 @@ export const PostCard: React.FC<PostCardProps> = ({
                         post.images?.map((img, idx) => (
                             <div
                                 key={idx}
-                                className={`relative h-[300px] sm:h-[400px] bg-black/20 rounded-xl overflow-hidden shrink-0 snap-center ${post.images!.length > 1 ? 'w-[90%] sm:w-[85%]' : 'w-full'
+                                className={`relative bg-warm-50/50 rounded-xl overflow-hidden shrink-0 snap-center shadow-sm border border-warm-200/50 ${post.images!.length > 1 ? 'w-[85%] sm:w-[80%]' : 'w-full'
                                     }`}
                             >
-                                <SmartImage
+                                <FeedImage
                                     src={img.image_url}
                                     alt={`Post media ${idx}`}
-                                    className="object-cover"
-                                    fallbackIconSize={48}
                                 />
                             </div>
                         ))

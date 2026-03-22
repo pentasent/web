@@ -200,7 +200,7 @@ export function Sidebar({
                                             <span className="absolute top-[8px] right-[8px] w-2 h-2 bg-red-900 rounded-full border-2 border-[#F8F2EE]" />
                                         </Button> */}
                                         <div className="flex items-center gap-2 cursor-pointer rounded-full shrink-0">
-                                            <Avatar className="h-6 w-6 border border-border/40 shrink-0">
+                                            <Avatar key={user?.avatar_url} className="h-6 w-6 border border-border/40 shrink-0">
                                                 <AvatarImage src={user?.avatar_url || "https://i.pravatar.cc/150?u=a042581f4e29026024e"} alt="User" />
                                                 <AvatarFallback>{user?.name?.charAt(0)?.toUpperCase() || "U"}</AvatarFallback>
                                             </Avatar>

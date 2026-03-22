@@ -20,6 +20,12 @@ export const SmartImage: React.FC<SmartImageProps> = ({
     const [hasError, setHasError] = useState(false);
     const resolvedSrc = getImageUrl(src as string);
 
+    // Reset load state when src changes
+    React.useEffect(() => {
+        setIsLoaded(false);
+        setHasError(false);
+    }, [src]);
+
     // Auto-detect if we should use unoptimized (for local, blob, data URLs)
     const isLocal = resolvedSrc.startsWith('data:') || 
                    resolvedSrc.startsWith('blob:') || 
