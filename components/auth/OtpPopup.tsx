@@ -10,7 +10,7 @@ import { trackEvent } from "@/lib/analytics/track";
 import { identifyUser } from "@/lib/analytics/identify";
 
 export default function OtpPopup() {
-    const { unverifiedEmail, setUnverifiedEmail, refreshUser, otpType } = useAuth();
+    const { unverifiedEmail, setUnverifiedEmail, refreshUser, otpType, setIsResetVerified } = useAuth();
     const { toast } = useToast();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
@@ -101,7 +101,7 @@ export default function OtpPopup() {
             setUnverifiedEmail(null);
             
             if (otpType === 'recovery') {
-                sessionStorage.setItem('pentasent_reset_verified', 'true');
+                setIsResetVerified(true);
             }
 
             // Refresh user will trigger fetchAndSetUserData which creates the public record if needed

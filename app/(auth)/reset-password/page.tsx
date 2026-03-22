@@ -2,22 +2,28 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Mail, Loader2, ArrowLeft } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Mail, Loader2, ArrowLeft, AlertCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 
 export default function ResetPasswordPage() {
-  const { user, setUnverifiedEmail, setOtpType, logout } = useAuth();
+  const { user, setUnverifiedEmail, setOtpType, logout, setIsResetVerified } = useAuth();
+  
+  // States: 'request' | 'verify' | 'reset'
+  const [stage, setStage] = useState<'request' | 'verify' | 'reset'>('request');
+  
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
-  const [isVerified, setIsVerified] = useState(false);
   const { toast } = useToast();
+  
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const TIMER_KEY = "reset_password_timer_end";
   const EMAIL_KEY = "reset_password_email";
@@ -33,7 +39,7 @@ export default function ResetPasswordPage() {
       
       if (remaining > 0) {
         setTimer(remaining);
-        setEmail(storedEmail);
+        setEmail(storedEmail || "");
       } else {
         localStorage.removeItem(TIMER_KEY);
         localStorage.removeItem(EMAIL_KEY);
@@ -41,20 +47,17 @@ export default function ResetPasswordPage() {
     }
   }, []);
 
-  // 2. Auto-fill email for logged-in users (only if not already in timer state)
+  // 2. Auto-fill email for logged-in users
   useEffect(() => {
-    if (user?.email && !timer && !isVerified) {
+    if (user?.email && !email && stage === 'request') {
       setEmail(user.email);
     }
     
-    // Check if we just verified via OTP popup
-    if (user && !isVerified && typeof window !== 'undefined') {
-        if (window.location.hash.includes('access_token') || sessionStorage.getItem('pentasent_reset_verified') === 'true') {
-            setIsVerified(true);
-            sessionStorage.removeItem('pentasent_reset_verified');
-        }
+    // Check for recovery hash (legacy support)
+    if (typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
+        setStage('reset');
     }
-  }, [user, timer, isVerified]);
+  }, [user, email, stage]);
 
   // 3. Timer interval
   useEffect(() => {
@@ -88,62 +91,82 @@ export default function ResetPasswordPage() {
     const targetEmail = email.trim().toLowerCase();
     
     if (!validateEmail(targetEmail)) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid email address.",
-        variant: "destructive",
-      });
+      toast({ title: "Invalid Email", description: "Please enter a valid email address.", variant: "destructive" });
       return;
     }
 
-    if (timer > 0) return;
+
+    if (timer > 0 && targetEmail === localStorage.getItem(EMAIL_KEY)) {
+      setStage('verify');
+      return;
+    }
 
     setLoading(true);
     try {
-      // Stage 1: Check existence in public.users table
-      const { data: userData } = await supabase
-        .from('users')
-        .select('id, is_verified, is_onboarded')
-        .ilike('email', targetEmail)
-        .maybeSingle();
+      const { data: userData } = await supabase.from('users').select('id').ilike('email', targetEmail).maybeSingle();
 
       if (!userData) {
-        toast({
-          title: "Account not found",
-          description: "user account not found with this email.",
-          variant: "destructive",
-        });
+        toast({ title: "Account not found", description: "Account not found with this email.", variant: "destructive" });
         setLoading(false);
         return;
       }
 
-      // Stage 2: Trigger Reset Password Email
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(targetEmail, {
+      const { error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
         redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/reset-password`,
       });
-      if (resetError) throw resetError;
+      if (error) throw error;
 
-      setOtpType('recovery');
-      toast({
-        title: "Reset OTP Sent",
-        description: "A 6-digit reset code has been sent to your email.",
-      });
+      toast({ title: "OTP Sent", description: "A 6-digit reset code has been sent to your email." });
 
-      // 3. Set persistent timer
       const endTime = Date.now() + 120 * 1000;
       localStorage.setItem(TIMER_KEY, endTime.toString());
       localStorage.setItem(EMAIL_KEY, targetEmail);
       setTimer(120);
-
-      // 4. Trigger OTP Popup
-      setUnverifiedEmail(targetEmail);
+      setStage('verify');
 
     } catch (e: any) {
-      toast({
-        title: "Error",
-        description: e.message || "Something went wrong. Please try again.",
-        variant: "destructive",
+      toast({ title: "Error", description: e.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^[0-9]?$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+    if (value && index < 5) inputRefs.current[index + 1]?.focus();
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) inputRefs.current[index - 1]?.focus();
+  };
+
+  const handleVerifyOTP = async () => {
+    const token = otp.join('');
+    if (token.length !== 6) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: email.trim().toLowerCase(),
+        token,
+        type: 'recovery',
       });
+
+      if (error) throw error;
+
+      toast({ title: "Verified!", description: "Code verified successfully. Now set your new password." });
+      setStage('reset');
+      
+      // Cleanup timer
+      localStorage.removeItem(TIMER_KEY);
+      localStorage.removeItem(EMAIL_KEY);
+      setTimer(0);
+
+    } catch (e: any) {
+      toast({ title: "Verification failed", description: e.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -151,45 +174,27 @@ export default function ResetPasswordPage() {
 
   const handleUpdatePassword = async () => {
     if (newPassword.length < 6) {
-        toast({
-            title: "Short password",
-            description: "Password must be at least 6 characters.",
-            variant: "destructive",
-        });
+        toast({ title: "Short password", description: "Password must be at least 6 characters.", variant: "destructive" });
         return;
     }
     if (newPassword !== confirmPassword) {
-        toast({
-            title: "Mismatch",
-            description: "Passwords do not match.",
-            variant: "destructive",
-        });
+        toast({ title: "Mismatch", description: "Passwords do not match.", variant: "destructive" });
         return;
     }
 
     setLoading(true);
     try {
-        const { error } = await supabase.auth.updateUser({
-            password: newPassword
-        });
-
+        const { error } = await supabase.auth.updateUser({ password: newPassword });
         if (error) throw error;
 
-        toast({
-            title: "Success!",
-            description: "Your password has been updated. You are now logged in.",
-        });
-
-        // The AuthGuard will now detect session and redirect to feed (or onboarding)
-        // because we updated the state.
-        setIsVerified(false); // Hide form
+        toast({ title: "Success!", description: "Password updated successfully. You are now logged in." });
+        
+        // Final redirection handled by AuthGuard as we are now logged in and password is set.
+        // But let's be explicit
+        window.location.href = '/app/feed';
         
     } catch (e: any) {
-        toast({
-            title: "Update failed",
-            description: e.message,
-            variant: "destructive",
-        });
+        toast({ title: "Update failed", description: e.message, variant: "destructive" });
     } finally {
         setLoading(false);
     }
@@ -208,116 +213,141 @@ export default function ResetPasswordPage() {
 
         {/* Heading */}
         <h2 className="text-3xl md:text-4xl font-light text-[#3c2a34] mb-4">
-          {isVerified ? "Set New Password" : "Reset Password"}
+          {stage === 'request' && "Reset Password"}
+          {stage === 'verify' && "Verify Reset Code"}
+          {stage === 'reset' && "Set New Password"}
         </h2>
 
         <p className="text-gray-500 mb-8 leading-relaxed">
-          {isVerified 
-            ? "Create a strong new password for your account." 
-            : user 
-                ? "Confirm your email to receive a secure reset code." 
-                : "Enter your registered email to receive a secure reset code."}
+          {stage === 'request' && (user ? "Confirm your email to receive a secure reset code." : "Enter your registered email to receive a secure reset code.")}
+          {stage === 'verify' && `Please enter the 6-digit code sent to ${email}`}
+          {stage === 'reset' && "Create a strong new password for your account."}
         </p>
 
-        {/* Form Space-y-6 matches signin */}
         <div className="space-y-6">
-          {isVerified ? (
-            <>
-              <div className="relative group">
-                <input
-                  type="password"
-                  placeholder="New Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-4 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition"
-                />
-              </div>
-              <div className="relative group">
-                <input
-                  type="password"
-                  placeholder="Confirm New Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition"
-                />
-              </div>
-              <button
-                onClick={handleUpdatePassword}
-                disabled={loading}
-                className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-70"
-              >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Update Password"}
-              </button>
-            </>
-          ) : (
+          {stage === 'request' && (
             <>
               {user ? (
-                <div className="bg-[#fdf8fa] border border-pink-100 rounded-xl p-5 mb-2 shadow-sm ring-1 ring-pink-100/50">
+                <div className="bg-[#fdf8fa] border border-pink-100 rounded-xl p-5 mb-2">
                   <p className="text-[#3d2f4d] font-semibold mb-1 truncate">{user.email}</p>
-                  <p className="text-sm text-gray-500 leading-relaxed italic">
-                    This is your email you loggedin with. Click below to receive a reset code.
-                  </p>
                 </div>
               ) : (
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-4 w-5 h-5 text-gray-400 group-focus-within:text-[#3d2f4d] transition-colors" />
+                  <Mail className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
                   <input
                     type="email"
                     placeholder="Email Address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={timer > 0}
-                    className="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition disabled:bg-gray-50 disabled:text-gray-400"
+                    className="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#e8d4df]"
                   />
                 </div>
               )}
-
               <button
                 onClick={handleSendOTP}
-                disabled={loading || (timer > 0) || (!user && !email)}
-                className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-70 shadow-lg shadow-[#3d2f4d]/10 hover:shadow-xl hover:-translate-y-0.5"
+                disabled={loading || timer > 0}
+                className="w-full h-[56px] rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-70"
               >
-                {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : timer > 0 ? (
-                  `Resend in ${formatTime(timer)}`
-                ) : (
-                  "Send Reset Code"
-                )}
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : timer > 0 ? `Resend in ${formatTime(timer)}` : "Send Reset Code"}
               </button>
             </>
           )}
 
-          {/* Links Row */}
-          <div className="flex items-center justify-between text-sm mt-8">
-            <Link 
-              href="/signin" 
-              className="inline-flex items-center text-gray-400 hover:text-[#3d2f4d] transition-colors group"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-              Back to Sign In
-            </Link>
-            {!user && !isVerified && (
-              <p className="text-gray-500">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="text-[#3d2f4d] font-medium hover:underline">
-                  Sign Up
-                </Link>
+          {stage === 'verify' && (
+            <>
+              <div className="flex gap-2 justify-center mb-4">
+                {otp.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    ref={(el) => { inputRefs.current[idx] = el; }}
+                    type="text"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(idx, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                    className="w-12 h-14 text-center text-2xl font-semibold border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#e8d4df]"
+                  />
+                ))}
+              </div>
+              <button
+                onClick={handleVerifyOTP}
+                disabled={loading || otp.join('').length !== 6}
+                className="w-full h-[56px] rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-70"
+              >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify & Continue"}
+              </button>
+              <button onClick={() => setStage('request')} className="w-full text-sm text-gray-500 hover:text-[#3d2f4d]">
+                Back to email
+              </button>
+            </>
+          )}
+
+          {stage === 'reset' && (
+            <>
+              <input
+                type="password"
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full px-4 py-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#e8d4df]"
+              />
+              <input
+                type="password"
+                placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#e8d4df]"
+              />
+              <button
+                onClick={handleUpdatePassword}
+                disabled={loading}
+                className="w-full h-[56px] rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-70"
+              >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Update Password"}
+              </button>
+            </>
+          )}
+
+          {(stage === 'verify' || stage === 'reset') && (
+            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 flex items-start gap-3 mt-4">
+              <AlertCircle className="w-4 h-4 mt-0.5 text-amber-600" />
+              {/* <span className="text-amber-600 mt-0.5">⚠️</span> */}
+              <p className="text-amber-800 text-sm italic">
+                {stage === 'verify' ? "Please don't refresh the page while verifying the code." : "Please don't refresh the page while updating your password."}
               </p>
-            )}
-          </div>
+            </div>
+          )}
+
+          {stage === 'request' && (
+            <div className="flex items-center justify-between text-sm mt-8">
+              <Link href="/signin" className="inline-flex items-center text-gray-400 hover:text-[#3d2f4d]">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Sign In
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
       {/* ================= RIGHT SIDE ================= */}
       <div className="hidden lg:flex relative bg-[#4b2a3f] text-white p-14 items-center justify-center overflow-hidden">
+
+        {/* Gradient layer */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#4b2a3f] via-[#5a324a] to-[#3d2235]" />
+
+        {/* Soft glow blobs */}
         <div className="absolute -top-32 -left-32 w-[420px] h-[420px] bg-pink-400/20 rounded-full blur-[120px]" />
         <div className="absolute -bottom-32 -right-32 w-[420px] h-[420px] bg-purple-400/20 rounded-full blur-[140px]" />
+
+        {/* Pattern */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
-            backgroundImage: `radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 80%, white 1px, transparent 1px)`,
+            backgroundImage: `
+              radial-gradient(circle at 20% 20%, white 1px, transparent 1px),
+              radial-gradient(circle at 80% 80%, white 1px, transparent 1px)
+            `,
             backgroundSize: "120px 120px",
           }}
         />
@@ -326,11 +356,15 @@ export default function ResetPasswordPage() {
           <h3 className="text-3xl font-light mb-6">
             Secure your journey.
           </h3>
-          <p className="text-white/80 mb-10 leading-relaxed italic">
-            &quot;True wellness isn&apos;t just about your rituals, it&apos;s about ensuring your journey is protected every step of the way.&quot;
+
+          <p className="text-white/80 mb-10">
+           &quot;True wellness isn&apos;t just about your rituals, it&apos;s about ensuring your journey is protected every step of the way.&quot;
           </p>
-          
+
+          {/* ================= MOBILE MOCKUPS ================= */}
           <div className="relative h-[220px] hidden lg:block">
+
+            {/* Back Phone */}
             <motion.div
               initial={{ opacity: 0, x: 60, rotate: -6 }}
               whileInView={{ opacity: 1, x: 0, rotate: -6 }}
@@ -359,7 +393,9 @@ export default function ResetPasswordPage() {
                 className="w-full h-full object-contain"
               />
             </motion.div>
+
           </div>
+
         </div>
       </div>
     </div>

@@ -241,11 +241,10 @@ function SignUpForm() {
             </p>
           </div>
 
-          {/* Sign Up Button */}
           <button
             type="submit"
             disabled={loading || (timer > 0)}
-            className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex justify-center items-center disabled:opacity-70"
+            className="w-full h-[56px] rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex justify-center items-center disabled:opacity-70"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

@@ -141,7 +141,7 @@ export default function SignInPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-70"
+            className="w-full h-[56px] rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-70"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
           </button>

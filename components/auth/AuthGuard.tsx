@@ -24,7 +24,7 @@ export default function AuthGuard() {
         }
 
         // 2. CONFIRMED REDIRECT: Logic for authenticated users
-        if (user) {
+        if (user && user.is_onboarded) {
             if (pathname === '/signin' || pathname === '/signup') {
                 router.push('/app/feed');
             }
@@ -52,7 +52,7 @@ export default function AuthGuard() {
     if (loading) return null;
 
     // 1. Unverified Email (OTP)
-    if (unverifiedEmail) {
+    if (unverifiedEmail && pathname !== '/reset-password') {
         return <OtpPopup />;
     }
 

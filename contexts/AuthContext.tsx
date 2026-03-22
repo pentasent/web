@@ -27,6 +27,8 @@ interface AuthContextType {
         avatar_uri?: string;
         is_onboarded?: boolean;
     }) => Promise<void>;
+    isResetVerified: boolean;
+    setIsResetVerified: (verified: boolean) => void;
     initialAuthHint: boolean;
 }
 
@@ -38,6 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
     const [loading, setLoading] = useState(true); // Always start true to sync with client-side supabase check
     const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
     const [otpType, setOtpType] = useState<'signup' | 'recovery'>('signup');
+    const [isResetVerified, setIsResetVerified] = useState(false);
 
     const setAuthCookie = (isLoggedIn: boolean) => {
         if (typeof document !== 'undefined') {
@@ -340,7 +343,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAdmin, loading, unverifiedEmail, setUnverifiedEmail, otpType, setOtpType, login, register, logout, refreshUser, updateProfile, initialAuthHint }}>
+        <AuthContext.Provider value={{ 
+            user, isAdmin, loading, unverifiedEmail, setUnverifiedEmail, 
+            otpType, setOtpType, isResetVerified, setIsResetVerified,
+            login, register, logout, refreshUser, updateProfile, initialAuthHint 
+        }}>
             {children}
         </AuthContext.Provider>
     );
