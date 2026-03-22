@@ -124,12 +124,8 @@ export default function CommunityOnboardingPopup() {
             // Track onboarding completion
             trackEvent("onboarding_completed");
 
-            // Redirect based on role
-            if (user.role === 'admin') {
-                router.push('/app/feed');
-            } else {
-                router.push('/beta-release');
-            }
+            // Redirect to feed
+            router.push('/app/feed');
         } catch (e: any) {
             console.error('Join error:', e);
             toast({

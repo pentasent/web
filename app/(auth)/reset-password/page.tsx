@@ -2,299 +2,366 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Eye, EyeOff, Lock, Loader2, CheckCircle, AlertTriangle, ShieldX } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { Mail, Loader2, ArrowLeft } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
-
-type PageState = "loading" | "ready" | "expired" | "invalid" | "success";
+import { useAuth } from "@/contexts/AuthContext";
+import Image from "next/image";
 
 export default function ResetPasswordPage() {
-  const [pageState, setPageState] = useState<PageState>("loading");
+  const { user, setUnverifiedEmail, setOtpType, logout } = useAuth();
+  const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [logs, setLogs] = useState<string[]>(["Initializing..."]);
+  const [loading, setLoading] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [isVerified, setIsVerified] = useState(false);
   const { toast } = useToast();
-  const router = useRouter();
 
-  const passwordsMatch = newPassword.length >= 6 && newPassword === confirmPassword;
-  const hasProcessed = useRef(false);
+  const TIMER_KEY = "reset_password_timer_end";
+  const EMAIL_KEY = "reset_password_email";
 
+  // 1. persistent timer initialization
   useEffect(() => {
-    if (hasProcessed.current) return;
-    hasProcessed.current = true;
+    const storedTimerEnd = localStorage.getItem(TIMER_KEY);
+    const storedEmail = localStorage.getItem(EMAIL_KEY);
 
-    const addLog = (msg: string) => {
-      setLogs(prev => [...prev, msg]);
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        addLog("Session established via state change.");
-        setPageState("ready");
+    if (storedTimerEnd && storedEmail) {
+      const endTime = parseInt(storedTimerEnd, 10);
+      const remaining = Math.ceil((endTime - Date.now()) / 1000);
+      
+      if (remaining > 0) {
+        setTimer(remaining);
+        setEmail(storedEmail);
+      } else {
+        localStorage.removeItem(TIMER_KEY);
+        localStorage.removeItem(EMAIL_KEY);
       }
-    });
+    }
+  }, []);
 
-    const verify = async () => {
-      try {
-        addLog("Checking for existing session...");
-        // 1. Immediate check for existing session
-        const { data: { session: existingSession } } = await supabase.auth.getSession();
-        if (existingSession) {
-          addLog("Active session found.");
-          setPageState("ready");
-          subscription.unsubscribe();
-          return;
+  // 2. Auto-fill email for logged-in users (only if not already in timer state)
+  useEffect(() => {
+    if (user?.email && !timer && !isVerified) {
+      setEmail(user.email);
+    }
+    
+    // Check if we just verified via OTP popup
+    if (user && !isVerified && typeof window !== 'undefined') {
+        if (window.location.hash.includes('access_token') || sessionStorage.getItem('pentasent_reset_verified') === 'true') {
+            setIsVerified(true);
+            sessionStorage.removeItem('pentasent_reset_verified');
         }
+    }
+  }, [user, timer, isVerified]);
 
-        // 2. Extract tokens and perform manual setSession
-        addLog("Parsing reset tokens from URL...");
-        const hash = window.location.hash.substring(1);
-        const search = window.location.search.substring(1);
-        const params = new URLSearchParams(hash || search);
-        const accessToken = params.get("access_token");
-        const refreshToken = params.get("refresh_token");
-
-        if (accessToken) {
-          addLog("Authenticating with reset tokens...");
-          const { data, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken || "",
-          });
-
-          if (!error && data?.session) {
-            addLog("Authentication successful.");
-            setPageState("ready");
-            subscription.unsubscribe();
-            return;
-          } else if (error) {
-            addLog(`Auth error: ${error.message}`);
+  // 3. Timer interval
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            localStorage.removeItem(TIMER_KEY);
+            localStorage.removeItem(EMAIL_KEY);
+            return 0;
           }
-        } else {
-          addLog("No reset tokens found in URL.");
-        }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
 
-        // 3. Final safety check
-        setTimeout(async () => {
-          if (pageState === "loading") {
-            addLog("Executing final safety check...");
-            const { data: { session: lastCheck } } = await supabase.auth.getSession();
-            if (lastCheck) {
-              addLog("Session verified.");
-              setPageState("ready");
-            } else if (!accessToken) {
-              addLog("Link appears invalid or missing tokens.");
-              setPageState("invalid");
-            } else {
-              addLog("Still waiting for session synchronization...");
-            }
-            subscription.unsubscribe();
-          }
-        }, 3000);
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
 
-      } catch (err: any) {
-        addLog(`Verification failed: ${err.message}`);
-        console.error("Verification failed:", err);
-      }
-    };
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  };
 
-    verify();
-    return () => subscription.unsubscribe();
-  }, [pageState]);
+  const handleSendOTP = async () => {
+    const targetEmail = email.trim().toLowerCase();
+    
+    if (!validateEmail(targetEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const handleResetPassword = async () => {
-    if (!passwordsMatch) return;
+    if (timer > 0) return;
 
-    setSaving(true);
+    setLoading(true);
     try {
-      const result = await Promise.race([
-        supabase.auth.updateUser({ password: newPassword }),
-        new Promise<any>((_, reject) => 
-          setTimeout(() => reject(new Error("Request timed out. Please try again.")), 30000)
-        )
-      ]);
+      // Stage 1: Check existence in public.users table
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id, is_verified, is_onboarded')
+        .ilike('email', targetEmail)
+        .maybeSingle();
 
-      if (result.error) throw result.error;
+      if (!userData) {
+        toast({
+          title: "Account not found",
+          description: "user account not found with this email.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
 
-      setPageState("success");
-      setTimeout(() => router.push("/app/feed"), 3000);
+      // Stage 2: Trigger Reset Password Email
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(targetEmail, {
+        redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/reset-password`,
+      });
+      if (resetError) throw resetError;
+
+      setOtpType('recovery');
+      toast({
+        title: "Reset OTP Sent",
+        description: "A 6-digit reset code has been sent to your email.",
+      });
+
+      // 3. Set persistent timer
+      const endTime = Date.now() + 120 * 1000;
+      localStorage.setItem(TIMER_KEY, endTime.toString());
+      localStorage.setItem(EMAIL_KEY, targetEmail);
+      setTimer(120);
+
+      // 4. Trigger OTP Popup
+      setUnverifiedEmail(targetEmail);
+
     } catch (e: any) {
       toast({
-        title: "Update Failed",
-        description: e.message || "Something went wrong.",
+        title: "Error",
+        description: e.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setSaving(false);
+      setLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (newPassword.length < 6) {
+        toast({
+            title: "Short password",
+            description: "Password must be at least 6 characters.",
+            variant: "destructive",
+        });
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        toast({
+            title: "Mismatch",
+            description: "Passwords do not match.",
+            variant: "destructive",
+        });
+        return;
+    }
+
+    setLoading(true);
+    try {
+        const { error } = await supabase.auth.updateUser({
+            password: newPassword
+        });
+
+        if (error) throw error;
+
+        toast({
+            title: "Success!",
+            description: "Your password has been updated. You are now logged in.",
+        });
+
+        // The AuthGuard will now detect session and redirect to feed (or onboarding)
+        // because we updated the state.
+        setIsVerified(false); // Hide form
+        
+    } catch (e: any) {
+        toast({
+            title: "Update failed",
+            description: e.message,
+            variant: "destructive",
+        });
+    } finally {
+        setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-pink-50/60 to-white flex items-center justify-center px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
+    <div className="w-full max-w-7xl mx-auto min-h-screen overflow-hidden grid lg:grid-cols-2">
+      {/* ================= LEFT SIDE ================= */}
+      <div className="p-10 md:p-14 flex flex-col">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-semibold text-[#3d2f4d]">
-            Pentasent
-          </Link>
+        <div className="mb-12">
+          <h1 className="text-2xl font-semibold text-[#3d2f4d]">
+            <Link href="/">Pentasent</Link>
+          </h1>
         </div>
 
-        {/* ===== LOADING STATE ===== */}
-        {pageState === "loading" && (
-          <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
-            <Loader2 className="w-10 h-10 animate-spin text-[#3d2f4d] mx-auto mb-6" />
-            <div className="space-y-2 mb-8">
-              {logs.map((log, idx) => (
-                <p key={idx} className={`text-xs ${idx === logs.length - 1 ? 'text-[#3d2f4d] font-medium' : 'text-gray-400 opacity-60'}`}>
-                  {log}
-                </p>
-              ))}
-            </div>
-            
-            <div className="pt-6 border-t border-gray-50">
-              <p className="text-sm text-gray-500 mb-3">Stuck on this screen?</p>
-              <button 
-                onClick={() => setPageState("ready")}
-                className="text-[#3d2f4d] font-semibold text-sm hover:underline"
-              >
-                Click here to show reset form manually
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Heading */}
+        <h2 className="text-3xl md:text-4xl font-light text-[#3c2a34] mb-4">
+          {isVerified ? "Set New Password" : "Reset Password"}
+        </h2>
 
-        {/* ===== INVALID / 404 STATE ===== */}
-        {pageState === "invalid" && (
-          <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
-            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-5">
-              <ShieldX className="w-8 h-8 text-red-500" />
-            </div>
-            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-3">Invalid Link</h2>
-            <p className="text-gray-500 mb-6 leading-relaxed">
-              This password reset link is invalid or has expired. Please request a new one.
-            </p>
-            <Link
-              href="/signin"
-              className="inline-flex w-full py-3.5 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition justify-center"
-            >
-              Back to Sign In
-            </Link>
-          </div>
-        )}
+        <p className="text-gray-500 mb-8 leading-relaxed">
+          {isVerified 
+            ? "Create a strong new password for your account." 
+            : user 
+                ? "Confirm your email to receive a secure reset code." 
+                : "Enter your registered email to receive a secure reset code."}
+        </p>
 
-        {/* ===== EXPIRED STATE ===== */}
-        {pageState === "expired" && (
-          <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
-            <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-5">
-              <AlertTriangle className="w-8 h-8 text-amber-500" />
-            </div>
-            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-3">Link Expired</h2>
-            <p className="text-gray-500 mb-6 leading-relaxed">
-              This password reset link has expired. Please request a new one.
-            </p>
-            <Link
-              href="/signin"
-              className="inline-flex w-full py-3.5 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition justify-center"
-            >
-              Back to Sign In
-            </Link>
-          </div>
-        )}
-
-        {/* ===== READY — PASSWORD FORM ===== */}
-        {pageState === "ready" && (
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-2xl font-semibold text-[#3c2a34] mb-2">Set New Password</h2>
-            <p className="text-gray-500 mb-8 text-sm leading-relaxed">
-              Enter your new password below. It must be at least 6 characters long.
-            </p>
-
-            <div className="space-y-4">
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        {/* Form Space-y-6 matches signin */}
+        <div className="space-y-6">
+          {isVerified ? (
+            <>
+              <div className="relative group">
                 <input
-                  type={showNewPassword ? "text" : "password"}
+                  type="password"
                   placeholder="New Password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-100 focus:border-[#3d2f4d] focus:ring-1 focus:ring-[#3d2f4d] outline-none transition bg-gray-50/50"
-                  autoFocus
+                  className="w-full px-4 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition"
                 />
-                <button
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
-                  type="button"
-                >
-                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
               </div>
-
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative group">
                 <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm Password"
+                  type="password"
+                  placeholder="Confirm New Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-4 rounded-xl border border-gray-100 focus:border-[#3d2f4d] focus:ring-1 focus:ring-[#3d2f4d] outline-none transition bg-gray-50/50"
+                  className="w-full px-4 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition"
                 />
-                <button
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
-                  type="button"
-                >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
               </div>
-            </div>
-
-            <button
-              onClick={handleResetPassword}
-              disabled={!passwordsMatch || saving}
-              className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-semibold hover:bg-[#2d1f3d] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-8 shadow-lg shadow-[#3d2f4d]/20 active:scale-[0.98]"
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Updating...
-                </>
+              <button
+                onClick={handleUpdatePassword}
+                disabled={loading}
+                className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-70"
+              >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Update Password"}
+              </button>
+            </>
+          ) : (
+            <>
+              {user ? (
+                <div className="bg-[#fdf8fa] border border-pink-100 rounded-xl p-5 mb-2 shadow-sm ring-1 ring-pink-100/50">
+                  <p className="text-[#3d2f4d] font-semibold mb-1 truncate">{user.email}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed italic">
+                    This is your email you loggedin with. Click below to receive a reset code.
+                  </p>
+                </div>
               ) : (
-                "Save Password"
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-4 w-5 h-5 text-gray-400 group-focus-within:text-[#3d2f4d] transition-colors" />
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={timer > 0}
+                    className="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition disabled:bg-gray-50 disabled:text-gray-400"
+                  />
+                </div>
               )}
-            </button>
-          </div>
-        )}
 
-        {/* ===== SUCCESS STATE ===== */}
-        {pageState === "success" && (
-          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
-            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-[#3c2a34] mb-3">Password Changed!</h2>
-            <p className="text-gray-500 mb-6 leading-relaxed">
-              Your password has been updated successfully. Taking you to your dashboard...
-            </p>
-            <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-              <motion.div 
-                className="h-full bg-green-500"
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 2.5 }}
-              />
-            </div>
+              <button
+                onClick={handleSendOTP}
+                disabled={loading || (timer > 0) || (!user && !email)}
+                className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-70 shadow-lg shadow-[#3d2f4d]/10 hover:shadow-xl hover:-translate-y-0.5"
+              >
+                {loading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : timer > 0 ? (
+                  `Resend in ${formatTime(timer)}`
+                ) : (
+                  "Send Reset Code"
+                )}
+              </button>
+            </>
+          )}
+
+          {/* Links Row */}
+          <div className="flex items-center justify-between text-sm mt-8">
+            <Link 
+              href="/signin" 
+              className="inline-flex items-center text-gray-400 hover:text-[#3d2f4d] transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              Back to Sign In
+            </Link>
+            {!user && !isVerified && (
+              <p className="text-gray-500">
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="text-[#3d2f4d] font-medium hover:underline">
+                  Sign Up
+                </Link>
+              </p>
+            )}
           </div>
-        )}
-      </motion.div>
+        </div>
+      </div>
+
+      {/* ================= RIGHT SIDE ================= */}
+      <div className="hidden lg:flex relative bg-[#4b2a3f] text-white p-14 items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#4b2a3f] via-[#5a324a] to-[#3d2235]" />
+        <div className="absolute -top-32 -left-32 w-[420px] h-[420px] bg-pink-400/20 rounded-full blur-[120px]" />
+        <div className="absolute -bottom-32 -right-32 w-[420px] h-[420px] bg-purple-400/20 rounded-full blur-[140px]" />
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 80%, white 1px, transparent 1px)`,
+            backgroundSize: "120px 120px",
+          }}
+        />
+
+        <div className="relative z-10 text-center max-w-md">
+          <h3 className="text-3xl font-light mb-6">
+            Secure your journey.
+          </h3>
+          <p className="text-white/80 mb-10 leading-relaxed italic">
+            &quot;True wellness isn&apos;t just about your rituals, it&apos;s about ensuring your journey is protected every step of the way.&quot;
+          </p>
+          
+          <div className="relative h-[220px] hidden lg:block">
+            <motion.div
+              initial={{ opacity: 0, x: 60, rotate: -6 }}
+              whileInView={{ opacity: 1, x: 0, rotate: -6 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className='absolute right-[140px] top-0 inset-[8px] w-[330px] h-[560px] mx-auto -rotate-[6deg]'>
+              <Image
+                alt="Pentasent Welcome"
+                src="/images/splashscreen.svg"
+                width={1000}
+                height={1000}
+                className="w-full h-full object-contain"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 60, rotate: 6 }}
+              whileInView={{ opacity: 1, x: 0, rotate: 6 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className='absolute -right-[150px] top-10 inset-[8px] w-[330px] h-[560px] mx-auto rotate-[6deg]'>
+              <Image
+                alt="Pentasent Community"
+                src="/images/community.svg"
+                width={1000}
+                height={1000}
+                className="w-full h-full object-contain"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

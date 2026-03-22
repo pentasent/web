@@ -13,6 +13,8 @@ interface AuthContextType {
     loading: boolean;
     unverifiedEmail: string | null;
     setUnverifiedEmail: (email: string | null) => void;
+    otpType: 'signup' | 'recovery';
+    setOtpType: (type: 'signup' | 'recovery') => void;
     login: (email: string, password: string) => Promise<void>;
     register: (email: string, password: string, metadata?: any) => Promise<void>;
     logout: () => Promise<void>;
@@ -35,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true); // Always start true to sync with client-side supabase check
     const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+    const [otpType, setOtpType] = useState<'signup' | 'recovery'>('signup');
 
     const setAuthCookie = (isLoggedIn: boolean) => {
         if (typeof document !== 'undefined') {
@@ -96,13 +99,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
 
     const fetchAndSetUserData = async (userId: string, email: string) => {
         try {
-            const { data: publicUser, error } = await supabase
+            // Ensure the client session is fully synchronized before any DB calls
+            await supabase.auth.getUser();
+
+            let { data: publicUser, error } = await supabase
                 .from('users')
                 .select('*')
                 .eq('id', userId)
                 .maybeSingle();
 
             if (error) throw error;
+
+            if (!publicUser) {
+                // Case: User exists in auth but not in public DB
+                // If we're on the /signup page, this is a new registration completion.
+                // We create the record here as soon as the session is ready.
+                if (typeof window !== 'undefined' && window.location.pathname === '/signup') {
+                    const { data: insertedUser, error: insertError } = await supabase
+                        .from('users')
+                        .insert({
+                            id: userId,
+                            email: email,
+                            name: email.split('@')[0], // Ensure required 'name' field is provided
+                            is_verified: false,
+                            is_onboarded: false,
+                            role: 'user'
+                        })
+                        .select()
+                        .maybeSingle();
+                    
+                    if (insertError) {
+                        console.error("Error creating public user record:", insertError.message);
+                    } else if (insertedUser) {
+                        publicUser = insertedUser;
+                        console.log("Successfully created public user record:", publicUser.id);
+                    }
+                }
+            }
+
             if (publicUser) {
                 const userData: User = {
                     id: publicUser.id,
@@ -117,20 +151,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
                     following_count: publicUser.following_count || 0,
                     profile_views_count: publicUser.profile_views_count || 0,
                     posts_count: publicUser.posts_count || 0,
-                    is_verified: publicUser.is_verified || false,
+                    is_verified: publicUser.is_verified ?? false,
                     is_active: publicUser.is_active !== false,
-                    is_onboarded: publicUser.is_onboarded || false,
+                    is_onboarded: publicUser.is_onboarded ?? false,
                     created_at: publicUser.created_at,
                 };
                 setUser(userData);
-                setIsAdmin(userData.role === 'admin' || email === userData.email);
+                setIsAdmin(userData.role === 'admin');
             } else {
-                // User exists in auth but not in public DB => This is a new user who needs to complete profile
-                // Do NOT sign out. Instead, provide a default User object.
+                // Fallback for missing user record
                 const defaultUserData: User = {
                     id: userId,
                     email: email,
-                    name: email.split('@')[0], // Default name
+                    name: email.split('@')[0],
                     role: 'user',
                     followers_count: 0,
                     following_count: 0,
@@ -153,6 +186,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
 
     const register = async (email: string, password: string, metadata?: any) => {
         try {
+            // Stage 1: Absolute check in public.users (Source of Truth)
+            const { data: publicUser } = await supabase
+                .from('users')
+                .select('id')
+                .eq('email', email)
+                .maybeSingle();
+
+            if (publicUser) {
+                throw new Error("Account already exists with this email. Please sign in.");
+            }
+
+            // Stage 2: Attempt to clear stale unconfirmed record via RPC (Side-effect free)
+            // This ensures if an unverified user exists, they are removed before the new signUp
+            // so they receive only ONE email and can update their password.
+            try {
+                await supabase.rpc('delete_unconfirmed_user', { target_email: email });
+            } catch (rpcErr) {
+                // Ignore RPC failures (e.g. if function doesn't exist yet)
+                console.error("RPC deletion attempt failed:", rpcErr);
+            }
+
+            // Stage 3: Perform fresh Signup (or re-signup after deletion)
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
@@ -163,20 +218,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
 
             if (error) throw error;
 
-            if (data?.user && data.user.identities && data.user.identities.length === 0) {
-                throw new Error("Account already exists. Please sign in.");
-            }
-
-            // If signup is successful but user is not automatically signed in (common if email confirmation is required)
-            // Or if we just want to trigger the popup anyway
             if (data?.user && !data.session) {
+                // Verification required (Standard or Resent)
                 setUnverifiedEmail(email);
+                setOtpType('signup');
             }
 
-            if (data?.user) {
-                identifyUser(data.user.id, {
-                    email: data.user.email
-                });
+            if (data?.user && data.session) {
+                identifyUser(data.user.id, { email: data.user.email });
                 trackEvent("user_signup");
             }
         } catch (error: any) {
@@ -186,28 +235,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
 
     const login = async (email: string, password: string) => {
         try {
+            // Pre-check existence in public.users
+            const { data: publicUser } = await supabase
+                .from('users')
+                .select('id, is_verified, is_onboarded')
+                .ilike('email', email)
+                .maybeSingle();
+
+            if (!publicUser) {
+                // source of truth: if not in public table, account not found
+                throw new Error("Account not found with this email.");
+            }
+
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password
             });
             if (error) throw error;
+
         } catch (error: any) {
             if (error.message.includes('Email not confirmed')) {
                 setUnverifiedEmail(email);
-                // Automatically trigger a resend of the OTP
-                const { error: resendError } = await supabase.auth.resend({
+                await supabase.auth.resend({
                     type: 'signup',
                     email: email,
                     options: {
                         emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
                     }
                 });
-                if (resendError) {
-                    const combinedError = new Error(error.message);
-                    (combinedError as any).resendFailed = true;
-                    (combinedError as any).resendMessage = resendError.message;
-                    throw combinedError;
-                }
             }
             throw error;
         }
@@ -285,7 +340,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; initialAuthHint
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAdmin, loading, unverifiedEmail, setUnverifiedEmail, login, register, logout, refreshUser, updateProfile, initialAuthHint }}>
+        <AuthContext.Provider value={{ user, isAdmin, loading, unverifiedEmail, setUnverifiedEmail, otpType, setOtpType, login, register, logout, refreshUser, updateProfile, initialAuthHint }}>
             {children}
         </AuthContext.Provider>
     );

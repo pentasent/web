@@ -10,7 +10,7 @@ import { trackEvent } from "@/lib/analytics/track";
 import { identifyUser } from "@/lib/analytics/identify";
 
 export default function OtpPopup() {
-    const { unverifiedEmail, setUnverifiedEmail, refreshUser } = useAuth();
+    const { unverifiedEmail, setUnverifiedEmail, refreshUser, otpType } = useAuth();
     const { toast } = useToast();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
@@ -70,25 +70,41 @@ export default function OtpPopup() {
             const { data, error } = await supabase.auth.verifyOtp({
                 email: decodeURIComponent(unverifiedEmail),
                 token: otpString,
-                type: 'signup',
+                type: otpType,
             });
 
             if (error) throw error;
-
-            toast({
-                title: "Email verified!",
-                description: "Email verified successfully!",
-            });
 
             if (data?.user) {
                 identifyUser(data.user.id, {
                     email: data.user.email
                 });
                 trackEvent("user_verified");
+
+                const isSignupPage = typeof window !== 'undefined' && window.location.pathname === '/signup';
+
+                if (!isSignupPage) {
+                    // For non-signup flows (recovery, etc.), we explicitly ensure is_verified is true
+                    // Signup insertion with is_verified: false is handled in AuthContext's fetchAndSetUserData
+                    await supabase
+                        .from('users')
+                        .update({ is_verified: true })
+                        .eq('id', data.user.id);
+                }
             }
 
+            toast({
+                title: "Success!",
+                description: otpType === 'signup' ? "Email verified successfully!" : "Code verified successfully!",
+            });
+
             setUnverifiedEmail(null);
-            // Wait for auth context to react to the new session
+            
+            if (otpType === 'recovery') {
+                sessionStorage.setItem('pentasent_reset_verified', 'true');
+            }
+
+            // Refresh user will trigger fetchAndSetUserData which creates the public record if needed
             await refreshUser();
         } catch (error: any) {
             toast({
@@ -106,15 +122,28 @@ export default function OtpPopup() {
 
         setResendLoading(true);
         try {
-            const { error } = await supabase.auth.resend({
-                type: 'signup',
-                email: decodeURIComponent(unverifiedEmail),
-                options: {
-                    emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
-                }
-            });
-            if (error) throw error;
-            setTimer(120); // 2 minutes
+            const email = decodeURIComponent(unverifiedEmail);
+            if (otpType === 'signup') {
+                const { error } = await supabase.auth.resend({
+                    type: 'signup',
+                    email: email,
+                    options: {
+                        emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
+                    }
+                });
+                if (error) throw error;
+            } else {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/reset-password`,
+                });
+                if (error) throw error;
+            }
+            
+            // Persistent Timer Logic
+            const endTime = Date.now() + 120 * 1000;
+            localStorage.setItem('pentasent_otp_timer_end', endTime.toString());
+            setTimer(120); 
+
             toast({
                 title: "Code sent",
                 description: "A new code has been sent to your email.",
@@ -148,11 +177,15 @@ export default function OtpPopup() {
                     </button>
 
                     <h3 className="text-3xl font-semibold text-[#3d2f4d] mb-2">
-                        Verify Email
+                        {typeof window !== 'undefined' && window.location.pathname === '/reset-password' 
+                            ? 'Reset Password' 
+                            : (otpType === 'signup' ? 'Verify your account' : 'Reset Password')}
                     </h3>
 
                     <p className="text-gray-500 mb-8 text-sm">
-                        Please enter the 6-digit code sent to <br />
+                        {otpType === 'signup' 
+                            ? 'Please enter the 6-digit code sent to' 
+                            : 'Enter the 6-digit reset code sent to'} <br />
                         <span className="font-medium text-gray-800">{decodeURIComponent(unverifiedEmail)}</span>
                     </p>
 
@@ -176,16 +209,18 @@ export default function OtpPopup() {
                         disabled={loading || otp.join('').length !== 6}
                         className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-70 mb-4"
                     >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify & Login"}
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (otpType === 'signup' ? "Verify & Login" : "Verify & Reset")}
                     </button>
 
-                    <button
-                        onClick={handleResend}
-                        disabled={timer > 0 || resendLoading}
-                        className="text-sm text-gray-500 hover:text-[#3d2f4d] transition-colors disabled:opacity-50"
-                    >
-                        {resendLoading ? "Sending..." : timer > 0 ? `Resend again in ${formatTime(timer)}` : "Resend Code"}
-                    </button>
+                    {otpType === 'signup' && (
+                        <button
+                            onClick={handleResend}
+                            disabled={timer > 0 || resendLoading}
+                            className="text-sm text-gray-500 hover:text-[#3d2f4d] transition-colors disabled:opacity-50"
+                        >
+                            {resendLoading ? "Sending..." : timer > 0 ? `Resend again in ${formatTime(timer)}` : "Resend Code"}
+                        </button>
+                    )}
 
                 </motion.div>
             </div>

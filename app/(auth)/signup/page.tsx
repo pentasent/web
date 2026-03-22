@@ -40,9 +40,11 @@ function SignUpForm() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const { register: authRegister, setUnverifiedEmail } = useAuth();
+  const { register: authRegister, setUnverifiedEmail, setOtpType } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const TIMER_KEY = "signup_timer_end";
   const router = useRouter();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<SignUpFormValues>({
@@ -65,7 +67,46 @@ function SignUpForm() {
     }
   }, [searchParams]);
 
+  // Persistent timer initialization
+  useEffect(() => {
+    const storedTimerEnd = localStorage.getItem(TIMER_KEY);
+    if (storedTimerEnd) {
+      const endTime = parseInt(storedTimerEnd, 10);
+      const remaining = Math.ceil((endTime - Date.now()) / 1000);
+      if (remaining > 0) {
+        setTimer(remaining);
+      } else {
+        localStorage.removeItem(TIMER_KEY);
+      }
+    }
+  }, []);
+
+  // Timer interval
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            localStorage.removeItem(TIMER_KEY);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
   const onSubmit = async (data: SignUpFormValues) => {
+    if (timer > 0) return;
+
     if (!agreedToTerms) {
       toast({
         title: "Agreement required",
@@ -82,10 +123,17 @@ function SignUpForm() {
         Campain: "Promotion From Web"
       };
       await authRegister(data.email.toLowerCase().trim(), data.password, metadata);
+      
+      // Set persistent timer
+      const endTime = Date.now() + 120 * 1000;
+      localStorage.setItem(TIMER_KEY, endTime.toString());
+      setTimer(120);
+
       toast({
         title: "Account created!",
         description: "Please check your email for the confirmation code.",
       });
+      setOtpType('signup');
       setUnverifiedEmail(data.email);
       reset();
     } catch (error: any) {
@@ -100,11 +148,11 @@ function SignUpForm() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="w-full overflow-hidden grid lg:grid-cols-2"
+    <div
+      // initial={{ opacity: 0, y: 30 }}
+      // animate={{ opacity: 1, y: 0 }}
+      // transition={{ duration: 0.6 }}
+      className="w-full max-w-7xl mx-auto min-h-screen overflow-hidden grid lg:grid-cols-2"
     // className="w-full max-w-6xl bg-white rounded-3xl shadow-md overflow-hidden grid lg:grid-cols-2"
     >
       {/* ================= LEFT SIDE ================= */}
@@ -196,10 +244,16 @@ function SignUpForm() {
           {/* Sign Up Button */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (timer > 0)}
             className="w-full py-4 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex justify-center items-center disabled:opacity-70"
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : timer > 0 ? (
+              `Resend in ${formatTime(timer)}`
+            ) : (
+              "Create Account"
+            )}
           </button>
 
         </form>
@@ -285,6 +339,6 @@ function SignUpForm() {
         </div>
       </div>
 
-    </motion.div>
+    </div>
   );
 }

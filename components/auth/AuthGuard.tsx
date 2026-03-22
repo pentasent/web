@@ -15,7 +15,7 @@ export default function AuthGuard() {
     const router = useRouter();
 
     useEffect(() => {
-        const isAuthPage = pathname === '/signin' || pathname === '/signup';
+        const isAuthPage = pathname === '/signin' || pathname === '/signup' || pathname === '/reset-password';
 
         // 1. FAST REDIRECT: Use initialAuthHint to pivot away from auth pages immediately
         if (isAuthPage && initialAuthHint && !user && loading) {
@@ -25,7 +25,7 @@ export default function AuthGuard() {
 
         // 2. CONFIRMED REDIRECT: Logic for authenticated users
         if (user) {
-            if (isAuthPage) {
+            if (pathname === '/signin' || pathname === '/signup') {
                 router.push('/app/feed');
             }
         }
@@ -59,8 +59,10 @@ export default function AuthGuard() {
     // If there's no auth user at all, don't show profile/community popups
     if (!user) return null;
 
+    // If on reset-password, don't show popups, let the page handle the "New Password" form
+    if (pathname === '/reset-password') return null;
+
     // 2. Profile Setup
-    // User needs profile if: not verified OR name is still the email prefix
     const needsProfile = !user.is_verified || user.name === user.email?.split('@')[0];
 
     if (needsProfile) {

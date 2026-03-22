@@ -21,7 +21,6 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 
 export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [showForgotModal, setShowForgotModal] = useState(false);
   const { login, setUnverifiedEmail } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -35,10 +34,18 @@ export default function SignInPage() {
     setLoading(true);
     try {
       await login(data.email.toLowerCase().trim(), data.password);
+      
+      // The session is now active. AuthContext will update 'user' state.
+      // But we can check the public state directly if needed, or wait for refresh.
+      // However, we'll let the AuthGuard/Feed page handle the onboarding popups, 
+      // or we can do a quick check here.
+      
       toast({
         title: "Login successful",
         description: "Login successful, redirecting...",
       });
+      
+      // Redirect to feed - the feed page or a global guard should handle the onboarding/verification popups
       router.push('/app/feed');
       reset();
     } catch (error: any) {
@@ -67,7 +74,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="w-full min-h-screen overflow-hidden grid lg:grid-cols-2">
+    <div className="w-full max-w-7xl mx-auto min-h-screen overflow-hidden grid lg:grid-cols-2">
 
       {/* ================= LEFT SIDE ================= */}
       <div className="p-10 md:p-14">
@@ -122,13 +129,12 @@ export default function SignInPage() {
 
           {/* Forgot Password */}
           <div className="text-right">
-            <button
-              type="button"
-              onClick={() => setShowForgotModal(true)}
+            <Link
+              href="/reset-password"
               className="text-sm text-[#6b4c5c] hover:underline"
             >
               Forgot password?
-            </button>
+            </Link>
           </div>
 
           {/* Sign In Button */}
@@ -195,229 +201,9 @@ export default function SignInPage() {
         </div>
       </div>
 
-      {/* ================= FORGOT PASSWORD MODAL ================= */}
-      <AnimatePresence>
-        {showForgotModal && (
-          <ForgotPasswordModal onClose={() => setShowForgotModal(false)} />
-        )}
-      </AnimatePresence>
+      {/* ================= FORGOT PASSWORD MODAL REMOVED ================= */}
     </div>
   );
 }
 
-/* ================= FORGOT PASSWORD MODAL ================= */
-const COOLDOWN_KEY = 'pentasent_forgot_pwd_cooldown';
-const FORGOT_EMAIL_KEY = 'pentasent_forgot_pwd_email';
-
-function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotLoading, setForgotLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-  const { toast } = useToast();
-
-  const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail.trim());
-
-  // Restore cooldown and email from localStorage on mount
-  useEffect(() => {
-    const storedCooldown = localStorage.getItem(COOLDOWN_KEY);
-    const storedEmail = localStorage.getItem(FORGOT_EMAIL_KEY);
-    
-    if (storedEmail) {
-      setForgotEmail(storedEmail);
-    }
-
-    if (storedCooldown) {
-      const expiresAt = parseInt(storedCooldown, 10);
-      const remaining = Math.floor((expiresAt - Date.now()) / 1000);
-      if (remaining > 0) {
-        setCooldown(remaining);
-        setEmailSent(true); // They already sent one
-      } else {
-        localStorage.removeItem(COOLDOWN_KEY);
-      }
-    }
-  }, []);
-
-  // Cooldown timer
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (cooldown > 0) {
-      interval = setInterval(() => {
-        setCooldown((prev) => {
-          if (prev <= 1) {
-            localStorage.removeItem(COOLDOWN_KEY);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [cooldown]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  const handleForgotPassword = async () => {
-    if (!isValidEmail) return;
-
-    // Check if still in cooldown
-    if (cooldown > 0) {
-      toast({
-        title: "Please wait",
-        description: `You can resend in ${formatTime(cooldown)}. Please check your email.`,
-      });
-      return;
-    }
-
-    const email = forgotEmail.trim().toLowerCase();
-
-    setForgotLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/reset-password`,
-      });
-
-      if (error) throw error;
-
-      // Start 2-minute cooldown and persist to localStorage
-      const expiresAt = Date.now() + 120 * 1000;
-      localStorage.setItem(COOLDOWN_KEY, expiresAt.toString());
-      localStorage.setItem(FORGOT_EMAIL_KEY, email);
-      setCooldown(120);
-      setEmailSent(true);
-      
-      toast({
-        title: "Link Sent",
-        description: "A new password reset link has been sent to your email.",
-      });
-    } catch (e: any) {
-      toast({
-        title: "Error",
-        description: e.message || "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setForgotLoading(false);
-    }
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="bg-white max-w-md w-full rounded-2xl shadow-2xl p-8 relative"
-      >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-50 p-2 w-10 h-10 flex items-center justify-center rounded-full transition"
-        >
-          ✕
-        </button>
-
-        {emailSent ? (
-          /* ===== SUCCESS STATE ===== */
-          <div className="text-center py-4">
-            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-5">
-              <Mail className="w-7 h-7 text-green-600" />
-            </div>
-            <h3 className="text-2xl font-semibold text-[#3c2a34] mb-3">
-              Check your email
-            </h3>
-            <p className="text-gray-500 mb-6 leading-relaxed">
-              If an account exists with{' '}
-              <span className="font-medium text-gray-800">{forgotEmail}</span>,
-              you will receive a password reset link shortly.
-            </p>
-            <div className="bg-[#f9f5f7] border border-[#e8d4df] rounded-xl p-4 mb-6 text-left">
-              <p className="text-sm text-gray-600">
-                {`\uD83D\uDCA1 Didn\u2019t receive an email? Check your spam folder, or make sure the email address is correct.`}
-              </p>
-            </div>
-
-            {/* Resend button with cooldown */}
-            <button
-              onClick={handleForgotPassword}
-              disabled={cooldown > 0 || forgotLoading || !isValidEmail}
-              className="w-full py-3.5 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all flex items-center justify-center disabled:opacity-50 mb-3"
-            >
-              {forgotLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : cooldown > 0 ? (
-                `Resend in ${formatTime(cooldown)}`
-              ) : (
-                "Resend Reset Link"
-              )}
-            </button>
-
-            <button
-              onClick={onClose}
-              className="w-full py-3.5 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition"
-            >
-              Back to Sign In
-            </button>
-          </div>
-        ) : (
-          /* ===== EMAIL INPUT STATE ===== */
-          <>
-            <h3 className="text-2xl font-semibold text-[#3c2a34] mb-2">
-              Reset Password
-            </h3>
-
-            <p className="text-gray-500 mb-6 leading-relaxed text-sm">
-              {`Enter the email address associated with your account and we\u2019ll send you a link to reset your password.`}
-            </p>
-
-            {/* Email Input */}
-            <div className="relative mb-6">
-              <Mail className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && isValidEmail && handleForgotPassword()}
-                className="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#e8d4df] outline-none transition"
-                autoFocus
-              />
-            </div>
-
-            <button
-              onClick={handleForgotPassword}
-              disabled={forgotLoading || !isValidEmail || cooldown > 0}
-              className="w-full py-3.5 rounded-xl bg-[#3d2f4d] text-white font-medium hover:bg-[#2d1f3d] transition-all flex items-center justify-center disabled:opacity-60 mb-4"
-            >
-              {forgotLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : cooldown > 0 ? (
-                `Resend in ${formatTime(cooldown)}`
-              ) : (
-                "Send Reset Link"
-              )}
-            </button>
-
-            <p className="text-center text-sm text-gray-500">
-              {`Don\u2019t have an account? `}
-              <Link href="/signup" className="text-[#3d2f4d] font-medium hover:underline">
-                Sign Up
-              </Link>
-            </p>
-          </>
-        )}
-      </motion.div>
-    </motion.div>
-  );
-}
+// Removed ForgotPasswordModal and related constants
