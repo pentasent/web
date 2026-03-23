@@ -45,8 +45,17 @@ export const metadata: Metadata = {
         alt: "Pentasent"
       }
     ]
+  },
+  other: {
+    "al:android:package": "com.pentasent.app",
+    "al:android:app_name": "Pentasent",
+    "al:ios:bundle_id": "com.pentasent.app",
+    "al:ios:app_name": "Pentasent",
+    "twitter:app:name:iphone": "Pentasent",
+    "twitter:app:id:iphone": "com.pentasent.app",
+    "twitter:app:name:googleplay": "Pentasent",
+    "twitter:app:id:googleplay": "com.pentasent.app",
   }
-
 };
 
 import { NotificationProvider } from '@/contexts/NotificationContext';
