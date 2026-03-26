@@ -1,5 +1,6 @@
 
-const STORAGE_BASE_URL = process.env.EXPO_PUBLIC_STORAGE_BASE_URL || "https://api.pentasent.com/storage/v1/object/public";
+const STORAGE_BASE_URL = process.env.EXPO_PUBLIC_STORAGE_BASE_URL || "https://cdn.pentasent.com/storage/object/public";
+// const STORAGE_BASE_URL = process.env.EXPO_PUBLIC_STORAGE_BASE_URL || "https://api.pentasent.com/storage/v1/object/public";
 const BUCKET = process.env.EXPO_PUBLIC_BUCKET || "avatars";
 
 /**
