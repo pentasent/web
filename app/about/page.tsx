@@ -1,7 +1,6 @@
 "use client";
 
 import Footer from "@/components/layout/footer";
-import { GlobalLayout } from "@/components/layout/global-layout";
 import Navbar from "@/components/layout/navbar";
 import { SmartImage } from "@/components/ui/SmartImage";
 import { motion } from "framer-motion";
@@ -12,16 +11,11 @@ import {
   Brain,
   Headphones,
   Activity,
-  ChevronRight,
-  Trophy,
   Sparkles,
-  ShieldCheck,
   Cpu,
   Zap
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useState } from "react";
 
 /* ================= DATA ================= */
 
@@ -171,18 +165,18 @@ export default function AboutPage() {
                 <div className="relative mb-6">
                   {/* Circular Image Container */}
                   <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-white shadow-lg group-hover:scale-110 transition-transform duration-500 relative z-10">
-                    {/* <Image
+                    <Image
                       src={product.image}
                       alt={product.name}
                       fill
                       className="object-cover"
-                    /> */}
-                    <SmartImage
+                    />
+                    {/* <SmartImage
                             src={product.image}
                             alt={product.name}
                             className="object-cover"
                             fallbackIconSize={20}
-                        />
+                        /> */}
                   </div>
                   {/* Hover Reveal Card */}
                   <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 max-w-[calc(100vw-40px)] p-6 bg-white rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:-translate-y-2 transition-all duration-300 z-[20] border border-gray-100 text-left pointer-events-none group-hover:pointer-events-auto`}>
@@ -230,20 +224,20 @@ export default function AboutPage() {
               initial={{ opacity: 0, scale: 0.98 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative h-[300px] md:h-[470px] w-full rounded-[32px] overflow-hidden shadow-xl"
+              className="relative h-[300px] md:h-[470px] w-full rounded-[32px] overflow-hidden"
             >
-              {/* <Image
+              <Image
                 src="/images/office/main_office.svg"
                 alt="Main Office"
                 fill
                 className="object-cover transition-transform duration-300 hover:scale-110"
-              /> */}
-              <SmartImage
+              />
+              {/* <SmartImage
                             src="/images/office/main_office.svg"
                             alt="Main Office"
                             className="object-cover transition-transform duration-300 hover:scale-110"
                             fallbackIconSize={48}
-                        />
+                        /> */}
             </motion.div>
 
             {/* 3 Smaller Images */}
@@ -257,20 +251,20 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="relative h-48 rounded-2xl overflow-hidden shadow-md"
+                  className="relative h-48 rounded-2xl overflow-hidden"
                 >
-                  {/* <Image
+                  <Image
                     src={`/images/office/${id}.svg`}
                     alt={`Gallery ${i}`}
                     fill
                     className="object-cover transition-transform duration-300 hover:scale-110"
-                  /> */}
-                  <SmartImage
+                  />
+                  {/* <SmartImage
                             src={`/images/office/${id}.svg`}
                             alt={`Gallery ${i}`}
                             className="object-cover transition-transform duration-300 hover:scale-110"
                             fallbackIconSize={20}
-                        />
+                        /> */}
                 </motion.div>
               ))}
             </div>

@@ -87,6 +87,7 @@ export default function ArticlesSection() {
               className="group cursor-pointer"
             >
               {/* Image */}
+              <a href='/articles' >
               <div className="relative rounded-2xl overflow-hidden mb-5">
                 <Image 
                   src={article.image}
@@ -96,7 +97,7 @@ export default function ArticlesSection() {
                   height={500}
                   />
               </div>
-
+              </a>
                 {/* Category Tag */}
                 <span className=" bg-[#3e2f7d] text-white text-xs px-3 py-1 rounded-full">
                   {article.category}

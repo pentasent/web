@@ -182,7 +182,7 @@ export default function ArticlesPage() {
                 {/* FEATURED ARTICLE */}
                 {featured && (
                   <Link href={`/articles/${featured.slug}`} className="group space-y-6">
-                    <div className="relative w-full h-[320px] rounded-3xl overflow-hidden shadow-md bg-gray-100 flex items-center justify-center">
+                    <div className="relative w-full h-[320px] rounded-3xl overflow-hidden bg-gray-100 flex items-center justify-center">
                       <ImageIcon className="text-gray-300 absolute" size={48} />
                       <SmartImage
                         src={featured.banner_image || ""}

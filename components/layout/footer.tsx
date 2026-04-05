@@ -116,7 +116,7 @@ export default function Footer() {
               Download the Pentasent app
             </p> */}
             <div className="flex flex-col sm:flex-row gap-4 w-fit sm:w-auto">
-              <a href='/beta-release'>
+              <a href='https://play.google.com/store/apps/details?id=com.pentasent.app'>
                 <div className="bg-[#3d2f4d] text-white px-6 py-3 rounded-lg flex items-center gap-3 cursor-pointer hover:bg-[#4b2a3f] transition-colors">
                   <div className="text-md">
                     <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">

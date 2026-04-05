@@ -37,6 +37,7 @@ export const metadata: Metadata = {
     description: "Build healthy habits and find your rhythm with personalized communities that understands your unique journey.",
     url: "https://pentasent.com",
     type: "website",
+    siteName: "Pentasent",
     images: [
       {
         url: "https://pentasent.com/social/home_banner.png", // Use an absolute URL

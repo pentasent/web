@@ -198,7 +198,7 @@ export default function EditProfilePage() {
 
                             <div className="p-1.5 border-2 border-warm-100 rounded-[2rem] bg-white transition-transform group-hover:scale-[1.02]">
                                 <Avatar className="h-32 w-32 rounded-[1.8rem] border border-warm-200">
-                                    <AvatarImage src={avatarUrl || "https://api.pentasent.com/storage/v1/object/public/avatars/placeholders/icon.png"} />
+                                    <AvatarImage src={avatarUrl || "https://cdn.pentasent.com/storage/object/public/avatars/placeholders/icon.png"} />
                                     <AvatarFallback className="text-4xl bg-warm-50 text-[#3d2f4d] font-serif">
                                         {name.charAt(0).toUpperCase() || "U"}
                                     </AvatarFallback>

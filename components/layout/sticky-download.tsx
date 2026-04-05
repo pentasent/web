@@ -57,8 +57,8 @@ export const StickyDownload = () => {
                     <div className="text-sm text-white/90">Download now and start your wellness journey</div>
                   </div>
                 </div>
-                <a href='/beta-release'>
-                {/* <a href='https://play.google.com/store/apps/details?id=com.pentasent.app'> */}
+                {/* <a href='/beta-release'> */}
+                <a href='https://play.google.com/store/apps/details?id=com.pentasent.app'>
                 <div className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg flex items-center gap-3 cursor-pointer transition-colors w-fit sm:w-auto">
                   <div className="text-md">
                     <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">

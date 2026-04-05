@@ -141,7 +141,7 @@ const content = {
     badgeColor: 'bg-[#c7956e]',
     title: 'Move with awareness and strength.',
     icon: Activity,
-    link: '/beta-release',
+    link: '/articles',
     linktext: "Learn More",
     description:
       'Structured yoga flows and breathwork designed to support flexibility, hormonal balance, and long-term vitality.',

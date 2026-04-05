@@ -118,7 +118,7 @@ export default function ProfilePage() {
               <AvatarImage
                 src={
                   user.avatar_url ||
-                  'https://api.pentasent.com/storage/v1/object/public/avatars/placeholders/icon.png'
+                  'https://cdn.pentasent.com/storage/object/public/avatars/placeholders/icon.png'
                 }
               />
               <AvatarFallback className="bg-warm-100 text-warm-800 text-3xl font-serif">

@@ -10,6 +10,11 @@ Disallow: /admin/
 Disallow: /private/
 Disallow: /auth/*
 Disallow: /security/*
+Disallow: /app/*
+Disallow: /reset-password/
+Disallow: /signup/
+Disallow: /signin/
+Disallow: /help/delete-account/
 
 # Allow access to important assets like CSS, JS, and images
 Allow: /*.css$

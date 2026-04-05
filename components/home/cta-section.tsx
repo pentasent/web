@@ -44,7 +44,7 @@ export default function CTASection() {
             </div> */}
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mt-8">
 
-              <a href="/beta-release" className="w-full sm:w-auto">
+              <a href="https://play.google.com/store/apps/details?id=com.pentasent.app" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-[#3d2f4d] text-white px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-[#2d1f3d] transition-all">
                   Get the app
                 </button>

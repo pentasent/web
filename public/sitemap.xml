@@ -35,5 +35,12 @@
         <lastmod>2026-03-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>1.0</priority>
+    </url> 
+        </url>   
+        <url>
+        <loc>https://pentasent.com/articles</loc>
+        <lastmod>2026-04-06</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
     </url>         
 </urlset>

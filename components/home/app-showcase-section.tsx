@@ -99,7 +99,7 @@ export default function AppShowcaseSection() {
                 Dive into real-time chatstreams where women connect,
                 support each other, and grow together daily.
               </p>
-              <a href='/beta-release'>
+              <a href='/app/chats'>
               <button className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium group w-fit border-2 border-gray-100 py-2.5 px-5 rounded-full mb-10">
                 Enter chat
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
