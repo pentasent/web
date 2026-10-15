@@ -10,7 +10,7 @@ async function getCommunityData(slug: string): Promise<{
   community: CommunityDetailDTO | null;
   allCommunities: PublicCommunityDTO[];
 }> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+  const apiUrl = process.env.API_URL || 'http://localhost:5000/api/v1';
   try {
     const [detailRes, listRes] = await Promise.all([
       fetch(`${apiUrl}/communities/slug/${slug}`, { cache: 'no-store' }),
@@ -63,8 +63,8 @@ export async function generateMetadata({
       images: community.bannerUrl
         ? [{ url: community.bannerUrl }]
         : community.iconUrl
-        ? [{ url: community.iconUrl }]
-        : [],
+          ? [{ url: community.iconUrl }]
+          : [],
       type: 'website',
     },
   };
