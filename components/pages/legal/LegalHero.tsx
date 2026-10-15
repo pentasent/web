@@ -26,8 +26,8 @@ export default function LegalHero({ hero, iconType = 'shield' }: LegalHeroProps)
   };
 
   return (
-    <section className="relative w-full bg-border-background mt-20 py-12 sm:py-16 lg:py-20">
-      <div className="mx-auto max-w-5xl px-4 sm:px-8 lg:px-12">
+    <section className="relative w-full bg-border-background py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-4xl px-4 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}

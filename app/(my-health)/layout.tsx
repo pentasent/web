@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Navbar from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import MyHealthNavTabs from '@/components/my-health/MyHealthNavTabs';
+import MyHealthAuthGuard from '@/components/my-health/MyHealthAuthGuard';
 
 export const metadata: Metadata = {
   title: "My Health | Pentasent",
@@ -34,13 +35,15 @@ export default function MyHealthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#faf7f4] text-foreground">
-      <Navbar />
-      <MyHealthNavTabs />
-      <div className="flex-1 w-full bg-[#faf7f4]">
-        {children}
+    <MyHealthAuthGuard>
+      <div className="min-h-screen flex flex-col bg-[#faf7f4] text-foreground">
+        <Navbar />
+        <MyHealthNavTabs />
+        <div className="flex-1 w-full bg-[#faf7f4]">
+          {children}
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </MyHealthAuthGuard>
   );
 }

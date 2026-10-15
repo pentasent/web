@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function OpenRolesPage() {
   return (
-    <main className="min-h-screen bg-white pt-20">
+    <main className="min-h-screen bg-white">
       {/* Top Candidate Safety Banner in bg-border-background as requested */}
       <div className="w-full bg-border-background border-b border-[#e5e0dc] py-3 px-4 text-center">
         <p className="text-[13px] sm:text-[14px] font-medium text-[#2f0036] max-w-5xl mx-auto">

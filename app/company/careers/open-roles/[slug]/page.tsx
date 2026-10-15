@@ -5,6 +5,8 @@ import { JOB_OPENINGS, CANDIDATE_SAFETY_BANNER } from '@/data/jobs';
 import type { JobDetailPageProps, JobOpening } from '@/types/jobs';
 import JobDetailView from '@/components/pages/careers/open-roles/JobDetailView';
 
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   return JOB_OPENINGS.map((job) => ({
     slug: job.slug,
@@ -15,7 +17,7 @@ async function getJob(slug: string): Promise<JobOpening | null> {
   try {
     const apiUrl = process.env.API_URL || 'http://localhost:5000/api/v1';
     const res = await fetch(`${apiUrl}/jobs/slug/${slug}`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
     });
     if (res.ok) {
       const json = await res.json();
@@ -62,7 +64,7 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-white pt-20">
+    <main className="min-h-screen bg-white">
       {/* Top Candidate Safety Banner in bg-border-background */}
       <div className="w-full bg-border-background border-b border-[#e5e0dc] py-3 px-4 text-center">
         <p className="text-[13px] sm:text-[14px] font-medium text-[#2f0036] max-w-5xl mx-auto">

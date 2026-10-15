@@ -9,6 +9,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/context/auth-context';
 
 import {
   type RouteNavConfig,
@@ -130,6 +131,9 @@ export default function Navbar({
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [showWhiteNav, setShowWhiteNav] = useState(false);
   const pathname = usePathname();
+
+  const { user, status, isAuthenticated } = useAuth();
+  const isLoggedIn = status === 'authenticated' && Boolean(user) && isAuthenticated;
 
   const {
     resolvedBg,
@@ -280,32 +284,34 @@ export default function Navbar({
 
               {/* Scrollable Body Content */}
               <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 space-y-6">
-                {/* 1. Featured Option: My Health */}
-                <Link
-                  href={DRAWER_FEATURED_ITEM.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="group flex items-center justify-between p-3.5 rounded-xl bg-gradient-to-r from-[#4a0139]/8 via-[#4a0139]/4 to-transparent border border-[#4a0139]/20 hover:border-primary hover:bg-[#4a0139]/10 transition-all shadow-2xs"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#4a0139] text-white shadow-2xs">
-                      <HeartPulse size={20} strokeWidth={2.2} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[15px] font-bold text-[#171317] tracking-tight">
-                          {DRAWER_FEATURED_ITEM.label}
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-[#4a0139] text-white">
-                          {DRAWER_FEATURED_ITEM.badge}
-                        </span>
+                {/* 1. Featured Option: My Health (Shown only when logged in with valid token) */}
+                {isLoggedIn && (
+                  <Link
+                    href={DRAWER_FEATURED_ITEM.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="group flex items-center justify-between p-3.5 rounded-xl bg-gradient-to-r from-[#4a0139]/8 via-[#4a0139]/4 to-transparent border border-[#4a0139]/20 hover:border-primary hover:bg-[#4a0139]/10 transition-all shadow-2xs"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#4a0139] text-white shadow-2xs">
+                        <HeartPulse size={20} strokeWidth={2.2} />
                       </div>
-                      <p className="text-[12px] text-[#6b6267] truncate mt-0.5">
-                        {DRAWER_FEATURED_ITEM.description}
-                      </p>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[15px] font-bold text-[#171317] tracking-tight">
+                            {DRAWER_FEATURED_ITEM.label}
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-[#4a0139] text-white">
+                            {DRAWER_FEATURED_ITEM.badge}
+                          </span>
+                        </div>
+                        <p className="text-[12px] text-[#6b6267] truncate mt-0.5">
+                          {DRAWER_FEATURED_ITEM.description}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <ChevronRight size={18} className="text-[#4a0139] shrink-0 transition-transform group-hover:translate-x-1" />
-                </Link>
+                    <ChevronRight size={18} className="text-[#4a0139] shrink-0 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                )}
 
                 {/* 2. Structured Navigation Sections */}
                 {DRAWER_MENU_SECTIONS.map((section, sIdx) => (
