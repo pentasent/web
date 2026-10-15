@@ -6,6 +6,8 @@ import "@/styles/shadow.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
 import { GoogleFonts } from "@/fonts";
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 export const metadata: Metadata = {
@@ -79,6 +81,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </AuthProvider>
         <ChatBot />
         <Toaster />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

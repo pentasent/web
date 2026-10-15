@@ -1,0 +1,11 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.pentasent.app",
+      "sha256_cert_fingerprints":
+        ["C5:C9:F8:3D:CD:12:E5:3B:17:DB:DA:B2:1E:FF:39:B9:E3:3D:A3:2C:DD:01:21:0E:A4:1D:4B:38:1C:33:A4:C9"]
+    }
+  }
+]
