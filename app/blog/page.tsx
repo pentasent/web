@@ -118,9 +118,8 @@ function BlogContent() {
 
 export default function BlogPage() {
   return (
-    // <Suspense fallback={null}>
-    //   <BlogContent />
-    // </Suspense>
-    <BlogContent />
+    <Suspense fallback={null}>
+      <BlogContent />
+    </Suspense>
   );
 }
