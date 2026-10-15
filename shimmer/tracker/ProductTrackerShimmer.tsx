@@ -14,8 +14,12 @@ export function ProductsListShimmer() {
     >
       {[1, 2, 3, 4, 5].map((idx) => (
         <div key={idx} className="py-6 sm:py-7 flex items-start gap-4 sm:gap-6">
-          {/* Logo Skeleton */}
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#faf8f6] animate-shimmer shrink-0 border border-[#f0ece9]" />
+          {/* Logo / Monogram & Mobile Upvote Column Skeleton */}
+          <div className="shrink-0 flex flex-col items-center gap-2">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-[#faf8f6] animate-shimmer shrink-0 border border-[#f0ece9]" />
+            {/* Mobile Upvote Button Skeleton (Under Product Image) */}
+            <div className="sm:hidden w-14 h-11 rounded-lg bg-[#faf8f6] animate-shimmer border border-[#f0ece9]" />
+          </div>
 
           {/* Details Skeleton */}
           <div className="flex-1 min-w-0 space-y-2.5">
@@ -41,8 +45,8 @@ export function ProductsListShimmer() {
             </div>
           </div>
 
-          {/* Upvote Button Skeleton */}
-          <div className="shrink-0 flex flex-col items-center justify-center w-12 h-14 sm:w-14 sm:h-16 rounded-xl bg-[#faf8f6] animate-shimmer border border-[#f0ece9]" />
+          {/* Desktop Upvote Button Skeleton (Large screen) */}
+          <div className="hidden sm:flex shrink-0 self-center flex-col items-center justify-center sm:min-w-[58px] sm:h-16 rounded-lg bg-[#faf8f6] animate-shimmer border border-[#f0ece9]" />
         </div>
       ))}
     </div>

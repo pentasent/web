@@ -186,7 +186,7 @@ function JobsContent() {
             className="object-cover object-center opacity-30 mix-blend-screen"
           />
           {/* Bottom Fade Gradient for smooth transition */}
-          <div className="absolute inset-x-0 h-full bg-linear-to-r from-black/40 via-secondary/60 to-transparent" />
+          <div className="absolute inset-x-0 h-full bg-linear-to-r from-black/60 via-secondary/60 to-transparent" />
         </div>
 
         {/* Main Hero Content (Fade + Blur + Scale Animation matching Press Hero) */}
@@ -742,9 +742,8 @@ function JobsFallback() {
 
 export default function GlobalJobsPage() {
   return (
-    // <Suspense fallback={<JobsFallback />}>
-    //   <JobsContent />
-    // </Suspense>
-    <JobsContent />
+    <Suspense fallback={null}>
+      <JobsContent />
+    </Suspense>
   );
 }

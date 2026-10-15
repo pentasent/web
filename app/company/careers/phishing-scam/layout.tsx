@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://pentasent.com/assets/images/banners/phishing_scam_banner.png", // Use an absolute URL
+        url: "https://pentasent.com/assets/images/banners/phishing_scam.png", // Use an absolute URL
         width: 1200,
         height: 630,
         alt: "Pentasent Careers - Phishing Scam"

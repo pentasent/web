@@ -1,9 +1,8 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { BookOpen, Microscope, ArrowRight, FileText } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { RESEARCH_HERO_DATA, RESEARCH_PROCESS_DATA } from '@/data/research';
 
 export default function ResearchPage() {
@@ -43,7 +42,7 @@ export default function ResearchPage() {
         </div>
 
         {/* Publications Callout */}
-        <div className="mt-12 rounded-2xl bg-gradient-to-r from-[#4a0139] to-[#300025] text-white p-8 sm:p-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="mt-12 rounded-2xl bg-linear-to-r from-[#4a0139] to-[#300025] text-white p-8 sm:p-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
             <h2 className="text-[22px] sm:text-[26px] font-bold tracking-tight">
               Looking for clinical trial publications & open science?

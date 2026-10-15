@@ -110,24 +110,50 @@ export default function ProductCard({
     >
       <div className="flex flex-col w-full">
         <div className="pt-6 sm:pt-7 pb-2.5 transition-colors cursor-pointer w-full flex items-start gap-4 sm:gap-5">
-          {/* Logo / Monogram */}
-          <Link href={targetHref} className="shrink-0 mt-0.5">
-            <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-[#faf9f8] border-2 border-[#e8e4e1] flex items-center justify-center transition-transform group-hover:scale-102">
-              {product.logoUrl ? (
-                <Image
-                  src={product.logoUrl}
-                  alt={product.name}
-                  fill
-                  sizes="120px"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-[#f4ddf0] to-[#e4c4dc] text-primary font-bold text-[20px] sm:text-[22px]">
-                  {product.name.charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
-          </Link>
+          {/* Logo / Monogram & Mobile Upvote Column */}
+          <div className="shrink-0 flex flex-col items-center gap-2">
+            <Link href={targetHref} className="shrink-0 mt-0.5">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-[#faf9f8] border-2 border-[#e8e4e1] flex items-center justify-center transition-transform group-hover:scale-102">
+                {product.logoUrl ? (
+                  <Image
+                    src={product.logoUrl}
+                    alt={product.name}
+                    fill
+                    sizes="120px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-[#f4ddf0] to-[#e4c4dc] text-primary font-bold text-[20px] sm:text-[22px]">
+                    {product.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+            </Link>
+
+            {/* Upvote Button on Mobile (Under Product Image) */}
+            {!isOwner && (
+              <div className="block sm:hidden w-full">
+                <button
+                  type="button"
+                  onClick={handleUpvoteClick}
+                  disabled={isSubmittingVote}
+                  title={upvoted ? 'Remove upvote' : 'Upvote this product'}
+                  className={`w-full flex flex-col items-center justify-center min-w-[52px] px-2 py-1.5 rounded-lg border transition-all cursor-pointer select-none ${upvoted
+                      ? 'bg-primary text-white border-primary shadow-xs'
+                      : 'bg-[#faf9f8] hover:bg-white text-foreground hover:text-primary border-[#ded9d5] hover:border-primary/50'
+                    }`}
+                >
+                  <ChevronUp
+                    size={18}
+                    className={`transition-transform ${upvoted ? 'stroke-[2.5]' : 'stroke-2 group-hover:-translate-y-0.5'}`}
+                  />
+                  <span className="text-[12px] font-bold mt-0.5">
+                    {upvotes}
+                  </span>
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Details Body */}
           <div className="flex-1 min-w-0">
@@ -209,15 +235,15 @@ export default function ProductCard({
             </Link>
           </div>
 
-          {/* Upvote Button (Product Hunt Style, Minimal Pentasent Theme) */}
+          {/* Upvote Button on Large Screens (Right Column) */}
           {!isOwner && (
-            <div className="shrink-0 self-center">
+            <div className="hidden sm:block shrink-0 self-center">
               <button
                 type="button"
                 onClick={handleUpvoteClick}
                 disabled={isSubmittingVote}
                 title={upvoted ? 'Remove upvote' : 'Upvote this product'}
-                className={`flex flex-col items-center justify-center min-w-[52px] sm:min-w-[58px] px-2.5 py-2 sm:py-2.5 rounded-lg border transition-all cursor-pointer select-none ${upvoted
+                className={`flex flex-col items-center justify-center min-w-[58px] px-2.5 py-2.5 rounded-lg border transition-all cursor-pointer select-none ${upvoted
                     ? 'bg-primary text-white border-primary shadow-xs'
                     : 'bg-[#faf9f8] hover:bg-white text-foreground hover:text-primary border-[#ded9d5] hover:border-primary/50'
                   }`}
@@ -226,7 +252,7 @@ export default function ProductCard({
                   size={19}
                   className={`transition-transform ${upvoted ? 'stroke-[2.5]' : 'stroke-2 group-hover:-translate-y-0.5'}`}
                 />
-                <span className="text-[12px] sm:text-[13px] font-bold mt-0.5">
+                <span className="text-[13px] font-bold mt-0.5">
                   {upvotes}
                 </span>
               </button>

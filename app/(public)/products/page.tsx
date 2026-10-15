@@ -210,7 +210,7 @@ function ProductsContent() {
             sizes="100vw"
             className="object-cover object-center opacity-30 mix-blend-screen"
           />
-          <div className="absolute inset-x-0 h-full bg-linear-to-r from-black/40 via-secondary/60 to-transparent" />
+          <div className="absolute inset-x-0 h-full bg-linear-to-r from-black/60 via-secondary/60 to-transparent" />
         </div>
 
         <motion.div
@@ -698,9 +698,8 @@ function ProductsFallback() {
 
 export default function ProductsPage() {
   return (
-    <ProductsContent />
-    // <Suspense fallback={<ProductsFallback />}>
-    //   <ProductsContent />
-    // </Suspense>
+    <Suspense fallback={null}>
+      <ProductsContent />
+    </Suspense>
   );
 }

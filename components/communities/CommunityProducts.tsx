@@ -68,12 +68,16 @@ export default function CommunityProducts({
         <div className="rounded-none sm:rounded-lg border-x-0 border-t-0 sm:border border-b border-[#ded5cd] bg-white divide-y divide-[#ded5cd] overflow-hidden">
           {[1, 2].map((idx) => (
             <div key={idx} className="p-4 sm:p-5 flex items-start gap-4">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#faf8f6] animate-shimmer shrink-0" />
+              <div className="shrink-0 flex flex-col items-center gap-2">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#faf8f6] animate-shimmer shrink-0" />
+                <div className="sm:hidden w-14 h-11 rounded-lg bg-[#faf8f6] animate-shimmer border border-[#f0ece9]" />
+              </div>
               <div className="flex-1 space-y-2">
                 <div className="h-4 w-48 rounded bg-[#faf8f6] animate-shimmer" />
                 <div className="h-3.5 w-3/4 rounded bg-[#faf8f6] animate-shimmer" />
                 <div className="h-3 w-1/3 rounded bg-[#faf8f6] animate-shimmer" />
               </div>
+              <div className="hidden sm:flex shrink-0 self-center flex-col items-center justify-center sm:min-w-[58px] sm:h-16 rounded-lg bg-[#faf8f6] animate-shimmer border border-[#f0ece9]" />
             </div>
           ))}
         </div>
