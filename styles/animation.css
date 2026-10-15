@@ -1,0 +1,141 @@
+/* App Animations */
+
+
+/* ================================ Music Notes Start ====================================== */
+.noot-1,
+.noot-2,
+.noot-3,
+.noot-4 {
+    position: absolute;
+    animation: notes 2s infinite linear;
+    font-size: 20px;
+    opacity: 0;
+}
+
+.noot-1 {
+    /* top: 60px; */
+    left: 0;
+    animation-delay: 0.5s;
+}
+
+.noot-2 {
+    /* top: 30px; */
+    left: 30%;
+    animation-delay: 1s;
+}
+
+.noot-3 {
+    /* top: 90px; */
+    left: 60%;
+    animation-delay: 1.5s;
+}
+
+.noot-4 {
+    /* top: 40px; */
+    left: 90%;
+    animation-delay: 2s;
+}
+
+@keyframes notes {
+    0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.5) translate(50%, -50%);
+    }
+
+    80% {
+        opacity: 0;
+        transform: scale(1.5) translate(100%, -100%);
+    }
+
+    100% {
+        transform: scale(1.5) translate(100%, -100%);
+        opacity: 0;
+    }
+}
+
+
+/* ================================ Music Notes End ====================================== */
+
+
+@keyframes scroll {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-50%);
+    }
+}
+
+.animate-scroll {
+    flex-direction: column;
+    /* gap: 8px; */
+    animation: scroll linear infinite;
+    will-change: transform;
+}
+
+.reverse-row .animate-scroll {
+    animation-direction: reverse;
+}
+
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loader-spin {
+    animation: spin 1s linear infinite;
+}
+
+
+
+
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 90s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+  .animate-shimmer {
+    animation: none;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #eae3dc 0%, #faf7f5 50%, #eae3dc 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite ease-in-out;
+}

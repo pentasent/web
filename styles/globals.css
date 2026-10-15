@@ -1,0 +1,355 @@
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+
+  --color-chart-7: var(--chart-7);
+  --color-chart-6: var(--chart-6);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-border-2: var(--border-2);
+  --color-border-background: var(--border-background);
+
+  --color-destructive: var(--destructive);
+
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-primary-text: var(--primary-text)
+}
+
+/* =========================================================
+   LIGHT THEME
+   ========================================================= */
+
+:root {
+  /* ─────────────────────────────────────────
+     Base
+  ───────────────────────────────────────── */
+
+  --background: #f2eeeb;
+  --foreground: #2f0036;
+
+  /* ─────────────────────────────────────────
+     Surfaces
+  ───────────────────────────────────────── */
+
+  --card: #e1d8d1;
+  --card-foreground: #2f0036;
+
+  --popover: #f2eeeb;
+  --popover-foreground: #2f0036;
+
+  /* ─────────────────────────────────────────
+     Brand
+     Primary: #4a0139
+     Hover:   #3a082d
+  ───────────────────────────────────────── */
+
+  --primary: #4a0139;
+  --primary-hover: #3a082d;
+  --primary-foreground: #f2eeeb;
+
+  /* ─────────────────────────────────────────
+     Secondary
+  ───────────────────────────────────────── */
+
+  --secondary: #2f0036;
+  --secondary-foreground: #f2eeeb;
+
+  /* ─────────────────────────────────────────
+     Muted
+  ───────────────────────────────────────── */
+
+  --muted: #e1d8d1;
+  --muted-foreground: #6f6268;
+
+  /* ─────────────────────────────────────────
+     Accent
+  ───────────────────────────────────────── */
+
+  --accent: #cfc1b6;
+  --accent-foreground: #4a0139;
+
+  /* ─────────────────────────────────────────
+     States
+  ───────────────────────────────────────── */
+
+  --destructive: #b42318;
+
+  /* ─────────────────────────────────────────
+     Borders / Inputs / Focus
+  ───────────────────────────────────────── */
+
+  --border-2: #cfc1b6;
+  --border: #efefef;
+  --input: #cfc1b6;
+  --border-background: #f4efe9;
+
+  /* Burgundy focus ring */
+  --ring: #4a0139;
+
+  /* ─────────────────────────────────────────
+     Brand / Yellow palette
+  ───────────────────────────────────────── */
+
+  --chart-1: #4a0139;
+  --chart-2: #2f0036;
+  --chart-3: #ffad25;
+  --chart-4: #ffb533;
+  --chart-5: #ffb32d;
+  --chart-6: #ffc14c;
+  --chart-7: #ffb333;
+
+  /* ─────────────────────────────────────────
+     Radius
+  ───────────────────────────────────────── */
+
+  --radius: 0.625rem;
+
+  /* ─────────────────────────────────────────
+     Sidebar
+  ───────────────────────────────────────── */
+
+  --sidebar: #e1d8d1;
+  --sidebar-foreground: #2f0036;
+
+  --sidebar-primary: #4a0139;
+  --sidebar-primary-foreground: #f2eeeb;
+
+  --sidebar-accent: #cfc1b6;
+  --sidebar-accent-foreground: #4a0139;
+
+  --sidebar-border: #cfc1b6;
+  --sidebar-ring: #4a0139;
+
+  /* Text */
+  /* --primary-text: #6f6268; */
+  /* --primary-text: #2f0036; */
+  /* --primary-text: #5f5c5a; */
+  --primary-text: #4f4b49;
+  /* --primary-text: #585357; */
+}
+
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+.dark {
+  /* ─────────────────────────────────────────
+     Base
+  ───────────────────────────────────────── */
+
+  --background: #2f0036;
+  --foreground: #f2eeeb;
+
+  /* ─────────────────────────────────────────
+     Surfaces
+  ───────────────────────────────────────── */
+
+  --card: #3a082d;
+  --card-foreground: #f2eeeb;
+
+  --popover: #3a082d;
+  --popover-foreground: #f2eeeb;
+
+  /* ─────────────────────────────────────────
+     Brand
+  ───────────────────────────────────────── */
+
+  --primary: #4a0139;
+  --primary-hover: #3a082d;
+  --primary-foreground: #f2eeeb;
+
+  /* ─────────────────────────────────────────
+     Secondary
+  ───────────────────────────────────────── */
+
+  --secondary: #4a0139;
+  --secondary-foreground: #f2eeeb;
+
+  /* ─────────────────────────────────────────
+     Muted
+  ───────────────────────────────────────── */
+
+  --muted: #3a082d;
+  --muted-foreground: #cfc1b6;
+
+  /* ─────────────────────────────────────────
+     Accent
+  ───────────────────────────────────────── */
+
+  --accent: #4a0139;
+  --accent-foreground: #f2eeeb;
+
+  /* ─────────────────────────────────────────
+     States
+  ───────────────────────────────────────── */
+
+  --destructive: #ef4444;
+
+  /* ─────────────────────────────────────────
+     Borders / Inputs / Focus
+  ───────────────────────────────────────── */
+
+  --border: #5b3a50;
+  --input: #5b3a50;
+
+  --ring: #fcd167;
+
+  /* ─────────────────────────────────────────
+     Charts
+  ───────────────────────────────────────── */
+
+  --chart-1: #f5945c;
+  --chart-2: #fcd167;
+  --chart-3: #fec76f;
+  --chart-4: #4a0139;
+  --chart-5: #cfc1b6;
+
+  /* ─────────────────────────────────────────
+     Sidebar
+  ───────────────────────────────────────── */
+
+  --sidebar: #3a082d;
+  --sidebar-foreground: #f2eeeb;
+
+  --sidebar-primary: #4a0139;
+  --sidebar-primary-foreground: #f2eeeb;
+
+  --sidebar-accent: #4a0139;
+  --sidebar-accent-foreground: #f2eeeb;
+
+  --sidebar-border: #5b3a50;
+  --sidebar-ring: #fcd167;
+
+  --primary-text: #6f6268;
+  /* --primary-text: #2f0036 */
+}
+
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+}
+
+
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* =========================================================
+   INFINITE MARQUEE ANIMATIONS (100% SEAMLESS HARDWARE ACCELERATED)
+   ========================================================= */
+
+@keyframes marqueeLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes marqueeRight {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  animation: marqueeLeft 92s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-right {
+  animation: marqueeRight 96s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left,
+  .animate-marquee-right {
+    animation-play-state: paused;
+  }
+}
+

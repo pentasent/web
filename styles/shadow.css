@@ -1,0 +1,38 @@
+/* Shadows */
+
+/* Shadow classess */
+.light-shadow {
+    box-shadow: 0 0 #0000,
+        0 0 #0000, 0 0 #0000,
+        0 0 #0000, 0 4px 6px -1px hsl(214 32% 91%),
+        0 2px 4px -2px hsl(214 32% 91%);
+}
+
+
+.backgropEffect {
+    backdrop-filter: blur(7px);
+    background-color: rgba(232, 232, 237, 0.7);
+    box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.11);
+}
+
+.audioBackdropEffect {
+    backdrop-filter: blur(7px);
+    background-color: rgba(27, 27, 27, 0.7);
+    box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.11);
+}
+
+.bgshadow {
+    box-shadow: 0 2px 12px rgba(53, 71, 90, .2),
+        0 0 0 1px rgba(68, 92, 116, .02);
+}
+
+.shadow-neutral-light {
+    box-shadow: 0 0 #0000,
+        0 0 #0000, 0 0 #0000,
+        0 0 #0000, 0 4px 6px -1px hsl(214 32% 91%),
+        0 2px 4px -2px hsl(214 32% 91%);
+}
+
+.navShadow {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}

@@ -1,0 +1,112 @@
+'use client';
+
+import { LEADERSHIP_TEAM } from '@/data/about';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
+
+
+export default function LeadershipSection() {
+  return (
+    <section aria-label="Leadership" className="min-h-0 px-4 py-12 text-[#090909] sm:px-6 sm:py-16 lg:px-8 xl:px-12 lg:py-20 w-full overflow-hidden">
+      <div className="mx-auto max-w-7xl">
+
+        {/* Section Header */}
+        <div className="text-center sm:text-left">
+          <p className="text-[12px] sm:text-[13px] font-bold uppercase tracking-[0.2em] text-[#6b185f] mb-2 sm:mb-3">
+            Leadership
+          </p>
+          <motion.h2
+            className="text-[30px] xs:text-[36px] sm:text-[42px] lg:text-[44px] font-semibold leading-[1.08] sm:leading-[1.02] tracking-[-0.03em] text-foreground"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{
+              duration: 0.65,
+              ease: 'easeOut',
+            }}
+          >
+            Meet our <span className="text-border-2">leadership team</span>
+          </motion.h2>
+
+          <p className="mt-3.5 sm:mt-4 text-[15px] sm:text-[16px] lg:text-[17px] leading-[1.7] text-primary-text max-w-2xl">
+            Pentasent leaders and advisors bring deep experience across healthcare technology,
+            clinical research, biomedical systems, and high-impact digital platforms.
+          </p>
+        </div>
+
+        {/* Cards Grid (Identical design & shadow to NewHighlights cards) */}
+        <div className="mt-8 sm:mt-12 lg:mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+          {LEADERSHIP_TEAM.map((member, index) => (
+            <motion.article
+              key={`${member.id}-${index}`}
+              className="group flex flex-col overflow-hidden rounded-[12px] bg-background hover:bg-accent/40 shadow-[0_1px_0_rgba(0,0,0,0.02)] border-4 border-background hover:border-accent/5 hover:transition-colors"
+              initial={{
+                opacity: 0,
+                y: 24,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{
+                delay: index * 0.1 + 0.1,
+                duration: 0.6,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              {/* Photo Area with Deep Burgundy Background (as in reference image) & Subtle Hover Scale */}
+              <div className="relative h-60 shrink-0 overflow-hidden bg-[linear-gradient(145deg,#450036_0%,#38002c_60%,#2d0023_100%)]">
+                {/* Subtle Radial Glow */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(168,0,137,0.18),transparent_65%)]" />
+
+                <motion.div
+                  className="relative h-full w-full flex items-end justify-center"
+                  initial={false}
+                  whileHover={{
+                    scale: 1.015,
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-contain object-bottom select-none"
+                    priority={index === 0}
+                  />
+                </motion.div>
+              </div>
+
+              {/* Content Area */}
+              <div className="flex flex-1 flex-col px-5 py-6 xs:px-6 xs:py-7 sm:px-8 sm:py-8 lg:px-9 lg:pb-9 lg:pt-9">
+                <h3 className="text-[20px] xs:text-[22px] sm:text-[24px] lg:text-[26px] font-semibold leading-[1.2] tracking-[-0.03em] text-foreground">
+                  {member.name}
+                </h3>
+
+                <p className="mt-2.5 sm:mt-3 text-[14.5px] sm:text-[15.5px] leading-normal text-primary-text">
+                  {member.role}
+                </p>
+
+                <Link
+                  href={member.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 sm:mt-auto inline-flex w-fit items-center gap-2 border-b-[3px] border-[#d59a00] pb-1 pt-4 sm:pt-6 text-[15px] sm:text-[16px] font-semibold leading-none transition-colors hover:border-primary hover:text-primary cursor-pointer"
+                >
+                  LinkedIn
+                </Link>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+
+      </div>
+    </section>
+  );
+}
