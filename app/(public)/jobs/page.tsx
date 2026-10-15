@@ -742,8 +742,9 @@ function JobsFallback() {
 
 export default function GlobalJobsPage() {
   return (
-    <Suspense fallback={<JobsFallback />}>
-      <JobsContent />
-    </Suspense>
+    // <Suspense fallback={<JobsFallback />}>
+    //   <JobsContent />
+    // </Suspense>
+    <JobsContent />
   );
 }

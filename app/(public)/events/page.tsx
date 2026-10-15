@@ -199,10 +199,10 @@ function EventsContent() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 1.05, filter: 'blur(16px)' }}
+          initial={{ opacity: 0, scale: 1.055, filter: 'blur(18px)' }}
           animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto flex w-full max-w-5xl flex-col items-center px-4 xs:px-6 text-center relative z-10"
+          transition={{ delay: 0.12, duration: 1.75, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto flex w-full max-w-5xl flex-col items-center px-4 xs:px-6 text-center"
         >
           <div className="mb-3 text-[13px] xs:text-[14px] sm:text-[15px] font-medium tracking-[0.06em] text-white/80">
             <span>Clinical Symposia &amp; Academic Gathering</span>
@@ -646,8 +646,9 @@ function EventsFallback() {
 
 export default function EventsPage() {
   return (
-    <Suspense fallback={<EventsFallback />}>
-      <EventsContent />
-    </Suspense>
+    <EventsContent />
+    // <Suspense fallback={<EventsFallback />}>
+    //   <EventsContent />
+    // </Suspense>
   );
 }

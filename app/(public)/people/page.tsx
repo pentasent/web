@@ -640,8 +640,9 @@ function PeopleFallback() {
 
 export default function PeoplePage() {
   return (
-    <Suspense fallback={<PeopleFallback />}>
-      <PeopleContent />
-    </Suspense>
+    // <Suspense fallback={<PeopleFallback />}>
+    //   <PeopleContent />
+    // </Suspense>
+    <PeopleContent />
   );
 }
