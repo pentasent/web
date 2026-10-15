@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: 'Pricing & Plans',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/pricing',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://pentasent.com/banners/home.png",
+        url: "https://pentasent.com/assets/images/banners/home.png",
         width: 1200,
         height: 630,
         alt: "Pentasent Pricing"

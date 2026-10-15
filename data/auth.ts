@@ -110,7 +110,7 @@ export const AUTH_LAYOUT_CONFIG: AuthLayoutConfig = {
   footerLinks: [
     { label: 'Terms of Service', href: '/legal/terms' },
     { label: 'Privacy Policy', href: '/legal/privacy' },
-    // { label: 'Security & Compliance', href: '/legal/security' },
+    // { label: 'Phishing Scam Warning', href: '/company/careers/phishing-scam' },
   ],
 };
 

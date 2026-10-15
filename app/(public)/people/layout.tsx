@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Leaders | Pentasent',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'Pentasent',
     images: [
       {
-        url: 'https://pentasent.com/banners/people.png',
+        url: 'https://pentasent.com/assets/images/banners/people.png',
         width: 1200,
         height: 630,
         alt: 'Pentasent Healthcare People & Leaders',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Leaders, Clinicians & Medical Innovators | Pentasent',
     description:
       'Connect with distinguished physicians, medical specialists, clinical researchers, and healthcare pioneers leading care transformation on Pentasent.',
-    images: ['https://pentasent.com/banners/people.png'],
+    images: ['https://pentasent.com/assets/images/banners/people.png'],
   },
 };
 

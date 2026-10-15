@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     title: 'Coming Soon | Pentasent',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/coming-soon',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     title: 'Stay Tuned | Pentasent Coming Soon',
     description:
       'We are actively preparing new features and tools for the Pentasent healthcare ecosystem. Stay tuned for upcoming releases.',
-    url: 'https://pentasent.com/coming-soon',
+    url: 'https://pentasent.com/assets/images/banners/coming-soon',
     type: 'website',
   },
 };

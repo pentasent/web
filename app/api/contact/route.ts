@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { contactFormSchema } from '@/lib/validations/contact';
 
-const API_BASE_URL = process.env.API_URL || 'http://localhost:5000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pentasent.com/api/v1';
 
 export async function POST(req: Request) {
   try {

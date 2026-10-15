@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: 'Careers - Open Roles',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://pentasent.com/social/open_roles_banner.png", // Use an absolute URL
+        url: "https://pentasent.com/assets/images/banners/open_roles_banner.png", // Use an absolute URL
         width: 1200,
         height: 630,
         alt: "Pentasent Careers - Open Roles"

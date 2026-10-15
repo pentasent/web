@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: 'Investor Relations',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/company/',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: "https://pentasent.com/banners/investors.png",
+        url: "https://pentasent.com/assets/images/banners/investors.png",
         width: 1200,
         height: 630,
         alt: "Pentasent Investor Relations"
@@ -67,7 +67,7 @@ export default function InvestorsLayout({
   return (
     <Suspense fallback={null}>
       <InvestorNavProvider>
-        <div className="min-h-screen bg-white text-foreground flex flex-col font-sans selection:bg-primary/10 selection:text-primary">
+        <div className="min-h-screen bg-white text-foreground flex flex-col font-sans">
           <InvestorNavbar />
           <div className="flex-1">{children}</div>
           <InvestorFooter />

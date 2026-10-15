@@ -79,28 +79,25 @@ export default function InvestorNavbar() {
               onClick={toggleTabs}
               aria-expanded={isTabsOpen}
               aria-label="Toggle More Investors Menu"
-              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[13px] sm:text-[13.5px] font-semibold tracking-wide transition-all cursor-pointer select-none ${
-                isTabsOpen
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[13px] sm:text-[13.5px] font-semibold tracking-wide transition-all cursor-pointer select-none ${isTabsOpen
                   ? 'bg-primary text-white shadow-2xs'
                   : 'bg-[#faf9f8] text-foreground border border-[#ded9d5] hover:border-primary hover:text-primary hover:bg-white'
-              }`}
+                }`}
             >
               <span>Investors</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-300 ${
-                  isTabsOpen ? 'rotate-180 text-white' : 'text-primary'
-                }`}
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${isTabsOpen ? 'rotate-180 text-white' : 'text-primary'
+                  }`}
               />
             </button>
 
             {/* Pitch Deck Quick Link - Hidden on small screen (< sm), visible on sm and above */}
             <Link
               href="/company/investors/Pentasent_Investor_Pitch_Deck_PreSeed_2026"
-              className={`hidden sm:inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-md text-[13px] sm:text-[13.5px] font-semibold tracking-wide transition-all ${
-                isDeckPage
+              className={`hidden sm:inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-md text-[13px] sm:text-[13.5px] font-semibold tracking-wide transition-all ${isDeckPage
                   ? 'bg-primary text-white shadow-xs'
                   : 'bg-border-2/30 text-primary hover:bg-primary hover:text-white'
-              }`}
+                }`}
             >
               <FileText className="w-3.5 h-3.5" />
               <span>Pitch Deck</span>
@@ -111,7 +108,7 @@ export default function InvestorNavbar() {
 
             {/* Contact Action */}
             <a
-              href="mailto:investors@pentasent.com?subject=Investor%20Relations%20Inquiry"
+              href="mailto:hello@pentasent.com?subject=Investor%20Relations%20Inquiry"
               className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md border border-[#ded9d5] text-[13px] sm:text-[13.5px] font-medium text-foreground hover:border-primary hover:text-primary hover:bg-[#faf9f8] transition-colors"
             >
               <Mail className="w-3.5 h-3.5 text-muted-foreground" />
@@ -127,9 +124,8 @@ export default function InvestorNavbar() {
           Smooth slide-down / slide-up animation for tabs
          ────────────────────────────────────────────────────────── */}
       <div
-        className={`w-full border-t border-[#ded9d5] bg-white transition-all duration-300 ease-in-out overflow-hidden ${
-          isTabsOpen ? 'max-h-24 opacity-100 py-2.5 shadow-2xs' : 'max-h-0 opacity-0 py-0 border-t-0'
-        }`}
+        className={`w-full border-t border-[#ded9d5] bg-white transition-all duration-300 ease-in-out overflow-hidden ${isTabsOpen ? 'max-h-24 opacity-100 py-2.5 shadow-2xs' : 'max-h-0 opacity-0 py-0 border-t-0'
+          }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <nav
@@ -145,21 +141,19 @@ export default function InvestorNavbar() {
                   key={tab.id}
                   type="button"
                   onClick={() => handleTabClick(tab.id)}
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md text-[13px] sm:text-[14px] font-semibold whitespace-nowrap transition-all cursor-pointer select-none ${
-                    isActive
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md text-[13px] sm:text-[14px] font-semibold whitespace-nowrap transition-all cursor-pointer select-none ${isActive
                       ? 'bg-primary text-white shadow-2xs'
                       : 'text-muted-foreground hover:text-foreground hover:bg-[#faf9f8]'
-                  }`}
+                    }`}
                 >
                   <Icon size={15} className={isActive ? 'text-white' : 'text-primary/70'} />
                   <span>{tab.label}</span>
                   {tab.badge && (
                     <span
-                      className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                        isActive
+                      className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold ${isActive
                           ? 'bg-chart-3 text-secondary'
                           : 'bg-primary/10 text-primary border border-primary/20'
-                      }`}
+                        }`}
                     >
                       {tab.badge}
                     </span>
@@ -171,11 +165,10 @@ export default function InvestorNavbar() {
             {/* Direct Pitch Deck link in drawer on mobile */}
             <Link
               href="/company/investors/Pentasent_Investor_Pitch_Deck_PreSeed_2026"
-              className={`sm:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-semibold whitespace-nowrap transition-all ${
-                isDeckPage
+              className={`sm:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-semibold whitespace-nowrap transition-all ${isDeckPage
                   ? 'bg-primary text-white shadow-xs'
                   : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
-              }`}
+                }`}
             >
               <FileText size={14} />
               <span>Pitch Deck</span>

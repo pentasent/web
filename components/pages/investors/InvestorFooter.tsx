@@ -45,10 +45,10 @@ export default function InvestorFooter() {
             <div className="mt-5 flex items-center gap-2 text-[14px] sm:text-[15px] font-medium text-foreground">
               <Mail className="w-4 h-4 text-primary" />
               <a
-                href="mailto:investors@pentasent.com"
+                href="mailto:hello@pentasent.com"
                 className="text-primary hover:text-primary-hover hover:underline"
               >
-                investors@pentasent.com
+                hello@pentasent.com
               </a>
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function InvestorFooter() {
               </li>
               <li>
                 <a
-                  href="mailto:investors@pentasent.com?subject=Diligence%20Room%20Access"
+                  href="mailto:hello@pentasent.com?subject=Diligence%20Room%20Access"
                   className="text-[14.5px] sm:text-[15px] text-muted-foreground hover:text-primary transition-colors font-medium"
                 >
                   Diligence Room

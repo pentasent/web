@@ -138,7 +138,7 @@ export default function InvestorsPage() {
               <div className="lg:col-span-5 flex justify-center lg:justify-end">
                 <div className="relative w-full max-w-sm lg:max-w-none">
                   <div className="relative aspect-4/3 w-full overflow-hidden">
-                  {/* <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl border border-[#ded9d5] bg-[#faf9f8] shadow-2xs"> */}
+                    {/* <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl border border-[#ded9d5] bg-[#faf9f8] shadow-2xs"> */}
                     <Image
                       src="/assets/images/investors/investor_blocks_hero.png"
                       alt="Pentasent Alphabet Blocks Minimal Design"
@@ -276,7 +276,7 @@ export default function InvestorsPage() {
                       </div>
                     </div>
                     <div className="text-left sm:text-right text-[13px] text-muted-foreground font-medium">
-                      <div>Gurugram (H.R.), India</div>
+                      <div>London (HQ), UK</div>
                       <div>October 2026</div>
                     </div>
                   </div>

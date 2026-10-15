@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Events | Pentasent',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'Pentasent',
     images: [
       {
-        url: 'https://pentasent.com/banners/events.png',
+        url: 'https://pentasent.com/assets/images/banners/events.png',
         width: 1200,
         height: 630,
         alt: 'Pentasent Healthcare Events',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Events, Medical Summits & Conferences | Pentasent',
     description:
       'Discover upcoming global medical conferences, healthcare leadership summits, clinical webinars, and healthtech networking events on Pentasent.',
-    images: ['https://pentasent.com/banners/events.png'],
+    images: ['https://pentasent.com/assets/images/banners/events.png'],
   },
 };
 

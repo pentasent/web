@@ -41,7 +41,7 @@ export default function AuthHeader() {
           {/* Right Navigation Actions */}
           <div className="flex items-center gap-2.5 sm:gap-4">
             {isLoginPage && (
-              <div className="flex items-center gap-1.5 sm:gap-2 text-[13px] sm:text-[14px]">
+              <div className="hidden sm:flex items-center gap-1.5 sm:gap-2 text-[13px] sm:text-[14px]">
                 <span className="text-muted-foreground hidden sm:inline">{AUTH_HEADER_COPY.loginPrompt}</span>
                 <Link
                   href={AUTH_HEADER_COPY.registerHref}
@@ -54,7 +54,7 @@ export default function AuthHeader() {
             )}
 
             {isRegisterPage && (
-              <div className="flex items-center gap-1.5 sm:gap-2 text-[13px] sm:text-[14px]">
+              <div className="hidden sm:flex items-center gap-1.5 sm:gap-2 text-[13px] sm:text-[14px]">
                 <span className="text-muted-foreground hidden sm:inline">{AUTH_HEADER_COPY.registerPrompt}</span>
                 <Link
                   href={AUTH_HEADER_COPY.loginHref}

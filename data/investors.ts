@@ -276,7 +276,7 @@ export const INVESTOR_STATUS_DATA = {
     'Pro-rata rights and participation in subsequent institutional rounds',
     'Strict focus on sustainable unit economics rather than vanity metrics',
   ],
-  contactEmail: 'investors@pentasent.com',
+  contactEmail: 'hello@pentasent.com',
 };
 
 export const GOVERNANCE_DATA = {
@@ -344,7 +344,7 @@ export const ANNUAL_MEETING_DATA = {
   materials: [
     { name: 'Pentasent Pre-Seed Investor Pitch Deck (PDF)', path: '/assets/records/funding/Pentasent_Investor_Pitch_Deck_PreSeed_2026.pdf', format: 'PDF (489 KB)' },
     { name: 'Pentasent Pre-Seed Investor Pitch Deck (PPTX)', path: '/assets/records/funding/Pentasent_Investor_Pitch_Deck_PreSeed_2026.pptx', format: 'PowerPoint (96 KB)' },
-    { name: 'Company Certificate & Incorporation Records', path: 'mailto:investors@pentasent.com?subject=Due%20Diligence%20Request', format: 'Available in Diligence Room' },
+    { name: 'Company Certificate & Incorporation Records', path: 'mailto:hello@pentasent.com?subject=Due%20Diligence%20Request', format: 'Available in Diligence Room' },
   ],
 };
 

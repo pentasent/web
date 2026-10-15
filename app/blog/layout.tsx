@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: 'Pentasent Blog',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/blog/',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://pentasent.com/banners/blog.png", // Use an absolute URL
+        url: "https://pentasent.com/assets/images/banners/blog.png", // Use an absolute URL
         width: 1200,
         height: 630,
         alt: "Pentasent Blog"

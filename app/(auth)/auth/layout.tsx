@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-white text-foreground flex flex-col font-sans selection:bg-primary/10 selection:text-primary">
+    <div className="min-h-screen bg-white text-foreground flex flex-col font-sans">
       {/* Sleek top navigation header matching InvestorNavbar */}
       <AuthHeader />
 

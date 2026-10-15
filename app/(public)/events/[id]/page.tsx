@@ -8,7 +8,7 @@ interface EventDetailPageProps {
 
 async function getEvent(idOrSlug: string) {
   try {
-    const apiUrl = process.env.API_URL || 'http://localhost:5000/api/v1';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.pentasent.com/api/v1';
     const res = await fetch(`${apiUrl}/events/${idOrSlug}`, {
       cache: 'no-store',
     });

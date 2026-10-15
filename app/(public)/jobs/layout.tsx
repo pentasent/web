@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Jobs | Pentasent',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     siteName: 'Pentasent',
     images: [
       {
-        url: 'https://pentasent.com/banners/jobs.png',
+        url: 'https://pentasent.com/assets/images/banners/jobs.png',
         width: 1200,
         height: 630,
         alt: 'Pentasent Healthcare Jobs',
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Jobs, Clinical Roles & HealthTech Careers | Pentasent',
     description:
       'Explore verified healthcare job openings, clinical roles, hospital leadership positions, and medical technology careers across leading health institutions.',
-    images: ['https://pentasent.com/banners/jobs.png'],
+    images: ['https://pentasent.com/assets/images/banners/jobs.png'],
   },
 };
 

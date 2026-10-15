@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     title: 'Research',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://pentasent.com/social/research_banner.png", // Use an absolute URL
+        url: "https://pentasent.com/assets/images/banners/research_banner.png", // Use an absolute URL
         width: 1200,
         height: 630,
         alt: "Pentasent Research"

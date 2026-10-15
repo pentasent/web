@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Organizations | Pentasent',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'Pentasent',
     images: [
       {
-        url: 'https://pentasent.com/banners/organizations.png',
+        url: 'https://pentasent.com/assets/images/banners/organizations.png',
         width: 1200,
         height: 630,
         alt: 'Pentasent Healthcare Organizations',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Organizations, Hospitals & Clinical Directory | Pentasent',
     description:
       'Browse accredited hospitals, specialized clinics, medical institutions, and healthtech enterprises shaping modern patient care on Pentasent.',
-    images: ['https://pentasent.com/banners/organizations.png'],
+    images: ['https://pentasent.com/assets/images/banners/organizations.png'],
   },
 };
 

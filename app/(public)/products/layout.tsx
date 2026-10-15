@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Products | Pentasent',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'Pentasent',
     images: [
       {
-        url: 'https://pentasent.com/banners/products.png',
+        url: 'https://pentasent.com/assets/images/banners/products.png',
         width: 1200,
         height: 630,
         alt: 'Pentasent Healthcare Products & Solutions',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Products, Medical Devices & HealthTech Solutions | Pentasent',
     description:
       'Discover curated medical devices, clinical software, digital health solutions, and diagnostics trusted by healthcare providers on Pentasent.',
-    images: ['https://pentasent.com/banners/products.png'],
+    images: ['https://pentasent.com/assets/images/banners/products.png'],
   },
 };
 

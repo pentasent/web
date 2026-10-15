@@ -15,7 +15,7 @@ export async function generateStaticParams() {
 
 async function getJob(slug: string): Promise<JobOpening | null> {
   try {
-    const apiUrl = process.env.API_URL || 'http://localhost:5000/api/v1';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.pentasent.com/api/v1';
     const res = await fetch(`${apiUrl}/jobs/slug/${slug}`, {
       next: { revalidate: 60 },
     });

@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     title: 'Pentasent',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     siteName: 'Pentasent',
     images: [
       {
-        url: 'https://pentasent.com/banners/home.png',
+        url: 'https://pentasent.com/assets/images/banners/home.png',
         width: 1200,
         height: 630,
         alt: 'Pentasent — Healthcare, Wellness and Wellbeing Communities',
@@ -75,7 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={cn("h-full", "antialiased", `${GoogleFonts.red_hat_text.className}`)}
     >
-      <body className="min-h-full w-full overflow-x-hidden antialiased bg-white text-foreground">
+      <body className="min-h-full w-full overflow-x-hidden antialiased bg-white text-foreground selection:bg-[#ffb533]/80 selection:text-white">
         <AuthProvider>
           {children}
         </AuthProvider>

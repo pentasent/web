@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Research | Pentasent',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'Pentasent',
     images: [
       {
-        url: 'https://pentasent.com/banners/home.png',
+        url: 'https://pentasent.com/assets/images/banners/home.png',
         width: 1200,
         height: 630,
         alt: 'Pentasent Healthcare Research',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Research, Clinical Trials & Scientific Papers | Pentasent',
     description:
       'Explore biomedical discoveries, clinical trial registries, open-science publications, and evidence-based medical research on Pentasent.',
-    images: ['https://pentasent.com/banners/home.png'],
+    images: ['https://pentasent.com/assets/images/banners/home.png'],
   },
 };
 

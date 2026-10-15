@@ -10,7 +10,7 @@ import React from 'react';
 export default function ProfileShimmer() {
   return (
     <div
-      className="mx-auto max-w-7xl px-4 sm:px-8 md:px-10 lg:px-12 py-10 sm:py-12"
+      className="mx-auto max-w-7xl px-4 sm:px-8 md:px-10 lg:px-12 py-10 sm:py-12 mt-12 sm:mt-18"
       aria-busy="true"
       aria-label="Loading profile data"
     >

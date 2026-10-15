@@ -2,7 +2,7 @@ import React from 'react';
 
 export function HealthOverviewShimmer() {
   return (
-    <div className="space-y-8" aria-busy="true" aria-label="Loading health overview">
+    <div className="space-y-8 mt-12 sm:mt-18" aria-busy="true" aria-label="Loading health overview">
       {/* Baseline Bar skeleton */}
       <div className="bg-white border border-[#e8e2dc] rounded-lg p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-6">

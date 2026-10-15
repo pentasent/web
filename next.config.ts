@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  allowedDevOrigins: ["10.78.75.97"],
+  allowedDevOrigins: ["10.78.75.97","https://api.pentasent.com"],
   images: {
     remotePatterns: [
       {

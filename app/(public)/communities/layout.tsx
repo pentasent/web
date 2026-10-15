@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Communities | Pentasent',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/color_icon.png',
   },
   alternates: {
     canonical: '/',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'Pentasent',
     images: [
       {
-        url: 'https://pentasent.com/banners/community.png',
+        url: 'https://pentasent.com/assets/images/banners/community.png',
         width: 1200,
         height: 630,
         alt: 'Pentasent Healthcare Communities',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Healthcare Communities & Medical Circles | Pentasent',
     description:
       'Connect with clinicians, medical researchers, healthcare innovators, and patient care circles across specialized clinical disciplines on Pentasent.',
-    images: ['https://pentasent.com/banners/community.png'],
+    images: ['https://pentasent.com/assets/images/banners/community.png'],
   },
 };
 

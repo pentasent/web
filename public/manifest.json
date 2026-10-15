@@ -2,7 +2,7 @@
     "id": "Pentasent_App_Id",
     "name": "Pentasent",
     "short_name": "Pentasent",
-    "theme_color": "#ffffff",
+    "theme_color": "#4a0139",
     "background_color": "#ffffff",
     "start_url": "/",
     "scope": ".",
