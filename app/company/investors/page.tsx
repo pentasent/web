@@ -53,16 +53,16 @@ export default function InvestorsPage() {
               {/* Left Column: Vision & Founder Excerpt */}
               <div className="lg:col-span-7 flex flex-col items-start">
                 {/* Pre-Seed Indicator Badge */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[12px] sm:text-[12.5px] font-semibold tracking-wide mb-5">
+                {/* <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[12px] sm:text-[12.5px] font-semibold tracking-wide mb-5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Pre-Seed Round Open (€750k Target)</span>
-                </div>
+                </div> */}
 
                 {/* Emblem & Headline */}
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl bg-[#faf9f8] p-2.5 flex items-center justify-center border border-[#ded9d5] shadow-2xs shrink-0">
+                <div className="flex flex-col items-start gap-4 mb-4">
+                  <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-lg bg-border-2 p-2.5 flex items-center justify-center border-2 border-border-2 shadow-2xl shrink-0">
                     <Image
-                      src="/assets/images/logos/penta-icon-gradient.svg"
+                      src="/assets/images/logos/icon.png"
                       alt="Pentasent"
                       width={52}
                       height={52}
@@ -70,7 +70,7 @@ export default function InvestorsPage() {
                       priority
                     />
                   </div>
-                  <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-bold tracking-tight text-foreground leading-[1.15]">
+                  <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-bold tracking-tight text-border-2 leading-[1.15]">
                     {FOUNDERS_LETTER_DATA.headline}
                   </h1>
                 </div>
@@ -114,7 +114,7 @@ export default function InvestorsPage() {
                 </div>
 
                 {/* Quick Action Buttons */}
-                <div className="mt-8 flex flex-wrap items-center gap-3">
+                {/* <div className="mt-8 flex flex-wrap items-center gap-3">
                   <Link
                     href="/company/investors/Pentasent_Investor_Pitch_Deck_PreSeed_2026"
                     className="h-11 sm:h-12 px-5 rounded-md bg-primary text-white text-[14px] sm:text-[14.5px] font-semibold hover:bg-primary-hover transition-all shadow-2xs inline-flex items-center gap-2"
@@ -131,7 +131,7 @@ export default function InvestorsPage() {
                     <span>Explore Thesis</span>
                     <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </button>
-                </div>
+                </div> */}
               </div>
 
               {/* Right Column: Minimalist Alphabet Wooden Blocks */}

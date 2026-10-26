@@ -42,7 +42,7 @@ export default function InvestorFooter() {
             <p className="mt-3 text-[15px] sm:text-[16px] leading-[1.65] text-muted-foreground max-w-md">
               Building the operating layer for connected healthcare. Uniting people, providers, organizations, evidence tools, research, and communities into one healthcare graph.
             </p>
-            <div className="mt-5 flex items-center gap-2 text-[14px] sm:text-[15px] font-medium text-foreground">
+            {/* <div className="mt-5 flex items-center gap-2 text-[14px] sm:text-[15px] font-medium text-foreground">
               <Mail className="w-4 h-4 text-primary" />
               <a
                 href="mailto:hello@pentasent.com"
@@ -50,7 +50,12 @@ export default function InvestorFooter() {
               >
                 hello@pentasent.com
               </a>
-            </div>
+            </div> */}
+                {/* Pre-Seed Indicator Badge */}
+                <div className="inline-flex items-center mt-6 gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[12px] sm:text-[12.5px] font-semibold tracking-wide mb-5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Pre-Seed Round Open (€750k Target)</span>
+                </div>
           </div>
 
           {/* Column 2: Investment & Financing */}

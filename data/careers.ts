@@ -345,7 +345,7 @@ export const MEET_THE_TEAM_DATA: TeamSliderData = {
         'Meet Saurabh Yadav, leading Sales & Business Development, connecting hospitals and healthcare enterprises to the Pentasent platform',
       description:
         'Working at the intersection of healthcare operations and modern software, Saurabh expands Pentasent\'s institutional footprint, building lasting relationships with clinics, hospitals, and healthcare diagnostic networks.',
-      image: '/assets/images/team/ankit.png',
+      image: '/assets/images/team/saurabh.png',
       storyLinkText: "Read Saurabh's story",
       storyLinkHref: '/blog',
     },
@@ -357,7 +357,7 @@ export const MEET_THE_TEAM_DATA: TeamSliderData = {
         'Meet Khushbu, leading Marketing & Growth, amplifying patient stories, wellness communities, and impactful health awareness campaigns',
       description:
         'From community challenges and guided yoga adoption to interactive health events, Khushbu connects everyday individuals with supportive wellness ecosystems that transform their daily health habits.',
-      image: '/assets/images/team/ankit-color.png',
+      image: '/assets/images/team/khushbu.png',
       storyLinkText: "Read Khushbu's story",
       storyLinkHref: '/blog',
     },
@@ -369,7 +369,7 @@ export const MEET_THE_TEAM_DATA: TeamSliderData = {
         'Meet Nikhil Yadav, leading Engineering & Development, crafting performant mobile experiences and secure web interfaces for millions',
       description:
         'Nikhil focuses on front-end speed, offline-first reliability, and seamless UX across the Pentasent Android application and web suite, ensuring that accessing vital health tools is fast and effortless.',
-      image: '/assets/images/team/akesh.png',
+      image: '/assets/images/team/nikhil.png',
       storyLinkText: "Read Nikhil's story",
       storyLinkHref: '/blog',
     },

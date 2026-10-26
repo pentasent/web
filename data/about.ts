@@ -210,7 +210,7 @@ export const MORE_ABOUT_PENTASENT: MoreAboutCard[] = [
     title: 'Leadership, Board & Investments',
     description: "Discover more about Pentasent's leadership, Board of Directors, and strategic healthcare investment partners guiding our long-term vision, governance, and management.",
     linkText: 'Explore leadership & management',
-    linkHref: '/company/board',
+    linkHref: '/company/investors',
     image: '/assets/images/pages/about/investment_board.png',
   },
 ];
