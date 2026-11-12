@@ -75,6 +75,23 @@ export default function HelpPage() {
             <ArrowRight size={15} />
           </Link>
         </div>
+
+        {/* Account & Data Management Links */}
+        <div className="mt-5 rounded-2xl border border-[#ebe4dc] bg-white p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h4 className="text-base font-bold text-[#1c171a]">Account & Data Deletion Guide</h4>
+            <p className="text-sm text-[#665e64] mt-0.5">
+              Review our data erasure timelines, manage shared products or communities, and submit a verified deletion request.
+            </p>
+          </div>
+          <Link
+            href="/help/delete-account"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-200 bg-red-50/70 text-[#b42318] text-sm font-semibold hover:bg-red-100/70 transition-colors shrink-0 cursor-pointer"
+          >
+            <span>Delete Account Guide</span>
+            <ArrowRight size={15} />
+          </Link>
+        </div>
       </div>
     </main>
   );

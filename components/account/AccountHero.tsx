@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Sparkles, LogOut, Trash2, X, AlertTriangle, ShieldCheck } from 'lucide-react';
@@ -174,13 +175,13 @@ export default function AccountHero({
                 >
                   Close
                 </button>
-                <button
-                  type="button"
-                  disabled
-                  className="px-4 py-2 text-[13px] font-semibold rounded-lg bg-red-50 text-red-600 border border-red-200 opacity-60 cursor-not-allowed"
+                <Link
+                  href="/help/delete-account"
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="px-4 py-2 text-[13px] font-semibold rounded-lg bg-[#b42318] text-white hover:bg-[#991b1b] transition-colors cursor-pointer"
                 >
-                  Delete Account (Pending Release)
-                </button>
+                  Request Account Deletion
+                </Link>
               </div>
             </motion.div>
           </div>
